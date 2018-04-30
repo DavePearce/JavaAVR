@@ -2,8 +2,8 @@ package javaavr.core;
 
 import javaavr.util.ByteMemory;
 import javaavr.util.MultiplexedMemory;
-import javaavr.util.TinyInstructionDecoder;
-import javaavr.util.TinyInstructionExecutor;
+import javaavr.util.TinyDecoder;
+import javaavr.util.TinyExecutor;
 
 public class MicroController {
 	private final Instruction.Decoder decoder;
@@ -31,6 +31,6 @@ public class MicroController {
 		Memory SRAM = new ByteMemory(512);
 		Memory flash = new ByteMemory(8192);
 		Memory data = new MultiplexedMemory(regs,io,SRAM);
-		return new MicroController(new TinyInstructionDecoder(), new TinyInstructionExecutor(), flash, data);
+		return new MicroController(new TinyDecoder(), new TinyExecutor(), flash, data);
 	}
 }
