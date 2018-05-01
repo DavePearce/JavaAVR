@@ -5,6 +5,8 @@ public interface Memory {
 
 	public void write(int address, byte data);
 
+	public void write(int address, byte[] data);
+
 	/**
 	 * Get size of this memory in bytes.
 	 *

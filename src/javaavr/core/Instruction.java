@@ -155,6 +155,21 @@ public class Instruction {
 		return operands[ith];
 	}
 
+	@Override
+	public String toString() {
+		String r = opcode.toString();
+		if(operands.length > 0) {
+			r = r + " ";
+			for(int i=0;i!=operands.length;++i) {
+				if(i != 0) {
+					r += ", ";
+				}
+				r += operands[i];
+			}
+		}
+		return r;
+	}
+
 	public interface Decoder {
 		Instruction decode(Memory programSpace, int PC);
 	}

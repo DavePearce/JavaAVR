@@ -35,6 +35,13 @@ public class MultiplexedMemory implements Memory {
 	}
 
 	@Override
+	public void write(int address, byte[] data) {
+		for(int i=0,j=address;i!=data.length;++i,++j) {
+			write(j,data[i]);
+		}
+	}
+
+	@Override
 	public int size() {
 		int size = 0;
 		for (int i = 0; i != memories.length; ++i) {

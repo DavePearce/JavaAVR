@@ -113,16 +113,18 @@ public class DecoderGenerator {
 		return "0b" + bs;
 	}
 
-	private static void generateDecoder(Set<Instruction.Opcode> opcodes, int root, int width) {
+	private static int GLOBAL_INDEX = 0;
+
+	private static void generateDecoder(Set<Instruction.Opcode> opcodes, int id, int width) {
 		if (width > 16) {
 			System.out.println("OPCODES: " + opcodes);
 			throw new IllegalArgumentException("Overlapping opcodes!");
 		} else {
-			String tag = Integer.toBinaryString(root >> (16 - width));
 			int mask = generateOpcodeMask(width);
 			Map<Integer, Set<Instruction.Opcode>> buckets = split(opcodes, width);
-			System.out.println("public Instruction decode_" + tag + "(int opcode) {");
+			System.out.println("public Instruction decode_" + id + "(int opcode) {");
 			System.out.println("    switch(opcode) {");
+			int index = 0;
 			for (Map.Entry<Integer, Set<Instruction.Opcode>> e : buckets.entrySet()) {
 				int opcode = e.getKey() & mask;
 				Set<Instruction.Opcode> values = e.getValue();
@@ -132,19 +134,23 @@ public class DecoderGenerator {
 					System.out.println("\tcase " + toBinaryString(opcode) + ":");
 					System.out.println("\t\treturn new Instruction(" + o.toString() + ");");
 				} else if (values.size() > 1) {
+					int myid = GLOBAL_INDEX + index++;
 					System.out.println("\tcase " + toBinaryString(opcode) + ":");
-					tag = Integer.toBinaryString(opcode >> (16 - width));
-					System.out.println("\t\treturn decode_" + tag + "(opcode);");
+					System.out.println("\t\treturn decode_" + myid + "(opcode);");
 				}
 			}
+			System.out.println("\tdefault:");
+			System.out.println("\t\treturn null;");
 			System.out.println("    }");
 			System.out.println(" }");
+
 			// Now, print out any invoked methods
+			int tmp = GLOBAL_INDEX;
+			GLOBAL_INDEX += index;
 			for (Map.Entry<Integer, Set<Instruction.Opcode>> e : buckets.entrySet()) {
-				int opcode = e.getKey() & mask;
 				Set<Instruction.Opcode> values = e.getValue();
 				if (values.size() > 1) {
-					generateDecoder(values, opcode, width + 4);
+					generateDecoder(values, tmp++, width + 4);
 				}
 			}
 		}
