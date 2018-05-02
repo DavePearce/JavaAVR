@@ -80,7 +80,7 @@ public class Instruction {
 		LD_Z_DEC("1001_000d_dddd_0010"), // Load Indirect From data space to Register using Index Z
 		LD_Z_Q("10q0_qq0d_dddd_0qqq"), // Load Indirect From data space to Register using Index Z
 		LDI("1110_KKKK_dddd_KKKK"), // Load Immediate
-		LDS("1010_0kkkk_dddd_kkkk"), // Load Direct from data space
+		//LDS("1010_0kkk_dddd_kkkk"), // Load Direct from data space
 		//LDSW("1001_000d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Load Direct from data space
 		LPM("1001_0101_1100_1000"), // Load Program Memory
 		LPM_Z("1001_000d_dddd_0100"), // Load Program Memory
@@ -136,12 +136,12 @@ public class Instruction {
 		ST_Z_INC("1001_001r_rrrr_0001"), // Store Indirect From Register to data space using Index Z
 		ST_Z_DEC("1001_001r_rrrr_0010"), // Store Indirect From Register to data space using Index Z
 		ST_Z_Q("10q0_qq1r_rrrr_0qqq"), // Store Indirect From Register to data space using Index Z
-		STS_DATA("1010_1kkkk_dddd_kkkk"), // Store Direct to data space
+		//STS_DATA("1010_1kkk_dddd_kkkk"), // Store Direct to data space
 		//STS_DATA_WIDE("1001_001d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Store Direct to data space
 		SUB("0001_10rd_dddd_rrrr"), // Subtract without Carry
 		SUBI("0101_KKKK_dddd_KKKK"), // Subtract Immediate
 		SWAP("1001_010d_dddd_0010"), // Swap Nibbles
-		TST("0010_000dd_dddd_dddd"), // Test for Zero or Minus
+		TST("0010_00dd_dddd_dddd"), // Test for Zero or Minus
 		WDR("1001_0101_1010_1000"), // Watchdog Reset
 		XCH("1001_001r_rrrr_0100"); // Exchange
 
@@ -152,12 +152,18 @@ public class Instruction {
 
 		static {
 			subsumedBy.put(ROL,ADC);
+			subsumedBy.put(TST,AND);
+			subsumedBy.put(SBR,ORI);
 		}
 
 		private String fmt;
 
 		private Opcode(String fmt) {
+			if(fmt.length() != 19) {
+				throw new RuntimeException("Invalid format string: " + fmt);
+			}
 			this.fmt = fmt;
+
 		}
 
 		public String getFormat() {
