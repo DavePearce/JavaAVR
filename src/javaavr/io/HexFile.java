@@ -246,6 +246,9 @@ public class HexFile {
 		// Now, upload and try to decode
 		ByteMemory mem = new ByteMemory(512);
 		hf.uploadTo(mem);
+		for (int i = 0; i != mem.size(); ++i) {
+			System.out.println("VALUE: " + Integer.toHexString(mem.read(i)));
+		}
 		TinyDecoder decoder = new TinyDecoder();
 		for(int i=0;i!=mem.size();i=i+2) {
 			Instruction insn = decoder.decode(mem,i);

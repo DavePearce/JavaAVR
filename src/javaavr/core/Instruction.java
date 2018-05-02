@@ -15,38 +15,38 @@ public class Instruction {
 		BLD("1111_100d_dddd_0bbb"),   // Bit Load from the T Flag in SREG to a Bit in Register
 		BRBC("1111_01kk_kkkk_ksss"),  // Branch if Bit in SREG is Cleared
 		BRBS("1111_00kk_kkkk_ksss"),  // Branch if Bit in SREG is Set
-		//BRCC("1111_01kk_kkkk_k000"),  // Branch if Carry Cleared
-		//BRCS("1111_00kk_kkkk_k000"),  // Branch if Carry Set
+		BRCC("1111_01kk_kkkk_k000"),  // Branch if Carry Cleared
+		BRCS("1111_00kk_kkkk_k000"),  // Branch if Carry Set
 		BREAK("1001_0101_1001_1000"), // Break
-		BREQ("1001_00kk_kkkk_k001"),  // Branch if Equal
-		//BRGE("1111_01kk_kkkk_k100"),  // Branch if Greater or Equal Signed)
-		//BRHC("1111_01kk_kkkk_k101"),  // Branch if Half Carry Flag is Cleared
-		//BRHS("1111_00kk_kkkk_k101"),  // Branch if Half Carry Flag is Set
-		//BRID("1111_01kk_kkkk_k111"),  // Branch if Global Interrupt is Disabled
-		//BRIE("1111_00kk_kkkk_k111"),  // Branch if Global Interrupt is Enabled
-		//BRLO("1111_00kk_kkkk_k000"),  // Branch if Lower (Unsigned)
-		//BRLT("1111_00kk_kkkk_k100"),  // Branch if Less Than (Signed)
-		//BRMI("1111_00kk_kkkk_k010"),  // Branch if Minus
-		//BRNE("1111_01kk_kkkk_k001"),  // Branch if Not Equal
-		//BRPL("1111_01kk_kkkk_k010"),  // Branch if Plus
-		//BRSH("1111_00kk_kkkk_k000"),  // Branch if Same or Higher (Unsigned)
-		//BRTC("1111_01kk_kkkk_k110"),  // if the T Flag is Cleared
-		//BRTS("1111_00kk_kkkk_k110"),  // Branch if the T Flag is Set
-		//BRVC("1111_01kk_kkkk_k011"),  // Branch if Overflow Cleared
-		//BRVS("1111_00kk_kkkk_k011"),  // Branch if Overflow Set
+		BREQ("1111_00kk_kkkk_k001"),  // Branch if Equal
+		BRGE("1111_01kk_kkkk_k100"),  // Branch if Greater or Equal Signed)
+		BRHC("1111_01kk_kkkk_k101"),  // Branch if Half Carry Flag is Cleared
+		BRHS("1111_00kk_kkkk_k101"),  // Branch if Half Carry Flag is Set
+		BRID("1111_01kk_kkkk_k111"),  // Branch if Global Interrupt is Disabled
+		BRIE("1111_00kk_kkkk_k111"),  // Branch if Global Interrupt is Enabled
+		BRLO("1111_00kk_kkkk_k000"),  // Branch if Lower (Unsigned)
+		BRLT("1111_00kk_kkkk_k100"),  // Branch if Less Than (Signed)
+		BRMI("1111_00kk_kkkk_k010"),  // Branch if Minus
+		BRNE("1111_01kk_kkkk_k001"),  // Branch if Not Equal
+		BRPL("1111_01kk_kkkk_k010"),  // Branch if Plus
+		BRSH("1111_00kk_kkkk_k000"),  // Branch if Same or Higher (Unsigned)
+		BRTC("1111_01kk_kkkk_k110"),  // if the T Flag is Cleared
+		BRTS("1111_00kk_kkkk_k110"),  // Branch if the T Flag is Set
+		BRVC("1111_01kk_kkkk_k011"),  // Branch if Overflow Cleared
+		BRVS("1111_00kk_kkkk_k011"),  // Branch if Overflow Set
 		BSET("1001_0100_0sss_1000"),  // Bit Set in SREG
 		BST("1111_101d_dddd_0bbb"),   // Bit Store from Bit in Register to T Flag in SREG
 		//CALL("1001_010k_kkkk_111k_kkkk_kkkk_kkkk_kkkk"), // Long Call to a Subroutine
 		CBI("1001_1000_AAAA_Abbb"),  // Clear Bit in I/O Register
-		//CLC("1001_0100_1000_1000"),  // Clear Carry Flag
-		//CLH("1001_0100_1100_1000"),  // Clear Half Carry Flag
-		//CLI("1001_0100_1111_1000"),  // Clear Global Interrupt Flag
-		//CLN("1001_0100_1010_1000"),  // Clear Global Interrupt Flag
-		//CLR("0010_01rd_dddd_rrrr"),  // Clear Register
-		//CLS("1001_0100_1100_1000"),  // Clear Signed Flag
-		//CLT("1001_0100_1110_1000");  // Clear T Flag
-//		CLV(""), // Clear Overflow Flag
-//		CLZ(""), // Clear Zero Flag
+		CLC("1001_0100_1000_1000"),  // Clear Carry Flag
+		CLH("1001_0100_1100_1000"),  // Clear Half Carry Flag
+		CLI("1001_0100_1111_1000"),  // Clear Global Interrupt Flag
+		CLN("1001_0100_1010_1000"),  // Clear Global Interrupt Flag
+		// CLR("0010_01rd_dddd_rrrr"),  // Clear Register
+		CLS("1001_0100_1100_1000"),  // Clear Signed Flag
+		CLT("1001_0100_1110_1000"),  // Clear T Flag
+		CLV("1001_0100_1011_1000"), // Clear Overflow Flag
+		CLZ("1001_0100_1001_1000"), // Clear Zero Flag
 		COM("1001_010d_dddd_0000"), // One's Complement
 		CP("0001_01rd_dddd_rrrr"), // Compare
 		CPC("0000_01rd_dddd_rrrr"), // Compare with Carry
@@ -71,21 +71,21 @@ public class Instruction {
 		LD_X("1001_000d_dddd_1100"), // Load Indirect from data space to Register using Index X
 		LD_X_INC("1001_000d_dddd_1101"), // Load Indirect from data space to Register using Index X
 		LD_X_DEC("1001_000d_dddd_1110"), // Load Indirect from data space to Register using Index X
-		//LD_Y("1000_000d_dddd_1000"), // Load Indirect from data space to Register using Index Y
+		LD_Y("1000_000d_dddd_1000"), // Load Indirect from data space to Register using Index Y
 		LD_Y_INC("1001_000d_dddd_1001"), // Load Indirect from data space to Register using Index Y
 		LD_Y_DEC("1001_000d_dddd_1010"), // Load Indirect from data space to Register using Index Y
-		LD_Y_Q("10q0_qq0d_dddd_1qqq"), // Load Indirect from data space to Register using Index Y
-		//LD_Z("1000_000d_dddd_0000"), // Load Indirect From data space to Register using Index Z
+//		LD_Y_Q("10q0_qq0d_dddd_1qqq"), // Load Indirect from data space to Register using Index Y
+		LD_Z("1000_000d_dddd_0000"), // Load Indirect From data space to Register using Index Z
 		LD_Z_INC("1001_000d_dddd_0001"), // Load Indirect From data space to Register using Index Z
 		LD_Z_DEC("1001_000d_dddd_0010"), // Load Indirect From data space to Register using Index Z
-		LD_Z_Q("10q0_qq0d_dddd_0qqq"), // Load Indirect From data space to Register using Index Z
+//		LD_Z_Q("10q0_qq0d_dddd_0qqq"), // Load Indirect From data space to Register using Index Z
 		LDI("1110_KKKK_dddd_KKKK"), // Load Immediate
-		//LDS("1010_0kkk_dddd_kkkk"), // Load Direct from data space
-		//LDSW("1001_000d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Load Direct from data space
+		LDS("1010_0kkk_dddd_kkkk"), // Load Direct from data space
+//		LDSW("1001_000d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Load Direct from data space
 		LPM("1001_0101_1100_1000"), // Load Program Memory
 		LPM_Z("1001_000d_dddd_0100"), // Load Program Memory
 		LPM_Z_INC("1001_000d_dddd_0101"), // Load Program Memory
-		//LSL("0000_11dd_dddd_dddd"), // Logical Shift Left
+		LSL("0000_11dd_dddd_dddd"), // Logical Shift Left
 		LSR("1001_010d_dddd_0110"), // Logical Shift Right
 		MOV("0010_11rd_dddd_rrrr"), // Copy Register
 		MOVW("0000_0001_dddd_rrrr"), // Copy Register Word
@@ -131,13 +131,13 @@ public class Instruction {
 		ST_Y("1000_001r_rrrr_1000"), // Store Indirect From Register to data space using Index Y
 		ST_Y_INC("1001_001r_rrrr_1001"), // Store Indirect From Register to data space using Index Y
 		ST_Y_DEC("1001_001r_rrrr_1010"), // Store Indirect From Register to data space using Index Y
-		ST_Y_Q("10q0_qq1r_rrrr_1qqq"), // Store Indirect From Register to data space using Index Y
+//		ST_Y_Q("10q0_qq1r_rrrr_1qqq"), // Store Indirect From Register to data space using Index Y
 		ST_Z("1000_001r_rrrr_0000"), // Store Indirect From Register to data space using Index Z
 		ST_Z_INC("1001_001r_rrrr_0001"), // Store Indirect From Register to data space using Index Z
 		ST_Z_DEC("1001_001r_rrrr_0010"), // Store Indirect From Register to data space using Index Z
-		ST_Z_Q("10q0_qq1r_rrrr_0qqq"), // Store Indirect From Register to data space using Index Z
-		//STS_DATA("1010_1kkk_dddd_kkkk"), // Store Direct to data space
-		//STS_DATA_WIDE("1001_001d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Store Direct to data space
+//		ST_Z_Q("10q0_qq1r_rrrr_0qqq"), // Store Indirect From Register to data space using Index Z
+		STS_DATA("1010_1kkk_dddd_kkkk"), // Store Direct to data space
+//		STS_DATA_WIDE("1001_001d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Store Direct to data space
 		SUB("0001_10rd_dddd_rrrr"), // Subtract without Carry
 		SUBI("0101_KKKK_dddd_KKKK"), // Subtract Immediate
 		SWAP("1001_010d_dddd_0010"), // Swap Nibbles
@@ -151,9 +151,55 @@ public class Instruction {
 		private static Map<Opcode,Opcode> subsumedBy = new HashMap<>();
 
 		static {
+			subsumedBy.put(BREQ, BRBS);
+			subsumedBy.put(BRVS, BRBS);
+			subsumedBy.put(BRIE, BRBS);
+			subsumedBy.put(BRLT, BRBS);
+			subsumedBy.put(BRSH, BRBS);
+			subsumedBy.put(BRCS, BRBS);
+			subsumedBy.put(BRMI, BRBS);
+			subsumedBy.put(BRHS, BRBS);
+			subsumedBy.put(BRTS, BRBS);
+			subsumedBy.put(BRLO, BRBS);
+			//
+			subsumedBy.put(BRVC, BRBC);
+			subsumedBy.put(BRHC, BRBC);
+			subsumedBy.put(BRGE, BRBC);
+			subsumedBy.put(BRCC, BRBC);
+			subsumedBy.put(BRID, BRBC);
+			subsumedBy.put(BRTC, BRBC);
+			subsumedBy.put(BRNE, BRBC);
+			subsumedBy.put(BRPL, BRBC);
+			//
+			subsumedBy.put(LSL, ADD);
 			subsumedBy.put(ROL,ADC);
 			subsumedBy.put(TST,AND);
 			subsumedBy.put(SBR,ORI);
+			//
+//			subsumedBy.put(LD_Y,LD_Y_Q);
+//			subsumedBy.put(LD_Z,LD_Z_Q);
+//			subsumedBy.put(ST_Y,ST_Y_Q);
+//			subsumedBy.put(ST_Z,ST_Z_Q);
+			//
+			subsumedBy.put(CLS, BCLR);
+			subsumedBy.put(CLV, BCLR);
+			subsumedBy.put(CLT, BCLR);
+			subsumedBy.put(CLZ, BCLR);
+			subsumedBy.put(CLC, BCLR);
+			subsumedBy.put(CLN, BCLR);
+			subsumedBy.put(CLH, BCLR);
+			subsumedBy.put(CLI, BCLR);
+			//
+			subsumedBy.put(SET,BSET);
+			subsumedBy.put(SEI,BSET);
+			subsumedBy.put(SEC,BSET);
+			subsumedBy.put(SEZ,BSET);
+			subsumedBy.put(SEN,BSET);
+			subsumedBy.put(SEV,BSET);
+			subsumedBy.put(SEH,BSET);
+			subsumedBy.put(SES,BSET);
+			//
+			subsumedBy.put(SER, LDI);
 		}
 
 		private String fmt;

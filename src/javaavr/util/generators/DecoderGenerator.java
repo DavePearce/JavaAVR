@@ -34,6 +34,14 @@ public class DecoderGenerator {
 		public Map<Integer,Group> getBuckets() {
 			return buckets;
 		}
+
+		public boolean isTerminal() {
+			return DecoderGenerator.isTerminal(items);
+		}
+
+		public Opcode getTerminal() {
+			return DecoderGenerator.findWinner(items);
+		}
 	}
 
 	/**
@@ -150,17 +158,33 @@ public class DecoderGenerator {
 		}
 	}
 
-	public static boolean isTerminal(Set<Opcode> opcodes) {
+	public static Opcode findWinner(Set<Opcode> opcodes) {
 		Opcode matched = null;
-
+		// First, find a winner.
 		for(Opcode o : opcodes) {
-			if(matched == null) {
+			if(matched == null || o.subsumes(matched)) {
 				matched = o;
-			} else if(o.subsumes(matched)) {
-				matched = o;
-			} else if(matched.subsumes(o)) {
-				// do nout
-			} else {
+			}
+		}
+		return matched;
+	}
+
+	/**
+	 * Check whether a set of opcodes represents a terminating state. Obviously, if
+	 * the set contains only one opcode then it is by definition terminating.
+	 * However, in other cases, it may also be terminating. For example, if one
+	 * opcode subsumes all the others as this indicates we have a single opcode with
+	 * one or more (overlapping) specialisations.
+	 *
+	 * @param opcodes
+	 * @return
+	 */
+	public static boolean isTerminal(Set<Opcode> opcodes) {
+		// Find a winner
+		Opcode matched = findWinner(opcodes);
+		// Check it's the only winner.
+		for(Opcode o : opcodes) {
+			if(o != matched && !matched.subsumes(o)) {
 				return false;
 			}
 		}
@@ -188,6 +212,7 @@ public class DecoderGenerator {
 		Group g = split(tmp);
 		Map<Group,Integer> numbering = number(g);
 		print(g,numbering);
+		printDecoders(g,numbering);
 	}
 
 	public static String toBinaryString(int value) {
@@ -195,7 +220,7 @@ public class DecoderGenerator {
 		while(r.length() < 16) {
 			r = "0" + r;
 		}
-		return r;
+		return "0b" + r;
 	}
 
 	public static void print(Group g, Map<Group,Integer> numbering) {
@@ -209,5 +234,33 @@ public class DecoderGenerator {
 		for(Map.Entry<Integer,Group> e : g.getBuckets().entrySet()) {
 			print(e.getValue(),numbering);
 		}
+	}
+
+	public static void printDecoders(Group g, Map<Group,Integer> numbering) {
+		printDecoder(g,numbering);
+		for(Map.Entry<Integer, Group> e : g.getBuckets().entrySet()) {
+			printDecoders(e.getValue(),numbering);
+		}
+	}
+
+	public static void printDecoder(Group g, Map<Group,Integer> numbering) {
+		int id = numbering.get(g);
+		System.out.println("\tInstruction decode_" + id + "(int opcode) {");
+		if(g.isTerminal()) {
+			Opcode o = g.getTerminal();
+			System.out.println("\t\t\treturn new Instruction(" + o + ");");
+		} else {
+			String mask = toBinaryString(g.getMask());
+			System.out.println("\t\tswitch(opcode & " + mask + ") {");
+			for(Map.Entry<Integer, Group> e : g.getBuckets().entrySet()) {
+				System.out.println("\t\tcase " + toBinaryString(e.getKey()) + ":");
+				int n = numbering.get(e.getValue());
+				System.out.println("\t\t\treturn decode_" + n + "(opcode);");
+			}
+			System.out.println("\t\tdefault:");
+			System.out.println("\t\t\treturn null;");
+			System.out.println("\t\t}");
+		}
+		System.out.println("\t}");
 	}
 }
