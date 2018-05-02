@@ -1,4 +1,4 @@
-package javaavr.util;
+package javaavr.util.generators;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.Set;
 
 import javaavr.core.Instruction;
 
-public class DecoderGenerator {
+public class OldDecoderGenerator {
 	public static boolean match(Instruction.Opcode opcode, int bits) {
 		String fmt = opcode.getFormat().replaceAll("_", "");
 		if(fmt == "") {

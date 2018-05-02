@@ -1,5 +1,8 @@
 package javaavr.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Instruction {
 	public enum Opcode {
 		ADC("0001_11rd_dddd_rrrr"),   // Add with Carry
@@ -33,7 +36,7 @@ public class Instruction {
 		//BRVS("1111_00kk_kkkk_k011"),  // Branch if Overflow Set
 		BSET("1001_0100_0sss_1000"),  // Bit Set in SREG
 		BST("1111_101d_dddd_0bbb"),   // Bit Store from Bit in Register to T Flag in SREG
-		CALL("1001_010k_kkkk_111k_kkkk_kkkk_kkkk_kkkk"), // Long Call to a Subroutine
+		//CALL("1001_010k_kkkk_111k_kkkk_kkkk_kkkk_kkkk"), // Long Call to a Subroutine
 		CBI("1001_1000_AAAA_Abbb"),  // Clear Bit in I/O Register
 		//CLC("1001_0100_1000_1000"),  // Clear Carry Flag
 		//CLH("1001_0100_1100_1000"),  // Clear Half Carry Flag
@@ -61,7 +64,7 @@ public class Instruction {
 		IJMP("1001_0100_0000_1001"), // Indirect Jump
 		IN("1011_0AAd_dddd_AAAA"), // Load an I/O Location to Register
 		INC("1001_010d_dddd_0011"), // Increment
-		JMP("1001_010k_kkkk_110k_kkkk_kkkk_kkkk_kkkk"), // Jump
+		//JMP("1001_010k_kkkk_110k_kkkk_kkkk_kkkk_kkkk"), // Jump
 		LAC("1001_001r_rrrr_0110"), // Load and Clear
 		LAS("1001_001r_rrrr_0101"), // Load and Set
 		LAT("1001_001r_rrrr_0111"), // Load and Toggle
@@ -78,7 +81,7 @@ public class Instruction {
 		LD_Z_Q("10q0_qq0d_dddd_0qqq"), // Load Indirect From data space to Register using Index Z
 		LDI("1110_KKKK_dddd_KKKK"), // Load Immediate
 		LDS("1010_0kkkk_dddd_kkkk"), // Load Direct from data space
-		LDSW("1001_000d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Load Direct from data space
+		//LDSW("1001_000d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Load Direct from data space
 		LPM("1001_0101_1100_1000"), // Load Program Memory
 		LPM_Z("1001_000d_dddd_0100"), // Load Program Memory
 		LPM_Z_INC("1001_000d_dddd_0101"), // Load Program Memory
@@ -88,7 +91,7 @@ public class Instruction {
 		MOVW("0000_0001_dddd_rrrr"), // Copy Register Word
 		MUL("1001_11rd_dddd_rrrr"), // Multiply Unsigned
 		MULS("0000_0010_dddd_rrrr"), // Multiply Signed
-		MULSU("0000_0011_0ddd_0rrrr"), // Multiply Signed with Unsigned
+		MULSU("0000_0011_0ddd_0rrr"), // Multiply Signed with Unsigned
 		NEG("1001_010d_dddd_0001"), // Two's Complement
 		NOP("0000_0000_0000_0000"), // No Operation
 		OR("0010_10rd_dddd_rrrr"), // Logical OR
@@ -134,13 +137,22 @@ public class Instruction {
 		ST_Z_DEC("1001_001r_rrrr_0010"), // Store Indirect From Register to data space using Index Z
 		ST_Z_Q("10q0_qq1r_rrrr_0qqq"), // Store Indirect From Register to data space using Index Z
 		STS_DATA("1010_1kkkk_dddd_kkkk"), // Store Direct to data space
-		STS_DATA_WIDE("1001_001d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Store Direct to data space
+		//STS_DATA_WIDE("1001_001d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Store Direct to data space
 		SUB("0001_10rd_dddd_rrrr"), // Subtract without Carry
 		SUBI("0101_KKKK_dddd_KKKK"), // Subtract Immediate
 		SWAP("1001_010d_dddd_0010"), // Swap Nibbles
 		TST("0010_000dd_dddd_dddd"), // Test for Zero or Minus
 		WDR("1001_0101_1010_1000"), // Watchdog Reset
 		XCH("1001_001r_rrrr_0100"); // Exchange
+
+		// ======================================================================
+		// CONSTRUCT SUBSUMED RELATION
+		// ======================================================================
+		private static Map<Opcode,Opcode> subsumedBy = new HashMap<>();
+
+		static {
+			subsumedBy.put(ROL,ADC);
+		}
 
 		private String fmt;
 
@@ -150,6 +162,10 @@ public class Instruction {
 
 		public String getFormat() {
 			return fmt;
+		}
+
+		public boolean subsumes(Opcode opcode) {
+			return subsumedBy.get(opcode) == this;
 		}
 	}
 
