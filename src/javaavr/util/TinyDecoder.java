@@ -9,8 +9,9 @@ public class TinyDecoder implements Instruction.Decoder {
 
 	@Override
 	public Instruction decode(Memory programSpace, int PC) {
-		int opcode = programSpace.read(PC);
-		opcode = (opcode << 8) | programSpace.read(PC);
+		int b1 = programSpace.read(PC) & 0xFF;
+		int b2 = programSpace.read(PC+1) & 0xFF;
+		int opcode = (b2 << 8) | b1;
 		return decode_0(opcode);
 	}
 
