@@ -10,6 +10,8 @@ public class MicroController {
 	private final Instruction.Executor executor;
 	private final Memory data;
 	private final Memory flash;
+	// Internal registers
+	private RegisterFile registers;
 
 	public MicroController(Instruction.Decoder decoder, Instruction.Executor executor, Memory flash,
 			Memory data) {
@@ -17,12 +19,20 @@ public class MicroController {
 		this.decoder = decoder;
 		this.flash = flash;
 		this.data = data;
+		this.registers = new RegisterFile();
 	}
 
 	public void step() {
-		int PC = 0;
-		Instruction instruction = decoder.decode(flash, PC);
-		executor.execute(instruction, data);
+		Instruction instruction = decoder.decode(flash, registers.pc);
+		executor.execute(instruction, data, registers);
+	}
+
+	public final class RegisterFile {
+		public int pc;
+		public int sreg;
+		public int X;
+		public int Y;
+		public int Z;
 	}
 
 	public final MicroController Tiny85() {

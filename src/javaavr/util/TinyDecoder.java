@@ -10,7 +10,9 @@ public class TinyDecoder implements Instruction.Decoder {
 
 	@Override
 	public Instruction decode(Memory mem, int pc) {
-		// Little endian.
+		// Multiply address by 2
+		pc = pc * 2;
+		// Opcodes are in little endian format
 		int b1 = mem.read(pc) & 0xFF;
 		int b2 = mem.read(pc+1) & 0xFF;
 		int opcode = (b2 << 8) | b1;

@@ -249,7 +249,7 @@ public class HexFile {
 		TinyDecoder decoder = new TinyDecoder();
 		for(int i=0;i!=mem.size();) {
 			Instruction insn = decoder.decode(mem,i);
-			System.out.println(String.format("%04X", i) + ": " + insn);
+			System.out.println(String.format("%04X", i/2) + ": " + insn);
 			i = i + insn.getWidth();
 		}
 	}
