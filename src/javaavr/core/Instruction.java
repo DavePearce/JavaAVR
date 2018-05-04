@@ -250,7 +250,7 @@ public class Instruction {
 	}
 
 
-	public static class Address extends Instruction {
+	public static abstract class Address extends Instruction {
 		private final int k;
 
 		public Address(Opcode opcode, int k) {
@@ -264,7 +264,7 @@ public class Instruction {
 		}
 	}
 
-	public static class IoRegister extends Instruction {
+	public static abstract class IoRegister extends Instruction {
 		private final int A;
 		private final int Rd;
 
@@ -286,7 +286,7 @@ public class Instruction {
 		}
 	}
 
-	public static class RegisterIo extends Instruction {
+	public static abstract class RegisterIo extends Instruction {
 		private final int A;
 		private final int Rd;
 
@@ -308,7 +308,7 @@ public class Instruction {
 		}
 	}
 
-	public static class IoBit extends Instruction {
+	public static abstract class IoBit extends Instruction {
 		private final int A;
 		private final int b;
 
@@ -331,7 +331,7 @@ public class Instruction {
 	}
 
 
-	public static class Register extends Instruction {
+	public static abstract class Register extends Instruction {
 		private final int Rd;
 
 		public Register(Opcode opcode, int Rd) {
@@ -345,7 +345,7 @@ public class Instruction {
 		}
 	}
 
-	public static class RegisterBit extends Instruction {
+	public static abstract class RegisterBit extends Instruction {
 		private final int Rd;
 		private final int b;
 
@@ -368,7 +368,7 @@ public class Instruction {
 	}
 
 
-	public static class Flag extends Instruction {
+	public static abstract class Flag extends Instruction {
 		private final int s;
 
 		public Flag(Opcode opcode, int s) {
@@ -383,7 +383,7 @@ public class Instruction {
 	}
 
 
-	public static class FlagRelativeAddress extends Instruction {
+	public static abstract class FlagRelativeAddress extends Instruction {
 		private final int s;
 		private final int k;
 
@@ -402,7 +402,29 @@ public class Instruction {
 		}
 	}
 
-	public static class RegisterRegister extends Instruction {
+	public static abstract class RegisterAddress extends Instruction {
+		private final int Rd;
+		private final int k;
+
+		public RegisterAddress(Opcode opcode, int Rd, int k) {
+			super(opcode);
+			if(Rd < 0 || Rd >= 32) {
+				throw new IllegalArgumentException("invalid register: " + Rd);
+			}
+			if(k < 0 || k >= 128) {
+				throw new IllegalArgumentException("invalid address: " + k);
+			}
+			this.Rd = Rd;
+			this.k = k;
+		}
+
+		@Override
+		public String toString() {
+			return super.toString() +  " r" + Rd + ", 0x" + Integer.toHexString(k);
+		}
+	}
+
+	public static abstract class RegisterRegister extends Instruction {
 		private final int Rd;
 		private final int Rr;
 
@@ -424,7 +446,7 @@ public class Instruction {
 		}
 	}
 
-	public static class RegisterImmediate extends Instruction {
+	public static abstract class RegisterImmediate extends Instruction {
 		private final int Rd;
 		private final int K;
 
@@ -446,7 +468,7 @@ public class Instruction {
 		}
 	}
 
-	public static class RelativeAddress extends Instruction {
+	public static abstract class RelativeAddress extends Instruction {
 		private final int k;
 
 		public RelativeAddress(Opcode opcode, int k) {
@@ -474,12 +496,19 @@ public class Instruction {
 		}
 	}
 
+	private static int u7(int x) {
+		if((x & 0b111_1111) != x) {
+			throw new IllegalArgumentException("Invalid 7bit signed integer");
+		}
+		return x;
+	}
+
 	private static int i12(int x) {
 		if((x & 0b111111111111) != x) {
 			throw new IllegalArgumentException("Invalid 12bit signed integer");
 		}
 		if(x >= 2048) {
-			return -(x & 0b11111111111);
+			return -(x & 0b111_1111_1111);
 		} else {
 			return x;
 		}
@@ -492,9 +521,9 @@ public class Instruction {
 		public ADD(int d, int r) { super(Opcode.ADD, d, r); }
 		public ADD(int[] operands) { super(Opcode.ADD, operands[0], operands[1]); }
 	}
-	public static final class ADIW extends Instruction {
-		public ADIW(int K, int d) { super(Opcode.ADIW, K, d); }
-		public ADIW(int[] operands) { super(Opcode.ADIW, operands[0], operands[1]); }
+	public static final class ADIW extends RegisterImmediate {
+		public ADIW(int d, int K) { super(Opcode.ADIW, d, K); }
+		public ADIW(int[] operands) { super(Opcode.ADIW, operands[1],  operands[0]); }
 	}
 	public static final class AND extends RegisterRegister {
 		public AND(int d, int r) { super(Opcode.AND, d, r); }
@@ -712,39 +741,39 @@ public class Instruction {
 		public INC(int d) { super(Opcode.INC, d); }
 		public INC(int[] operands) { super(Opcode.INC, operands[0]); }
 	}
-	public static final class LAC extends Instruction {
+	public static final class LAC extends Register {
 		public LAC(int r) { super(Opcode.LAC, r); }
 		public LAC(int[] operands) { super(Opcode.LAC, operands[0]); }
 	}
-	public static final class LAS extends Instruction {
+	public static final class LAS extends Register {
 		public LAS(int r) { super(Opcode.LAS, r); }
 		public LAS(int[] operands) { super(Opcode.LAS, operands[0]); }
 	}
-	public static final class LAT extends Instruction {
+	public static final class LAT extends Register {
 		public LAT(int r) { super(Opcode.LAT, r); }
 		public LAT(int[] operands) { super(Opcode.LAT, operands[0]); }
 	}
-	public static final class LD_X extends Instruction {
+	public static final class LD_X extends Register {
 		public LD_X(int d) { super(Opcode.LD_X, d); }
 		public LD_X(int[] operands) { super(Opcode.LD_X, operands[0]); }
 	}
-	public static final class LD_X_INC extends Instruction {
+	public static final class LD_X_INC extends Register {
 		public LD_X_INC(int d) { super(Opcode.LD_X_INC, d); }
 		public LD_X_INC(int[] operands) { super(Opcode.LD_X_INC, operands[0]); }
 	}
-	public static final class LD_X_DEC extends Instruction {
+	public static final class LD_X_DEC extends Register {
 		public LD_X_DEC(int d) { super(Opcode.LD_X_DEC, d); }
 		public LD_X_DEC(int[] operands) { super(Opcode.LD_X_DEC, operands[0]); }
 	}
-	public static final class LD_Y extends Instruction {
+	public static final class LD_Y extends Register {
 		public LD_Y(int d) { super(Opcode.LD_Y, d); }
 		public LD_Y(int[] operands) { super(Opcode.LD_Y, operands[0]); }
 	}
-	public static final class LD_Y_INC extends Instruction {
+	public static final class LD_Y_INC extends Register {
 		public LD_Y_INC(int d) { super(Opcode.LD_Y_INC, d); }
 		public LD_Y_INC(int[] operands) { super(Opcode.LD_Y_INC, operands[0]); }
 	}
-	public static final class LD_Y_DEC extends Instruction {
+	public static final class LD_Y_DEC extends Register {
 		public LD_Y_DEC(int d) { super(Opcode.LD_Y_DEC, d); }
 		public LD_Y_DEC(int[] operands) { super(Opcode.LD_Y_DEC, operands[0]); }
 	}
@@ -764,8 +793,8 @@ public class Instruction {
 		public LDI(int d, int K) { super(Opcode.LDI, d, K); }
 		public LDI(int[] operands) { super(Opcode.LDI, operands[1]+16, operands[0]); }
 	}
-	public static final class LDS extends Instruction {
-		public LDS(int d, int k) { super(Opcode.LDS, d, k); }
+	public static final class LDS extends RegisterAddress {
+		public LDS(int d, int k) { super(Opcode.LDS, d, u7(k)); }
 		public LDS(int[] operands) { super(Opcode.LDS, operands[0], operands[1]); }
 	}
 	public static final class LPM extends Instruction {
@@ -780,7 +809,7 @@ public class Instruction {
 		public LPM_Z_INC(int d) { super(Opcode.LPM_Z_INC, d); }
 		public LPM_Z_INC(int[] operands) { super(Opcode.LPM_Z_INC, operands[0]); }
 	}
-	public static final class LSL extends Instruction {
+	public static final class LSL extends Register {
 		public LSL(int d) { super(Opcode.LSL, d); }
 		public LSL(int[] operands) { super(Opcode.LSL, operands[0]); }
 	}
@@ -792,7 +821,7 @@ public class Instruction {
 		public MOV(int d, int r) { super(Opcode.MOV, d, r); }
 		public MOV(int[] operands) { super(Opcode.MOV, operands[0], operands[1]); }
 	}
-	public static final class MOVW extends Instruction {
+	public static final class MOVW extends RegisterRegister {
 		public MOVW(int d, int r) { super(Opcode.MOVW, d, r); }
 		public MOVW(int[] operands) { super(Opcode.MOVW, operands[0], operands[1]); }
 	}
@@ -800,11 +829,11 @@ public class Instruction {
 		public MUL(int d, int r) { super(Opcode.MUL, d, r); }
 		public MUL(int[] operands) { super(Opcode.MUL, operands[0], operands[1]); }
 	}
-	public static final class MULS extends Instruction {
+	public static final class MULS extends RegisterRegister {
 		public MULS(int d, int r) { super(Opcode.MULS, d, r); }
 		public MULS(int[] operands) { super(Opcode.MULS, operands[0], operands[1]); }
 	}
-	public static final class MULSU extends Instruction {
+	public static final class MULSU extends RegisterRegister {
 		public MULSU(int d, int r) { super(Opcode.MULSU, d, r); }
 		public MULSU(int[] operands) { super(Opcode.MULSU, operands[0], operands[1]); }
 	}
@@ -828,15 +857,15 @@ public class Instruction {
 		public OUT(int A, int r) { super(Opcode.OUT, A, r); }
 		public OUT(int[] operands) { super(Opcode.OUT, operands[0], operands[1]); }
 	}
-	public static final class POP extends Instruction {
+	public static final class POP extends Register {
 		public POP(int d) { super(Opcode.POP, d); }
 		public POP(int[] operands) { super(Opcode.POP, operands[0]); }
 	}
-	public static final class PUSH extends Instruction {
+	public static final class PUSH extends Register {
 		public PUSH(int d) { super(Opcode.PUSH, d); }
 		public PUSH(int[] operands) { super(Opcode.PUSH, operands[0]); }
 	}
-	public static final class RCALL extends Instruction {
+	public static final class RCALL extends Address {
 		public RCALL(int k) { super(Opcode.RCALL, k); }
 		public RCALL(int[] operands) { super(Opcode.RCALL, operands[0]); }
 	}
@@ -852,7 +881,7 @@ public class Instruction {
 		public RJMP(int k) { super(Opcode.RJMP, i12(k)); }
 		public RJMP(int[] operands) { super(Opcode.RJMP, i12(operands[0])); }
 	}
-	public static final class ROL extends Instruction {
+	public static final class ROL extends Register {
 		public ROL(int d) { super(Opcode.ROL, d); }
 		public ROL(int[] operands) { super(Opcode.ROL, operands[0]); }
 	}
@@ -868,33 +897,33 @@ public class Instruction {
 		public SBCI(int d, int K) { super(Opcode.SBCI, d, K); }
 		public SBCI(int[] operands) { super(Opcode.SBCI, operands[1]+16, operands[0]); }
 	}
-	public static final class SBI extends Instruction {
+	public static final class SBI extends IoBit {
 		public SBI(int A, int b) { super(Opcode.SBI, A, b); }
 		public SBI(int[] operands) { super(Opcode.SBI, operands[0], operands[1]); }
 	}
-	public static final class SBIC extends Instruction {
+	public static final class SBIC extends IoBit {
 		public SBIC(int A, int b) { super(Opcode.SBIC, A, b); }
 		public SBIC(int[] operands) { super(Opcode.SBIC, operands[0], operands[1]); }
 	}
-	public static final class SBIS extends Instruction {
+	public static final class SBIS extends IoBit {
 		public SBIS(int A, int b) { super(Opcode.SBIS, A, b); }
 		public SBIS(int[] operands) { super(Opcode.SBIS, operands[0], operands[1]); }
 	}
-	public static final class SBIW extends Instruction {
-		public SBIW(int K, int d) { super(Opcode.SBIW, K, d); }
-		public SBIW(int[] operands) { super(Opcode.SBIW, operands[0], operands[1]); }
+	public static final class SBIW extends RegisterImmediate {
+		public SBIW(int d, int K) { super(Opcode.SBIW, d, K); }
+		public SBIW(int[] operands) { super(Opcode.SBIW, operands[1], operands[0]); }
 	}
 	public static final class SBR extends RegisterImmediate {
 		public SBR(int d, int K) { super(Opcode.SBR, d, K); }
 		public SBR(int[] operands) { super(Opcode.SBR, operands[1]+16, operands[0]); }
 	}
-	public static final class SBRC extends Instruction {
-		public SBRC(int b, int r) { super(Opcode.SBRC, b, r); }
-		public SBRC(int[] operands) { super(Opcode.SBRC, operands[0], operands[1]); }
+	public static final class SBRC extends RegisterBit {
+		public SBRC(int r, int b) { super(Opcode.SBRC, r, b); }
+		public SBRC(int[] operands) { super(Opcode.SBRC, operands[1], operands[0]); }
 	}
-	public static final class SBRS extends Instruction {
-		public SBRS(int b, int r) { super(Opcode.SBRS, b, r); }
-		public SBRS(int[] operands) { super(Opcode.SBRS, operands[0], operands[1]); }
+	public static final class SBRS extends RegisterBit {
+		public SBRS(int r, int b) { super(Opcode.SBRS, r, b); }
+		public SBRS(int[] operands) { super(Opcode.SBRS, operands[1], operands[0]); }
 	}
 	public static final class SEC extends Instruction {
 		public SEC() { super(Opcode.SEC); }
@@ -912,7 +941,7 @@ public class Instruction {
 		public SEN() { super(Opcode.SEN); }
 		public SEN(int[] operands) { super(Opcode.SEN); }
 	}
-	public static final class SER extends Instruction {
+	public static final class SER extends Register {
 		public SER(int d) { super(Opcode.SER, d); }
 		public SER(int[] operands) { super(Opcode.SER, operands[0]); }
 	}
@@ -940,44 +969,44 @@ public class Instruction {
 		public SPM() { super(Opcode.SPM); }
 		public SPM(int[] operands) { super(Opcode.SPM); }
 	}
-	public static final class ST_X extends Instruction {
+	public static final class ST_X extends Register {
 		public ST_X(int r) { super(Opcode.ST_X, r); }
 		public ST_X(int[] operands) { super(Opcode.ST_X, operands[0]); }
 	}
-	public static final class ST_X_INC extends Instruction {
+	public static final class ST_X_INC extends Register {
 		public ST_X_INC(int r) { super(Opcode.ST_X_INC, r); }
 		public ST_X_INC(int[] operands) { super(Opcode.ST_X_INC, operands[0]); }
 	}
-	public static final class ST_X_DEC extends Instruction {
+	public static final class ST_X_DEC extends Register {
 		public ST_X_DEC(int r) { super(Opcode.ST_X_DEC, r); }
 		public ST_X_DEC(int[] operands) { super(Opcode.ST_X_DEC, operands[0]); }
 	}
-	public static final class ST_Y extends Instruction {
+	public static final class ST_Y extends Register {
 		public ST_Y(int r) { super(Opcode.ST_Y, r); }
 		public ST_Y(int[] operands) { super(Opcode.ST_Y, operands[0]); }
 	}
-	public static final class ST_Y_INC extends Instruction {
+	public static final class ST_Y_INC extends Register {
 		public ST_Y_INC(int r) { super(Opcode.ST_Y_INC, r); }
 		public ST_Y_INC(int[] operands) { super(Opcode.ST_Y_INC, operands[0]); }
 	}
-	public static final class ST_Y_DEC extends Instruction {
+	public static final class ST_Y_DEC extends Register {
 		public ST_Y_DEC(int r) { super(Opcode.ST_Y_DEC, r); }
 		public ST_Y_DEC(int[] operands) { super(Opcode.ST_Y_DEC, operands[0]); }
 	}
-	public static final class ST_Z extends Instruction {
+	public static final class ST_Z extends Register {
 		public ST_Z(int r) { super(Opcode.ST_Z, r); }
 		public ST_Z(int[] operands) { super(Opcode.ST_Z, operands[0]); }
 	}
-	public static final class ST_Z_INC extends Instruction {
+	public static final class ST_Z_INC extends Register {
 		public ST_Z_INC(int r) { super(Opcode.ST_Z_INC, r); }
 		public ST_Z_INC(int[] operands) { super(Opcode.ST_Z_INC, operands[0]); }
 	}
-	public static final class ST_Z_DEC extends Instruction {
+	public static final class ST_Z_DEC extends Register {
 		public ST_Z_DEC(int r) { super(Opcode.ST_Z_DEC, r); }
 		public ST_Z_DEC(int[] operands) { super(Opcode.ST_Z_DEC, operands[0]); }
 	}
-	public static final class STS_DATA extends Instruction {
-		public STS_DATA(int d, int k) { super(Opcode.STS_DATA, d, k); }
+	public static final class STS_DATA extends RegisterAddress {
+		public STS_DATA(int d, int k) { super(Opcode.STS_DATA, d, u7(k)); }
 		public STS_DATA(int[] operands) { super(Opcode.STS_DATA, operands[0], operands[1]); }
 	}
 	public static final class SUB extends RegisterRegister {
@@ -992,7 +1021,7 @@ public class Instruction {
 		public SWAP(int d) { super(Opcode.SWAP, d); }
 		public SWAP(int[] operands) { super(Opcode.SWAP, operands[0]); }
 	}
-	public static final class TST extends Instruction {
+	public static final class TST extends Register {
 		public TST(int d) { super(Opcode.TST, d); }
 		public TST(int[] operands) { super(Opcode.TST, operands[0]); }
 	}
@@ -1000,7 +1029,7 @@ public class Instruction {
 		public WDR() { super(Opcode.WDR); }
 		public WDR(int[] operands) { super(Opcode.WDR); }
 	}
-	public static final class XCH extends Instruction {
+	public static final class XCH extends Register {
 		public XCH(int r) { super(Opcode.XCH, r); }
 		public XCH(int[] operands) { super(Opcode.XCH, operands[0]); }
 	}
