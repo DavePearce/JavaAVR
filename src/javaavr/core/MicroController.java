@@ -22,6 +22,18 @@ public class MicroController {
 		this.registers = new RegisterFile();
 	}
 
+	public Memory getCode() {
+		return flash;
+	}
+
+	public Memory getData() {
+		return data;
+	}
+
+	public RegisterFile getRegisters() {
+		return registers;
+	}
+
 	public void step() {
 		Instruction instruction = decoder.decode(flash, registers.pc);
 		executor.execute(instruction, data, registers);
@@ -35,7 +47,7 @@ public class MicroController {
 		public int Z;
 	}
 
-	public final MicroController Tiny85() {
+	public final static MicroController Tiny85() {
 		Memory regs = new ByteMemory(32);
 		Memory io = new ByteMemory(64);
 		Memory SRAM = new ByteMemory(512);
