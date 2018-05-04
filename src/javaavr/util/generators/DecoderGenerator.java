@@ -1,5 +1,6 @@
 package javaavr.util.generators;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +42,76 @@ public class DecoderGenerator {
 
 		public Opcode getTerminal() {
 			return DecoderGenerator.findWinner(items);
+		}
+	}
+
+	private static class Range {
+		private int start;
+		private int end;
+
+		public Range(int start, int end) {
+			this.start = start;
+			this.end = end;
+		}
+
+		public int getWidth() {
+			return (end-start)+1;
+		}
+
+		public int getStart() {
+			return start;
+		}
+
+		public int getEnd() {
+			return end;
+		}
+
+		public int toMask() {
+			int mask = 0;
+			for(int i=start;i<=end;++i) {
+				mask |= (1 << i);
+			}
+			return mask;
+		}
+
+		@Override
+		public String toString() {
+			return start + "-" + end;
+		}
+	}
+
+	public static class Variable {
+		private String name;
+		private Range[] ranges;
+
+		public Variable(String name, int mask) {
+			this.name = name;
+			this.ranges = toRanges(mask);
+		}
+
+		private Range[] toRanges(int mask) {
+			int start = Integer.MIN_VALUE;
+			ArrayList<Range> ranges = new ArrayList<>();
+			//
+			int unit = 1;
+			for(int i=0;i!=17;++i) {
+				if((mask & unit) == unit) {
+					if(start < 0) {
+						start = i;
+					}
+				} else if(start >= 0) {
+					ranges.add(new Range(start,i-1));
+					start = Integer.MIN_VALUE;
+				}
+				unit = unit << 1;
+			}
+			//
+			return ranges.toArray(new Range[ranges.size()]);
+		}
+
+		@Override
+		public String toString() {
+			return name + Arrays.toString(ranges);
 		}
 	}
 
@@ -141,7 +212,6 @@ public class DecoderGenerator {
 			return new Group(0,opcodes);
 		} else {
 			int mask = determineMaximumMask(opcodes);
-			System.out.println("MASK: " + toBinaryString(mask));
 			Group group = new Group(mask,opcodes);
 			for(int i=0;i!=65536;++i) {
 				if((i & mask) == i) {
@@ -191,6 +261,49 @@ public class DecoderGenerator {
 		return true;
 	}
 
+	public static char[] extractVariables(String format) {
+		ArrayList<Character> vars = new ArrayList<>();
+		boolean[] seen = new boolean[256];
+		for(int i=0;i!=format.length();++i) {
+			char c = format.charAt(i);
+			if(Character.isAlphabetic(c)) {
+				if(!seen[c]) {
+					vars.add(c);
+					seen[c] = true;
+				}
+			}
+		}
+		char[] chars = new char[vars.size()];
+		for(int i=0;i!=chars.length;++i) {
+			chars[i] = vars.get(i);
+		}
+		return chars;
+	}
+
+	public static Variable extractVariable(char v, String fmt) {
+		String name = "";
+		int mask = 0;
+		int unit = 1;
+		for(int i=15;i>=0;--i) {
+			if(fmt.charAt(i) == v) {
+				name += v;
+				mask |= unit;
+			}
+			unit = unit << 1;
+		}
+		return new Variable(name,mask);
+	}
+
+	public static Variable[] extractVariables(Opcode opcode) {
+		String fmt = opcode.getFormat().replaceAll("_", "");
+		char[] chars = extractVariables(fmt);
+		Variable[] vars = new Variable[chars.length];
+		for(int i=0;i!=vars.length;++i) {
+			vars[i] = extractVariable(chars[i],fmt);
+		}
+		return vars;
+	}
+
 	public static Map<Group,Integer> number(Group g) {
 		HashMap<Group,Integer> numbering = new HashMap<>();
 		number(g,0,numbering);
@@ -211,8 +324,10 @@ public class DecoderGenerator {
 		tmp.addAll(Arrays.asList(Opcode.values()));
 		Group g = split(tmp);
 		Map<Group,Integer> numbering = number(g);
-		print(g,numbering);
-		printDecoders(g,numbering);
+//		print(g,numbering);
+//		printDecoders(g,numbering);
+//		printExtractors(g);
+		printInstructions();
 	}
 
 	public static String toBinaryString(int value) {
@@ -245,10 +360,15 @@ public class DecoderGenerator {
 
 	public static void printDecoder(Group g, Map<Group,Integer> numbering) {
 		int id = numbering.get(g);
-		System.out.println("\tInstruction decode_" + id + "(int opcode) {");
+		System.out.println("\tprivate static Instruction decode_" + id + "(int opcode) {");
 		if(g.isTerminal()) {
 			Opcode o = g.getTerminal();
-			System.out.println("\t\t\treturn new Instruction(" + o + ");");
+			boolean hasOperands = (toValue(o.getFormat()) != 0xFFFF);
+			if(hasOperands) {
+				System.out.println("\t\t\treturn new " + o + "(extract_" + o.getFormat() + "(opcode));");
+			} else {
+				System.out.println("\t\t\treturn new " + o + "();");
+			}
 		} else {
 			String mask = toBinaryString(g.getMask());
 			System.out.println("\t\tswitch(opcode & " + mask + ") {");
@@ -262,5 +382,81 @@ public class DecoderGenerator {
 			System.out.println("\t\t}");
 		}
 		System.out.println("\t}");
+	}
+
+	public static void printExtractors(Group g) {
+		HashSet<String> visited = new HashSet<>();
+		for(Opcode o : g.getAll()) {
+			String fmt = o.getFormat();
+			boolean hasOperands = (toValue(fmt) != 0xFFFF);
+			if(hasOperands && !visited.contains(fmt)) {
+				visited.add(fmt);
+				printExtractor(o);
+			}
+		}
+	}
+
+	public static void printExtractor(Opcode o) {
+		String fmt = o.getFormat();
+		System.out.println("\tprivate static int[] extract_" + fmt + "(int opcode) {");
+		Variable[] variables = extractVariables(o);
+		for(Variable v : variables) {
+			printVariable(v);
+		}
+		System.out.print("\t\treturn new int[]{");
+		for(int i=0;i!=variables.length;++i) {
+			if(i != 0) {
+				System.out.print(", ");
+			}
+			System.out.print(variables[i].name);
+		}
+		System.out.println("};");
+		System.out.println("\t}");
+	}
+
+	private static void printVariable(Variable v) {
+		int width = 0;
+		for(int i=0;i!=v.ranges.length;++i) {
+			Range r = v.ranges[i];
+			int offset = r.getStart() - width;
+			System.out.print("\t\t");
+			if(i == 0) {
+				System.out.print("int " + v.name + " = ");
+			} else {
+				System.out.print(v.name + " |= ");
+			}
+			System.out.println("(opcode & " + toBinaryString(r.toMask()) + ") >> " + offset + ";");
+			width += r.getWidth();
+		}
+	}
+
+	private static void printInstructions() {
+		for(Opcode o : Opcode.values()) {
+			char[] vars = extractVariables(o.getFormat());
+			Arrays.sort(vars);
+			String baseClass = o.getKind();
+			System.out.println("\tpublic static final class " + o + " extends " + baseClass + " {");
+			System.out.print("\t\tpublic " + o + "(");
+			for(int i=0;i!=vars.length;++i) {
+				if(i != 0) {
+					System.out.print(", ");
+				}
+				System.out.print("int " + vars[i]);
+			}
+			System.out.print(") { super(Opcode." + o);
+			for(int i=0;i!=vars.length;++i) {
+				System.out.print(", ");
+				System.out.print(vars[i]);
+			}
+			System.out.println("); }");
+			System.out.print("\t\tpublic " + o + "(int[] operands");
+			System.out.print(") { super(Opcode." + o);
+			for(int i=0;i!=vars.length;++i) {
+				System.out.print(", ");
+				System.out.print("operands[" + i + "]");
+			}
+			System.out.println("); }");
+			System.out.println("\t}");
+		}
 	}
 }

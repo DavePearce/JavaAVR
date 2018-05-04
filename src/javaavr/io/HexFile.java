@@ -244,7 +244,7 @@ public class HexFile {
 			System.out.println("READ: " + hf.get(i));
 		}
 		// Now, upload and try to decode
-		ByteMemory mem = new ByteMemory(512);
+		ByteMemory mem = new ByteMemory(100);
 		hf.uploadTo(mem);
 		TinyDecoder decoder = new TinyDecoder();
 		for(int i=0;i!=mem.size();i=i+2) {
