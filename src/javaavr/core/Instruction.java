@@ -5,66 +5,66 @@ import java.util.Map;
 
 public class Instruction {
 	public enum Opcode {
-		ADC("0001_11rd_dddd_rrrr", "RegisterDirect"),   // Add with Carry
-		ADD("0000_11rd_dddd_rrrr", "RegisterDirect"),   // Add without Carry
+		ADC("0001_11rd_dddd_rrrr"),   // Add with Carry
+		ADD("0000_11rd_dddd_rrrr"),   // Add without Carry
 		ADIW("1001_0110_KKdd_KKKK"),  // Add Immediate to Word
-		AND("0010_00rd_dddd_rrrr", "RegisterDirect"),   // Logical AND
-		ANDI("0111_KKKK_dddd_KKKK", "RegisterImmediate"),  // Logical AND with Immediate
-		ASR("1001_010d_dddd_0101", "Register"),   // Arithmetic Shift Right
-		BCLR("1001_0100_1sss_1000", "Flag"), // Bit Clear in SREG
+		AND("0010_00rd_dddd_rrrr"),   // Logical AND
+		ANDI("0111_KKKK_dddd_KKKK"),  // Logical AND with Immediate
+		ASR("1001_010d_dddd_0101"),   // Arithmetic Shift Right
+		BCLR("1001_0100_1sss_1000"), // Bit Clear in SREG
 		BLD("1111_100d_dddd_0bbb"),   // Bit Load from the T Flag in SREG to a Bit in Register
-		BRBC("1111_01kk_kkkk_ksss","FlagRelativeAddress"),  // Branch if Bit in SREG is Cleared
-		BRBS("1111_00kk_kkkk_ksss","FlagRelativeAddress"),  // Branch if Bit in SREG is Set
-		BRCC("1111_01kk_kkkk_k000","Address"),  // Branch if Carry Cleared
-		BRCS("1111_00kk_kkkk_k000","Address"),  // Branch if Carry Set
+		BRBC("1111_01kk_kkkk_ksss"),  // Branch if Bit in SREG is Cleared
+		BRBS("1111_00kk_kkkk_ksss"),  // Branch if Bit in SREG is Set
+		BRCC("1111_01kk_kkkk_k000"),  // Branch if Carry Cleared
+		BRCS("1111_00kk_kkkk_k000"),  // Branch if Carry Set
 		BREAK("1001_0101_1001_1000"), // Break
-		BREQ("1111_00kk_kkkk_k001","Address"),  // Branch if Equal
-		BRGE("1111_01kk_kkkk_k100","Address"),  // Branch if Greater or Equal Signed)
-		BRHC("1111_01kk_kkkk_k101","Address"),  // Branch if Half Carry Flag is Cleared
-		BRHS("1111_00kk_kkkk_k101","Address"),  // Branch if Half Carry Flag is Set
-		BRID("1111_01kk_kkkk_k111","Address"),  // Branch if Global Interrupt is Disabled
-		BRIE("1111_00kk_kkkk_k111","Address"),  // Branch if Global Interrupt is Enabled
-		BRLO("1111_00kk_kkkk_k000","Address"),  // Branch if Lower (Unsigned)
-		BRLT("1111_00kk_kkkk_k100","Address"),  // Branch if Less Than (Signed)
-		BRMI("1111_00kk_kkkk_k010","Address"),  // Branch if Minus
-		BRNE("1111_01kk_kkkk_k001","Address"),  // Branch if Not Equal
-		BRPL("1111_01kk_kkkk_k010","Address"),  // Branch if Plus
-		BRSH("1111_00kk_kkkk_k000","Address"),  // Branch if Same or Higher (Unsigned)
-		BRTC("1111_01kk_kkkk_k110","Address"),  // if the T Flag is Cleared
-		BRTS("1111_00kk_kkkk_k110","Address"),  // Branch if the T Flag is Set
-		BRVC("1111_01kk_kkkk_k011","Address"),  // Branch if Overflow Cleared
-		BRVS("1111_00kk_kkkk_k011","Address"),  // Branch if Overflow Set
-		BSET("1001_0100_0sss_1000", "Flag"),  // Bit Set in SREG
+		BREQ("1111_00kk_kkkk_k001"),  // Branch if Equal
+		BRGE("1111_01kk_kkkk_k100"),  // Branch if Greater or Equal Signed)
+		BRHC("1111_01kk_kkkk_k101"),  // Branch if Half Carry Flag is Cleared
+		BRHS("1111_00kk_kkkk_k101"),  // Branch if Half Carry Flag is Set
+		BRID("1111_01kk_kkkk_k111"),  // Branch if Global Interrupt is Disabled
+		BRIE("1111_00kk_kkkk_k111"),  // Branch if Global Interrupt is Enabled
+		BRLO("1111_00kk_kkkk_k000"),  // Branch if Lower (Unsigned)
+		BRLT("1111_00kk_kkkk_k100"),  // Branch if Less Than (Signed)
+		BRMI("1111_00kk_kkkk_k010"),  // Branch if Minus
+		BRNE("1111_01kk_kkkk_k001"),  // Branch if Not Equal
+		BRPL("1111_01kk_kkkk_k010"),  // Branch if Plus
+		BRSH("1111_00kk_kkkk_k000"),  // Branch if Same or Higher (Unsigned)
+		BRTC("1111_01kk_kkkk_k110"),  // if the T Flag is Cleared
+		BRTS("1111_00kk_kkkk_k110"),  // Branch if the T Flag is Set
+		BRVC("1111_01kk_kkkk_k011"),  // Branch if Overflow Cleared
+		BRVS("1111_00kk_kkkk_k011"),  // Branch if Overflow Set
+		BSET("1001_0100_0sss_1000"),  // Bit Set in SREG
 		BST("1111_101d_dddd_0bbb"),   // Bit Store from Bit in Register to T Flag in SREG
-		//CALL("1001_010k_kkkk_111k_kkkk_kkkk_kkkk_kkkk"), // Long Call to a Subroutine
+		CALL("1001_010k_kkkk_111k","kkkk_kkkk_kkkk_kkkk"), // Long Call to a Subroutine
 		CBI("1001_1000_AAAA_Abbb"),  // Clear Bit in I/O Register
 		CLC("1001_0100_1000_1000"),  // Clear Carry Flag
 		CLH("1001_0100_1100_1000"),  // Clear Half Carry Flag
 		CLI("1001_0100_1111_1000"),  // Clear Global Interrupt Flag
 		CLN("1001_0100_1010_1000"),  // Clear Global Interrupt Flag
-		// CLR("0010_01rd_dddd_rrrr", "RegisterDirect"),  // Clear Register
+		// CLR("0010_01rd_dddd_rrrr"),  // Clear Register
 		CLS("1001_0100_1100_1000"),  // Clear Signed Flag
 		CLT("1001_0100_1110_1000"),  // Clear T Flag
 		CLV("1001_0100_1011_1000"), // Clear Overflow Flag
 		CLZ("1001_0100_1001_1000"), // Clear Zero Flag
-		COM("1001_010d_dddd_0000", "Register"), // One's Complement
-		CP("0001_01rd_dddd_rrrr", "RegisterDirect"), // Compare
-		CPC("0000_01rd_dddd_rrrr", "RegisterDirect"), // Compare with Carry
-		CPI("0011_KKKK_dddd_KKKK", "RegisterImmediate"), // Compare with Immediate
-		CPSE("0001_00rd_dddd_rrrr", "RegisterDirect"), // Compare Skip if Equal
+		COM("1001_010d_dddd_0000"), // One's Complement
+		CP("0001_01rd_dddd_rrrr"), // Compare
+		CPC("0000_01rd_dddd_rrrr"), // Compare with Carry
+		CPI("0011_KKKK_dddd_KKKK"), // Compare with Immediate
+		CPSE("0001_00rd_dddd_rrrr"), // Compare Skip if Equal
 		DEC("1001_010d_dddd_1010"), // Decrement
 		EICALL("1001_0101_0001_1001"), // Extended Indirect Call to Subroutine
 		EIJMP("1001_0100_0001_1001"), // Extended Indirect Jump
 		ELPM("1001_0101_1101_1000"), // Extended Load Program Memory
-		EOR("0010_01rd_dddd_rrrr", "RegisterDirect"), // Exclusive OR
+		EOR("0010_01rd_dddd_rrrr"), // Exclusive OR
 		FMUL("0000_0011_0ddd_1rrr"), // Fractional Multiply Unsigned
 		FMULS("0000_0011_1ddd_0rrr"), // Fractional Multiply Signed
 		FMULSU("0000_0011_1ddd_1rrr"), // Fractional Multiply Signed with Unsigned
 		ICALL("1001_0101_0000_1001"), // Indirect Call to Subroutine
 		IJMP("1001_0100_0000_1001"), // Indirect Jump
 		IN("1011_0AAd_dddd_AAAA"), // Load an I/O Location to Register
-		INC("1001_010d_dddd_0011", "Register"), // Increment
-		//JMP("1001_010k_kkkk_110k_kkkk_kkkk_kkkk_kkkk"), // Jump
+		INC("1001_010d_dddd_0011"), // Increment
+		JMP("1001_010k_kkkk_110k","kkkk_kkkk_kkkk_kkkk"), // Jump
 		LAC("1001_001r_rrrr_0110"), // Load and Clear
 		LAS("1001_001r_rrrr_0101"), // Load and Set
 		LAT("1001_001r_rrrr_0111"), // Load and Toggle
@@ -75,27 +75,27 @@ public class Instruction {
 		LD_Y_INC("1001_000d_dddd_1001"), // Load Indirect from data space to Register using Index Y
 		LD_Y_DEC("1001_000d_dddd_1010"), // Load Indirect from data space to Register using Index Y
 //		LD_Y_Q("10q0_qq0d_dddd_1qqq"), // Load Indirect from data space to Register using Index Y
-		LD_Z("1000_000d_dddd_0000", "Register"), // Load Indirect From data space to Register using Index Z
-		LD_Z_INC("1001_000d_dddd_0001", "Register"), // Load Indirect From data space to Register using Index Z
-		LD_Z_DEC("1001_000d_dddd_0010", "Register"), // Load Indirect From data space to Register using Index Z
+		LD_Z("1000_000d_dddd_0000"), // Load Indirect From data space to Register using Index Z
+		LD_Z_INC("1001_000d_dddd_0001"), // Load Indirect From data space to Register using Index Z
+		LD_Z_DEC("1001_000d_dddd_0010"), // Load Indirect From data space to Register using Index Z
 //		LD_Z_Q("10q0_qq0d_dddd_0qqq"), // Load Indirect From data space to Register using Index Z
-		LDI("1110_KKKK_dddd_KKKK", "RegisterImmediate"), // Load Immediate
+		LDI("1110_KKKK_dddd_KKKK"), // Load Immediate
 		LDS("1010_0kkk_dddd_kkkk"), // Load Direct from data space
-//		LDSW("1001_000d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Load Direct from data space
+		LDSW("1001_000d_dddd_0000","kkkk_kkkk_kkkk_kkkk"), // Load Direct from data space
 		LPM("1001_0101_1100_1000"), // Load Program Memory
-		LPM_Z("1001_000d_dddd_0100", "Register"), // Load Program Memory
-		LPM_Z_INC("1001_000d_dddd_0101", "Register"), // Load Program Memory
+		LPM_Z("1001_000d_dddd_0100"), // Load Program Memory
+		LPM_Z_INC("1001_000d_dddd_0101"), // Load Program Memory
 		LSL("0000_11dd_dddd_dddd"), // Logical Shift Left
-		LSR("1001_010d_dddd_0110", "Register"), // Logical Shift Right
-		MOV("0010_11rd_dddd_rrrr", "RegisterDirect"), // Copy Register
+		LSR("1001_010d_dddd_0110"), // Logical Shift Right
+		MOV("0010_11rd_dddd_rrrr"), // Copy Register
 		MOVW("0000_0001_dddd_rrrr"), // Copy Register Word
-		MUL("1001_11rd_dddd_rrrr", "RegisterDirect"), // Multiply Unsigned
+		MUL("1001_11rd_dddd_rrrr"), // Multiply Unsigned
 		MULS("0000_0010_dddd_rrrr"), // Multiply Signed
 		MULSU("0000_0011_0ddd_0rrr"), // Multiply Signed with Unsigned
-		NEG("1001_010d_dddd_0001", "Register"), // Two's Complement
+		NEG("1001_010d_dddd_0001"), // Two's Complement
 		NOP("0000_0000_0000_0000"), // No Operation
-		OR("0010_10rd_dddd_rrrr", "RegisterDirect"), // Logical OR
-		ORI("0110_KKKK_dddd_KKKK", "RegisterImmediate"), // Logical OR with Immediate
+		OR("0010_10rd_dddd_rrrr"), // Logical OR
+		ORI("0110_KKKK_dddd_KKKK"), // Logical OR with Immediate
 		OUT("1011_1AAr_rrrr_AAAA"), // Store Register to I/O Location
 		POP("1001_000d_dddd_1111"), // Pop Register from Stack
 		PUSH("1001_001d_dddd_1111"), // Push Register on Stack
@@ -104,14 +104,14 @@ public class Instruction {
 		RETI("1001_0101_0001_1000"), // Return from Interrupt
 		RJMP("1100_kkkk_kkkk_kkkk"), // Relative Jump
 		ROL("0001_11dd_dddd_dddd"), // Rotate Left trough Carry
-		ROR("1001_010d_dddd_0111", "Register"), // Rotate Right through Carry
-		SBC("0000_10rd_dddd_rrrr", "RegisterDirect"), // Subtract with Carry
-		SBCI("0100_KKKK_dddd_KKKK", "RegisterImmediate"), // Subtract Immediate with Carry
+		ROR("1001_010d_dddd_0111"), // Rotate Right through Carry
+		SBC("0000_10rd_dddd_rrrr"), // Subtract with Carry
+		SBCI("0100_KKKK_dddd_KKKK"), // Subtract Immediate with Carry
 		SBI("1001_1010_AAAA_Abbb"), // Set Bit in I/O Register
 		SBIC("1001_1001_AAAA_Abbb"), // Skip if Bit in I/O Register is Cleared
 		SBIS("1001_1011_AAAA_Abbb"), // Skip if Bit in I/O Register is Set
 		SBIW("1001_0111_KKdd_KKKK"), // Subtract Immediate from Word
-		SBR("0110_KKKK_dddd_KKKK", "RegisterImmediate"), // Set Bits in Register
+		SBR("0110_KKKK_dddd_KKKK"), // Set Bits in Register
 		SBRC("1111_110r_rrrr_0bbb"), // Skip if Bit in Register is Cleared
 		SBRS("1111_111r_rrrr_0bbb"), // Skip if Bit in Register is Set
 		SEC("1001_0100_0000_1000"), // Set Carry Flag
@@ -137,10 +137,10 @@ public class Instruction {
 		ST_Z_DEC("1001_001r_rrrr_0010"), // Store Indirect From Register to data space using Index Z
 //		ST_Z_Q("10q0_qq1r_rrrr_0qqq"), // Store Indirect From Register to data space using Index Z
 		STS_DATA("1010_1kkk_dddd_kkkk"), // Store Direct to data space
-//		STS_DATA_WIDE("1001_001d_dddd_0000_kkkk_kkkk_kkkk_kkkk"), // Store Direct to data space
-		SUB("0001_10rd_dddd_rrrr", "RegisterDirect"), // Subtract without Carry
-		SUBI("0101_KKKK_dddd_KKKK", "RegisterImmediate"), // Subtract Immediate
-		SWAP("1001_010d_dddd_0010", "Register"), // Swap Nibbles
+		STS_DATA_WIDE("1001_001d_dddd_0000","kkkk_kkkk_kkkk_kkkk"), // Store Direct to data space
+		SUB("0001_10rd_dddd_rrrr"), // Subtract without Carry
+		SUBI("0101_KKKK_dddd_KKKK"), // Subtract Immediate
+		SWAP("1001_010d_dddd_0010"), // Swap Nibbles
 		TST("0010_00dd_dddd_dddd"), // Test for Zero or Minus
 		WDR("1001_0101_1010_1000"), // Watchdog Reset
 		XCH("1001_001r_rrrr_0100"); // Exchange
@@ -202,31 +202,30 @@ public class Instruction {
 			subsumedBy.put(SER, LDI);
 		}
 
-		private String fmt;
-		private String kind;
+		private String opcodeFormat;
+		private String operandFormat;
 
 		private Opcode(String fmt) {
 			if(fmt.length() != 19) {
 				throw new RuntimeException("Invalid format string: " + fmt);
 			}
-			this.fmt = fmt;
-			this.kind = "Instruction";
+			this.opcodeFormat = fmt;
 		}
 
-		private Opcode(String fmt, String kind) {
-			if(fmt.length() != 19) {
-				throw new RuntimeException("Invalid format string: " + fmt);
+		private Opcode(String opcodeFormat, String operandFormat) {
+			if(opcodeFormat.length() != 19) {
+				throw new RuntimeException("Invalid format string: " + opcodeFormat);
 			}
-			this.fmt = fmt;
-			this.kind = kind;
+			this.opcodeFormat = opcodeFormat;
+			this.operandFormat = operandFormat;
 		}
 
-		public String getFormat() {
-			return fmt;
+		public String getOpcodeFormat() {
+			return opcodeFormat;
 		}
 
-		public String getKind() {
-			return kind;
+		public String getOperandFormat() {
+			return operandFormat;
 		}
 
 		public boolean subsumes(Opcode opcode) {
@@ -242,6 +241,10 @@ public class Instruction {
 
 	public Opcode getOpcode() {
 		return opcode;
+	}
+
+	public int getWidth() {
+		return 2;
 	}
 
 	@Override
@@ -481,7 +484,7 @@ public class Instruction {
 
 		@Override
 		public String toString() {
-			return super.toString() + " " + k;
+			return super.toString() + " 0x" + Integer.toHexString(k);
 		}
 	}
 
@@ -512,6 +515,12 @@ public class Instruction {
 		} else {
 			return x;
 		}
+	}
+	private static int u16(int x) {
+		if((x & 0b11111111_11111111) != x) {
+			throw new IllegalArgumentException("Invalid 16bit unsigned integer");
+		}
+		return x;
 	}
 	public static final class ADC extends RegisterRegister {
 		public ADC(int d, int r) { super(Opcode.ADC, d, r); }
@@ -637,6 +646,10 @@ public class Instruction {
 		public BST(int d, int b) { super(Opcode.BST, d, b); }
 		public BST(int[] operands) { super(Opcode.BST, operands[1], operands[0]); }
 	}
+	public static final class CALL extends Address {
+		public CALL(int k) { super(Opcode.CALL,u16(k)); }
+		public CALL(int[] operands) { super(Opcode.CALL, operands[0]); }
+	}
 	public static final class CBI extends IoBit {
 		public CBI(int A, int b) { super(Opcode.CBI, A, b); }
 		public CBI(int[] operands) { super(Opcode.CBI, operands[0], operands[1]); }
@@ -741,6 +754,15 @@ public class Instruction {
 		public INC(int d) { super(Opcode.INC, d); }
 		public INC(int[] operands) { super(Opcode.INC, operands[0]); }
 	}
+	public static final class JMP extends Address {
+		public JMP(int k) { super(Opcode.JMP, k); }
+		public JMP(int[] operands) { super(Opcode.JMP, operands[0]); }
+
+		@Override
+		public int getWidth() {
+			return 4;
+		}
+	}
 	public static final class LAC extends Register {
 		public LAC(int r) { super(Opcode.LAC, r); }
 		public LAC(int[] operands) { super(Opcode.LAC, operands[0]); }
@@ -796,6 +818,12 @@ public class Instruction {
 	public static final class LDS extends RegisterAddress {
 		public LDS(int d, int k) { super(Opcode.LDS, d, u7(k)); }
 		public LDS(int[] operands) { super(Opcode.LDS, operands[0], operands[1]); }
+	}
+	public static final class LDSW extends RegisterAddress {
+		public LDSW(int d, int k) { super(Opcode.LDSW, d, u16(k)); }
+		public LDSW(int[] operands) { super(Opcode.LDSW, operands[0], operands[1]); }
+		@Override
+		public int getWidth() { return 4; }
 	}
 	public static final class LPM extends Instruction {
 		public LPM() { super(Opcode.LPM); }
@@ -1008,6 +1036,12 @@ public class Instruction {
 	public static final class STS_DATA extends RegisterAddress {
 		public STS_DATA(int d, int k) { super(Opcode.STS_DATA, d, u7(k)); }
 		public STS_DATA(int[] operands) { super(Opcode.STS_DATA, operands[0], operands[1]); }
+	}
+	public static final class STS_DATA_WIDE extends RegisterAddress {
+		public STS_DATA_WIDE(int d, int k) { super(Opcode.STS_DATA_WIDE, d, u16(k)); }
+		public STS_DATA_WIDE(int[] operands) { super(Opcode.STS_DATA_WIDE, operands[0], operands[1]); }
+		@Override
+		public int getWidth() { return 4; }
 	}
 	public static final class SUB extends RegisterRegister {
 		public SUB(int d, int r) { super(Opcode.SUB, d, r); }

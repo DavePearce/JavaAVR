@@ -11,7 +11,7 @@ import javaavr.core.Instruction;
 
 public class OldDecoderGenerator {
 	public static boolean match(Instruction.Opcode opcode, int bits) {
-		String fmt = opcode.getFormat().replaceAll("_", "");
+		String fmt = opcode.getOpcodeFormat().replaceAll("_", "");
 		if(fmt == "") {
 			return false;
 		} else {
@@ -57,8 +57,8 @@ public class OldDecoderGenerator {
 	}
 
 	public static int[] extract(Instruction.Opcode opcode, int bits) {
-		String fmt = opcode.getFormat().replaceAll("_", "");
-		char[] vars = extractVariables(opcode.getFormat());
+		String fmt = opcode.getOpcodeFormat().replaceAll("_", "");
+		char[] vars = extractVariables(opcode.getOpcodeFormat());
 		int[] operands = new int[vars.length];
 		for (int i = 15; i >= 0; i--) {
 			char c = fmt.charAt(15-i);

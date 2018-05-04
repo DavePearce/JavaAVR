@@ -247,9 +247,10 @@ public class HexFile {
 		ByteMemory mem = new ByteMemory(100);
 		hf.uploadTo(mem);
 		TinyDecoder decoder = new TinyDecoder();
-		for(int i=0;i!=mem.size();i=i+2) {
+		for(int i=0;i!=mem.size();) {
 			Instruction insn = decoder.decode(mem,i);
 			System.out.println(String.format("%04X", i) + ": " + insn);
+			i = i + insn.getWidth();
 		}
 	}
 }

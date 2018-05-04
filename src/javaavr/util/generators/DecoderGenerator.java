@@ -94,7 +94,7 @@ public class DecoderGenerator {
 			ArrayList<Range> ranges = new ArrayList<>();
 			//
 			int unit = 1;
-			for(int i=0;i!=17;++i) {
+			for(int i=0;i!=32;++i) {
 				if((mask & unit) == unit) {
 					if(start < 0) {
 						start = i;
@@ -104,6 +104,10 @@ public class DecoderGenerator {
 					start = Integer.MIN_VALUE;
 				}
 				unit = unit << 1;
+			}
+			// Check if open range
+			if(start >= 0) {
+				ranges.add(new Range(start,31));
 			}
 			//
 			return ranges.toArray(new Range[ranges.size()]);
@@ -125,7 +129,7 @@ public class DecoderGenerator {
 	private static int determineMaximumMask(Set<Opcode> group) {
 		int mask = 0xFFFF;
 		for(Opcode o : group) {
-			int fmt = toMask(o.getFormat());
+			int fmt = toMask(o.getOpcodeFormat());
 			mask = mask & fmt;
 		}
 		return mask;
@@ -173,7 +177,7 @@ public class DecoderGenerator {
 	}
 
 	public static boolean covered(Opcode o, int mask, int value) {
-		int ovalue = toValue(o.getFormat());
+		int ovalue = toValue(o.getOpcodeFormat());
 		return (ovalue & mask) == value;
 	}
 
@@ -261,11 +265,14 @@ public class DecoderGenerator {
 		return true;
 	}
 
-	public static char[] extractVariables(String format) {
+	public static char[] extractVariables(String opcodeFormat, String operandFormat) {
 		ArrayList<Character> vars = new ArrayList<>();
 		boolean[] seen = new boolean[256];
-		for(int i=0;i!=format.length();++i) {
-			char c = format.charAt(i);
+		if(operandFormat != null) {
+			opcodeFormat += operandFormat;
+		}
+		for(int i=0;i!=opcodeFormat.length();++i) {
+			char c = opcodeFormat.charAt(i);
 			if(Character.isAlphabetic(c)) {
 				if(!seen[c]) {
 					vars.add(c);
@@ -280,26 +287,37 @@ public class DecoderGenerator {
 		return chars;
 	}
 
-	public static Variable extractVariable(char v, String fmt) {
+	public static Variable extractVariable(char v, String opcodeFormat, String operandFormat) {
 		String name = "";
 		int mask = 0;
 		int unit = 1;
 		for(int i=15;i>=0;--i) {
-			if(fmt.charAt(i) == v) {
+			if(opcodeFormat.charAt(i) == v) {
 				name += v;
 				mask |= unit;
 			}
 			unit = unit << 1;
 		}
+		if(operandFormat != null) {
+			for(int i=15;i>=0;--i) {
+				if(operandFormat.charAt(i) == v) {
+					name += v;
+					mask |= unit;
+				}
+				unit = unit << 1;
+			}
+		}
 		return new Variable(name,mask);
 	}
 
 	public static Variable[] extractVariables(Opcode opcode) {
-		String fmt = opcode.getFormat().replaceAll("_", "");
-		char[] chars = extractVariables(fmt);
+		String opcodeFormat = opcode.getOpcodeFormat().replaceAll("_", "");
+		String operandFormat = opcode.getOperandFormat();
+		operandFormat = (operandFormat == null) ? null : operandFormat.replaceAll("_", "");
+		char[] chars = extractVariables(opcodeFormat,operandFormat);
 		Variable[] vars = new Variable[chars.length];
 		for(int i=0;i!=vars.length;++i) {
-			vars[i] = extractVariable(chars[i],fmt);
+			vars[i] = extractVariable(chars[i],opcodeFormat,operandFormat);
 		}
 		return vars;
 	}
@@ -324,10 +342,9 @@ public class DecoderGenerator {
 		tmp.addAll(Arrays.asList(Opcode.values()));
 		Group g = split(tmp);
 		Map<Group,Integer> numbering = number(g);
-//		print(g,numbering);
-//		printDecoders(g,numbering);
-//		printExtractors(g);
-		printInstructions();
+		print(g,numbering);
+		printDecoders(g,numbering);
+		printExtractors(g);
 	}
 
 	public static String toBinaryString(int value) {
@@ -360,12 +377,19 @@ public class DecoderGenerator {
 
 	public static void printDecoder(Group g, Map<Group,Integer> numbering) {
 		int id = numbering.get(g);
-		System.out.println("\tprivate static Instruction decode_" + id + "(int opcode) {");
+		System.out.println("\tprivate static Instruction decode_" + id + "(int opcode, Memory mem, int pc) {");
 		if(g.isTerminal()) {
 			Opcode o = g.getTerminal();
-			boolean hasOperands = (toValue(o.getFormat()) != 0xFFFF);
+			boolean hasOperands = (toValue(o.getOpcodeFormat()) != 0xFFFF);
 			if(hasOperands) {
-				System.out.println("\t\t\treturn new " + o + "(extract_" + o.getFormat() + "(opcode));");
+				if(o.getOperandFormat() == null) {
+					System.out.println("\t\t\treturn new " + o + "(extract_" + o.getOpcodeFormat() + "(opcode));");
+				} else {
+					System.out.println("\t\t\tint lsb = mem.read(pc+2) & 0xFF;");
+					System.out.println("\t\t\tint msb = mem.read(pc+3) & 0xFF;");
+					System.out.println("\t\t\topcode = (msb << 24) | (lsb << 16) | opcode;");
+					System.out.println("\t\t\treturn new " + o + "(extract_" + o.getOpcodeFormat() + "_" + o.getOperandFormat() + "(opcode));");
+				}
 			} else {
 				System.out.println("\t\t\treturn new " + o + "();");
 			}
@@ -375,7 +399,7 @@ public class DecoderGenerator {
 			for(Map.Entry<Integer, Group> e : g.getBuckets().entrySet()) {
 				System.out.println("\t\tcase " + toBinaryString(e.getKey()) + ":");
 				int n = numbering.get(e.getValue());
-				System.out.println("\t\t\treturn decode_" + n + "(opcode);");
+				System.out.println("\t\t\treturn decode_" + n + "(opcode,mem,pc);");
 			}
 			System.out.println("\t\tdefault:");
 			System.out.println("\t\t\treturn null;");
@@ -387,7 +411,7 @@ public class DecoderGenerator {
 	public static void printExtractors(Group g) {
 		HashSet<String> visited = new HashSet<>();
 		for(Opcode o : g.getAll()) {
-			String fmt = o.getFormat();
+			String fmt = o.getOpcodeFormat();
 			boolean hasOperands = (toValue(fmt) != 0xFFFF);
 			if(hasOperands && !visited.contains(fmt)) {
 				visited.add(fmt);
@@ -397,8 +421,13 @@ public class DecoderGenerator {
 	}
 
 	public static void printExtractor(Opcode o) {
-		String fmt = o.getFormat();
-		System.out.println("\tprivate static int[] extract_" + fmt + "(int opcode) {");
+		String fmt = o.getOpcodeFormat();
+		String operand = o.getOperandFormat();
+		if(operand == null) {
+			System.out.println("\tprivate static int[] extract_" + fmt + "(int opcode) {");
+		} else {
+			System.out.println("\tprivate static int[] extract_" + fmt + "_" + operand + "(int opcode) {");
+		}
 		Variable[] variables = extractVariables(o);
 		for(Variable v : variables) {
 			printVariable(v);
@@ -430,33 +459,33 @@ public class DecoderGenerator {
 		}
 	}
 
-	private static void printInstructions() {
-		for(Opcode o : Opcode.values()) {
-			char[] vars = extractVariables(o.getFormat());
-			Arrays.sort(vars);
-			String baseClass = o.getKind();
-			System.out.println("\tpublic static final class " + o + " extends " + baseClass + " {");
-			System.out.print("\t\tpublic " + o + "(");
-			for(int i=0;i!=vars.length;++i) {
-				if(i != 0) {
-					System.out.print(", ");
-				}
-				System.out.print("int " + vars[i]);
-			}
-			System.out.print(") { super(Opcode." + o);
-			for(int i=0;i!=vars.length;++i) {
-				System.out.print(", ");
-				System.out.print(vars[i]);
-			}
-			System.out.println("); }");
-			System.out.print("\t\tpublic " + o + "(int[] operands");
-			System.out.print(") { super(Opcode." + o);
-			for(int i=0;i!=vars.length;++i) {
-				System.out.print(", ");
-				System.out.print("operands[" + i + "]");
-			}
-			System.out.println("); }");
-			System.out.println("\t}");
-		}
-	}
+//	private static void printInstructions() {
+//		for(Opcode o : Opcode.values()) {
+//			char[] vars = extractVariables(o.getOpcodeFormat());
+//			Arrays.sort(vars);
+//			String baseClass = o.getKind();
+//			System.out.println("\tpublic static final class " + o + " extends " + baseClass + " {");
+//			System.out.print("\t\tpublic " + o + "(");
+//			for(int i=0;i!=vars.length;++i) {
+//				if(i != 0) {
+//					System.out.print(", ");
+//				}
+//				System.out.print("int " + vars[i]);
+//			}
+//			System.out.print(") { super(Opcode." + o);
+//			for(int i=0;i!=vars.length;++i) {
+//				System.out.print(", ");
+//				System.out.print(vars[i]);
+//			}
+//			System.out.println("); }");
+//			System.out.print("\t\tpublic " + o + "(int[] operands");
+//			System.out.print(") { super(Opcode." + o);
+//			for(int i=0;i!=vars.length;++i) {
+//				System.out.print(", ");
+//				System.out.print("operands[" + i + "]");
+//			}
+//			System.out.println("); }");
+//			System.out.println("\t}");
+//		}
+//	}
 }
