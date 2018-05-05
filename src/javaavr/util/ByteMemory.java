@@ -22,7 +22,17 @@ public class ByteMemory implements Memory {
 	}
 
 	@Override
+	public byte peek(int address) {
+		return data[address];
+	}
+
+	@Override
 	public void write(int address, byte data) {
+		this.data[address] = data;
+	}
+
+	@Override
+	public void poke(int address, byte data) {
 		this.data[address] = data;
 	}
 

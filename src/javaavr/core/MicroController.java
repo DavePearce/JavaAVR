@@ -16,6 +16,9 @@ public class MicroController {
 	public final static int BITCOPY_FLAG = (0b1 << 6);
 	public final static int INTERRUPT_FLAG = (0b1 << 7);
 	//
+	public final static int SPH_ADDRESS = 0x3e + 32;
+	public final static int SPL_ADDRESS = 0x3d + 32;
+	//
 	private final Instruction.Decoder decoder;
 	private final Instruction.Executor executor;
 	private final Memory data;
@@ -44,14 +47,18 @@ public class MicroController {
 		return registers;
 	}
 
+	public void reset() {
+		registers = new Registers();
+	}
+
 	public void step() {
-		Instruction instruction = decoder.decode(flash, registers.pc);
+		Instruction instruction = decoder.decode(flash, registers.PC);
 		executor.execute(instruction, data, registers);
 	}
 
 	public static final class Registers {
-		public int pc;
-		public int sreg;
+		public int PC;
+		public int SREG;
 	}
 
 	public final static MicroController Tiny85() {

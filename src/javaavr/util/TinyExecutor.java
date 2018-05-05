@@ -420,10 +420,10 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(ADC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = mem.read(insn.Rr);
-		int C = (regs.sreg & CARRY_FLAG) >> 0;
+		int C = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
 		byte R = (byte) (Rd + Rr + C);
 		// Update Register file
@@ -433,7 +433,7 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(ADD insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = mem.read(insn.Rr);
 		// Perform operation
@@ -445,12 +445,12 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(ADIW insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(AND insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = mem.read(insn.Rr);
 		// Perform operation
@@ -462,7 +462,7 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(ANDI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = (byte) insn.K;
 		// Perform operation
@@ -474,7 +474,7 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(ASR insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		// Perform operation
 		byte R = (byte) (Rd >> 1);
@@ -490,50 +490,50 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(BCLR insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~(1 << insn.s);
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~(1 << insn.s);
 	}
 
 	private void execute(BLD insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		int Rd = mem.read(insn.Rd);
 		int mask = (1 << insn.b);
 		Rd = Rd & mask;
-		Rd |= (regs.sreg & BITCOPY_FLAG) != 0 ? mask : 0;
+		Rd |= (regs.SREG & BITCOPY_FLAG) != 0 ? mask : 0;
 		mem.write(insn.Rd, (byte) Rd);
 	}
 
 	private void execute(BRBC insn, Memory mem, Registers regs) {
 		int mask = (1 << insn.s);
-		if ((regs.sreg & mask) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & mask) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRBS insn, Memory mem, Registers regs) {
 		int mask = (1 << insn.s);
-		if ((regs.sreg & mask) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & mask) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRCC insn, Memory mem, Registers regs) {
-		if ((regs.sreg & CARRY_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & CARRY_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRCS insn, Memory mem, Registers regs) {
-		if ((regs.sreg & CARRY_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & CARRY_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
@@ -542,153 +542,153 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(BREQ insn, Memory mem, Registers regs) {
-		if ((regs.sreg & ZERO_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & ZERO_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRGE insn, Memory mem, Registers regs) {
-		if ((regs.sreg & SIGN_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & SIGN_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRHC insn, Memory mem, Registers regs) {
-		if ((regs.sreg & HALFCARRY_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & HALFCARRY_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRHS insn, Memory mem, Registers regs) {
-		if ((regs.sreg & HALFCARRY_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & HALFCARRY_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRID insn, Memory mem, Registers regs) {
-		if ((regs.sreg & INTERRUPT_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & INTERRUPT_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRIE insn, Memory mem, Registers regs) {
-		if ((regs.sreg & INTERRUPT_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & INTERRUPT_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRLO insn, Memory mem, Registers regs) {
-		if ((regs.sreg & CARRY_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & CARRY_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRLT insn, Memory mem, Registers regs) {
-		if ((regs.sreg & SIGN_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & SIGN_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRMI insn, Memory mem, Registers regs) {
-		if ((regs.sreg & NEGATIVE_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & NEGATIVE_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRNE insn, Memory mem, Registers regs) {
-		if ((regs.sreg & ZERO_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & ZERO_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRPL insn, Memory mem, Registers regs) {
-		if ((regs.sreg & NEGATIVE_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & NEGATIVE_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRSH insn, Memory mem, Registers regs) {
-		if ((regs.sreg & CARRY_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & CARRY_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRTC insn, Memory mem, Registers regs) {
-		if ((regs.sreg & BITCOPY_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & BITCOPY_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRTS insn, Memory mem, Registers regs) {
-		if ((regs.sreg & BITCOPY_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & BITCOPY_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRVC insn, Memory mem, Registers regs) {
-		if ((regs.sreg & OVERFLOW_FLAG) == 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & OVERFLOW_FLAG) == 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BRVS insn, Memory mem, Registers regs) {
-		if ((regs.sreg & OVERFLOW_FLAG) != 0) {
-			regs.pc = regs.pc + insn.k + 1;
+		if ((regs.SREG & OVERFLOW_FLAG) != 0) {
+			regs.PC = regs.PC + insn.k + 1;
 		} else {
-			regs.pc = regs.pc + 1;
+			regs.PC = regs.PC + 1;
 		}
 	}
 
 	private void execute(BSET insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg |= (1 << insn.s);
+		regs.PC = regs.PC + 1;
+		regs.SREG |= (1 << insn.s);
 	}
 
 	private void execute(BST insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		int Rd = mem.read(insn.Rd);
 		int mask = (1 << insn.b);
 		boolean T = (Rd & mask) != 0;
-		regs.sreg |= T ? (1 << 6) : 0;
+		regs.SREG |= T ? (1 << 6) : 0;
 	}
 
 	private void execute(CALL insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(CBI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		int A = mem.read(insn.A + 32);
 		int mask = (1 << insn.b);
 		A &= ~mask;
@@ -696,47 +696,47 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(CLC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~CARRY_FLAG;
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~CARRY_FLAG;
 	}
 
 	private void execute(CLH insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~HALFCARRY_FLAG;
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~HALFCARRY_FLAG;
 	}
 
 	private void execute(CLI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~INTERRUPT_FLAG;
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~INTERRUPT_FLAG;
 	}
 
 	private void execute(CLN insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~NEGATIVE_FLAG;
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~NEGATIVE_FLAG;
 	}
 
 	private void execute(CLS insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~SIGN_FLAG;
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~SIGN_FLAG;
 	}
 
 	private void execute(CLT insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~BITCOPY_FLAG;
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~BITCOPY_FLAG;
 	}
 
 	private void execute(CLV insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~OVERFLOW_FLAG;
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~OVERFLOW_FLAG;
 	}
 
 	private void execute(CLZ insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		regs.sreg &= ~ZERO_FLAG;
+		regs.PC = regs.PC + 1;
+		regs.SREG &= ~ZERO_FLAG;
 	}
 
 	private void execute(COM insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		// Perform operation
 		byte R = (byte) (0xFF - Rd);
@@ -747,7 +747,7 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(CP insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = mem.read(insn.Rr);
 		// Perform operation
@@ -757,10 +757,10 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(CPC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = mem.read(insn.Rr);
-		int C = (regs.sreg & CARRY_FLAG) >> 0;
+		int C = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
 		byte R = (byte) (Rd - Rr - C);
 		// Set Flags
@@ -768,7 +768,7 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(CPI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = mem.read(insn.K);
 		// Perform operation
@@ -778,12 +778,12 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(CPSE insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(DEC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = -1;
 		// Perform operation
@@ -795,22 +795,22 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(EICALL insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(EIJMP insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(ELPM insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(EOR insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = mem.read(insn.Rr);
 		// Perform operation
@@ -822,37 +822,37 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(FMUL insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(FMULS insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(FMULSU insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(ICALL insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(IJMP insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(IN insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(INC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
 		byte Rr = +1;
 		// Perform operation
@@ -864,380 +864,408 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	private void execute(JMP insn, Memory mem, Registers regs) {
-		regs.pc = insn.k;
+		regs.PC = insn.k;
 	}
 
 	private void execute(LAC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(LAS insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(LAT insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_X(LD_X insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_X_INC(LD_X_INC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_X_DEC(LD_X_DEC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Y(LD_Y insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Y_INC(LD_Y_INC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Y_DEC(LD_Y_DEC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Z(LD_Z insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Z_INC(LD_Z_INC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Z_DEC(LD_Z_DEC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(LDI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
+		mem.write(insn.Rd, (byte) insn.K);
 	}
 
 	private void execute(LDS insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(LDSW insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(LPM insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Z(LPM_Z insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Z_INC(LPM_Z_INC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(LSL insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(LSR insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(MOV insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(MOVW insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(MUL insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(MULS insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(MULSU insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(NEG insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(NOP insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
 	}
 
 	private void execute(OR insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
+		byte Rd = mem.read(insn.Rd);
+		byte Rr = mem.read(insn.Rr);
+		// Perform operation
+		byte R = (byte) (Rd | Rr);
+		// Update Register file
+		mem.write(insn.Rd, R);
+		// Set Flags
+		setStatusRegister(Rd, Rr, R, regs);
 	}
 
 	private void execute(ORI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
+		byte Rd = mem.read(insn.Rd);
+		byte Rr = (byte) insn.K;
+		// Perform operation
+		byte R = (byte) (Rd | Rr);
+		// Update Register file
+		mem.write(insn.Rd, R);
+		// Set Flags
+		setStatusRegister((byte) Rd, Rr, R, regs);
 	}
 
 	private void execute(OUT insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
+		byte Rd = mem.read(insn.Rd);
+		mem.write(insn.A + 32, Rd);
 	}
 
 	private void execute(POP insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
+		byte Rd = pop(mem);
+		mem.write(insn.Rd, Rd);
 	}
 
 	private void execute(PUSH insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
+		byte Rd = mem.read(insn.Rd);
+		push(Rd,mem);
 	}
 
 	private void execute(RCALL insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
+		byte lsb = (byte) (regs.PC & 0xFF);
+		byte msb = (byte) (regs.PC >> 8);
+		push(msb, mem);
+		push(lsb, mem);
+		regs.PC = regs.PC + insn.k;
 	}
 
 	private void execute(RET insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(RETI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(RJMP insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + insn.k + 1;
+		regs.PC = regs.PC + insn.k + 1;
 	}
 
 	private void execute(ROL insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(ROR insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SBC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 1;
+		byte Rd = mem.read(insn.Rd);
+		byte Rr = mem.read(insn.Rr);
+		int C = (regs.SREG & CARRY_FLAG) >> 0;
+		// Perform operation
+		byte R = (byte) (Rd - Rr - C);
+		// Update Register file
+		mem.write(insn.Rd, R);
+		// Set Flags
+		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(SBCI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SBI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SBIC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SBIS insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SBIW insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SBR insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SBRC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SBRS insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SEC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SEH insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SEI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SEN insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SER insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SES insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SET insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SEV insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SEZ insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SLEEP insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SPM insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_X(ST_X insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_X_INC(ST_X_INC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_X_DEC(ST_X_DEC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Y(ST_Y insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Y_INC(ST_Y_INC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Y_DEC(ST_Y_DEC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Z(ST_Z insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Z_INC(ST_Z_INC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_Z_DEC(ST_Z_DEC insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_DATA(STS_DATA insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute_DATA_WIDE(STS_DATA_WIDE insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SUB insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SUBI insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(SWAP insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(TST insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(WDR insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
 	private void execute(XCH insn, Memory mem, Registers regs) {
-		regs.pc = regs.pc + 1;
+		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1260,27 +1288,59 @@ public class TinyExecutor implements Instruction.Executor {
 		setStatusRegister(C,Z,N,V,S,H,regs);
 	}
 
+	private void push(byte data, Memory mem) {
+		// Construct SP contents
+		int SP = readWord(SPL_ADDRESS,mem);
+		System.out.println("STACK POINTER: " + SP);
+		// Write data
+		mem.write(SP, data);
+		// Post-decrement stack pointer
+		SP = SP - 1;
+		writeWord(SPL_ADDRESS,SP,mem);
+	}
+
+	private byte pop(Memory mem) {
+		// Construct SP contents
+		int SP = readWord(SPL_ADDRESS,mem);
+		// Pre-increment stack pointer
+		SP = SP + 1;
+		writeWord(SPL_ADDRESS,SP,mem);
+		// read data
+		return mem.read(SP);
+	}
+
 	private void setStatusRegister(boolean C, boolean Z, boolean N, boolean V, boolean S, Registers regs) {
 		// Initially clear all bits
-		regs.sreg = regs.sreg & 0b11100000;
+		regs.SREG = regs.SREG & 0b11100000;
 		// Set relevant flags
-		regs.sreg |= C ? 0b1 << 0 : 0;
-		regs.sreg |= Z ? 0b1 << 1 : 0;
-		regs.sreg |= N ? 0b1 << 2 : 0;
-		regs.sreg |= V ? 0b1 << 3 : 0;
-		regs.sreg |= S ? 0b1 << 4 : 0;
+		regs.SREG |= C ? 0b1 << 0 : 0;
+		regs.SREG |= Z ? 0b1 << 1 : 0;
+		regs.SREG |= N ? 0b1 << 2 : 0;
+		regs.SREG |= V ? 0b1 << 3 : 0;
+		regs.SREG |= S ? 0b1 << 4 : 0;
 	}
 
 	private void setStatusRegister(boolean C, boolean Z, boolean N, boolean V, boolean S, boolean H, Registers regs) {
 		// Initially clear all bits
-		regs.sreg = regs.sreg & 0b11000000;
+		regs.SREG = regs.SREG & 0b11000000;
 		// Set relevant flags
-		regs.sreg |= C ? 0b1 << 0 : 0;
-		regs.sreg |= Z ? 0b1 << 1 : 0;
-		regs.sreg |= N ? 0b1 << 2 : 0;
-		regs.sreg |= V ? 0b1 << 3 : 0;
-		regs.sreg |= S ? 0b1 << 4 : 0;
-		regs.sreg |= H ? 0b1 << 5 : 0;
+		regs.SREG |= C ? 0b1 << 0 : 0;
+		regs.SREG |= Z ? 0b1 << 1 : 0;
+		regs.SREG |= N ? 0b1 << 2 : 0;
+		regs.SREG |= V ? 0b1 << 3 : 0;
+		regs.SREG |= S ? 0b1 << 4 : 0;
+		regs.SREG |= H ? 0b1 << 5 : 0;
+	}
+
+	public int readWord(int address, Memory mem) {
+		int msb = mem.read(address+1) & 0xFF;
+		int lsb = mem.read(address) & 0xFF;
+		return (msb << 8) | lsb;
+	}
+
+	public void writeWord(int address, int word, Memory mem) {
+		mem.write(address, (byte) (word & 0xFF));
+		mem.write(address+1, (byte) (word >> 8));
 	}
 
 	public static void main(String[] args) {
@@ -1292,6 +1352,6 @@ public class TinyExecutor implements Instruction.Executor {
 		exec.execute(new ADC(0,0), data, registers);
 		//
 		System.out.println("RESULT: " + data.read(0));
-		System.out.println("STATUS: " + Integer.toBinaryString(registers.sreg));
+		System.out.println("STATUS: " + Integer.toBinaryString(registers.SREG));
 	}
 }

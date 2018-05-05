@@ -22,6 +22,18 @@ public class MultiplexedMemory implements Memory {
 	}
 
 	@Override
+	public byte peek(int address) {
+		for(int i=0;i!=memories.length;++i) {
+			Memory memory = memories[i];
+			if(address < memory.size()) {
+				return memory.peek(address);
+			}
+			address -= memory.size();
+		}
+		throw new IllegalArgumentException("invalid memory address");
+	}
+
+	@Override
 	public void write(int address, byte data) {
 		for(int i=0;i!=memories.length;++i) {
 			Memory memory = memories[i];
@@ -33,6 +45,21 @@ public class MultiplexedMemory implements Memory {
 		}
 		throw new IllegalArgumentException("invalid memory address");
 	}
+
+
+	@Override
+	public void poke(int address, byte data) {
+		for(int i=0;i!=memories.length;++i) {
+			Memory memory = memories[i];
+			if(address < memory.size()) {
+				memory.poke(address,data);
+				return;
+			}
+			address -= memory.size();
+		}
+		throw new IllegalArgumentException("invalid memory address");
+	}
+
 
 	@Override
 	public void write(int address, byte[] data) {
