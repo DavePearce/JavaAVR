@@ -6,12 +6,22 @@ import javaavr.util.TinyDecoder;
 import javaavr.util.TinyExecutor;
 
 public class MicroController {
+	// Status Flags
+	public final static int CARRY_FLAG = (0b1 << 0);
+	public final static int ZERO_FLAG = (0b1 << 1);
+	public final static int NEGATIVE_FLAG = (0b1 << 2);
+	public final static int OVERFLOW_FLAG = (0b1 << 3);
+	public final static int SIGN_FLAG = (0b1 << 4);
+	public final static int HALFCARRY_FLAG = (0b1 << 5);
+	public final static int BITCOPY_FLAG = (0b1 << 6);
+	public final static int INTERRUPT_FLAG = (0b1 << 7);
+	//
 	private final Instruction.Decoder decoder;
 	private final Instruction.Executor executor;
 	private final Memory data;
 	private final Memory flash;
 	// Internal registers
-	private RegisterFile registers;
+	private Registers registers;
 
 	public MicroController(Instruction.Decoder decoder, Instruction.Executor executor, Memory flash,
 			Memory data) {
@@ -19,7 +29,7 @@ public class MicroController {
 		this.decoder = decoder;
 		this.flash = flash;
 		this.data = data;
-		this.registers = new RegisterFile();
+		this.registers = new Registers();
 	}
 
 	public Memory getCode() {
@@ -30,7 +40,7 @@ public class MicroController {
 		return data;
 	}
 
-	public RegisterFile getRegisters() {
+	public Registers getRegisters() {
 		return registers;
 	}
 
@@ -39,12 +49,9 @@ public class MicroController {
 		executor.execute(instruction, data, registers);
 	}
 
-	public final class RegisterFile {
+	public static final class Registers {
 		public int pc;
 		public int sreg;
-		public int X;
-		public int Y;
-		public int Z;
 	}
 
 	public final static MicroController Tiny85() {

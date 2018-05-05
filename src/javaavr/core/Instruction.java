@@ -1902,6 +1902,6 @@ public class Instruction {
 	 *
 	 */
 	public interface Executor {
-		void execute(Instruction insn, Memory data, MicroController.RegisterFile registers);
+		void execute(Instruction insn, Memory data, MicroController.Registers registers);
 	}
 }
