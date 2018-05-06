@@ -783,6 +783,7 @@ public class TinyDecoder implements Instruction.Decoder {
 	}
 	private static int[] extract_1111_00kk_kkkk_ksss(int opcode) {
 		int kkkkkkk = (opcode & 0b0000001111111000) >> 3;
+		kkkkkkk = kkkkkkk << (32-7) >> (32-7);
 		int sss = (opcode & 0b0000000000000111) >> 0;
 		return new int[]{kkkkkkk, sss};
 	}
@@ -1237,6 +1238,8 @@ public class TinyDecoder implements Instruction.Decoder {
 	}
 	private static int[] extract_1111_01kk_kkkk_ksss(int opcode) {
 		int kkkkkkk = (opcode & 0b0000001111111000) >> 3;
+		kkkkkkk = kkkkkkk << (32-7) >> (32-7);
+		System.out.println("GOT: " + kkkkkkk);
 		int sss = (opcode & 0b0000000000000111) >> 0;
 		return new int[]{kkkkkkk, sss};
 	}

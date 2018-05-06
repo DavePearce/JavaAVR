@@ -359,7 +359,7 @@ public class SimulationWindow extends JFrame {
 			// Finally redraw window
 			repaint();
 		} catch(Exception e) {
-			error("Problem loading file");
+			error("Problem loading file",e);
 		}
 	}
 
@@ -465,8 +465,9 @@ public class SimulationWindow extends JFrame {
 
 	}
 
-	public void error(String message) {
-		JOptionPane.showMessageDialog(this, message);
+	public void error(String message, Exception e) {
+		e.printStackTrace();
+		JOptionPane.showMessageDialog(this, message + " (" + e.getMessage() + ")");
 	}
 
 	public static void main(String[] args) {

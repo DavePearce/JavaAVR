@@ -405,9 +405,6 @@ public class TinyExecutor implements Instruction.Executor {
 		case SWAP:
 			execute((SWAP) insn, data, registers);
 			break;
-		case TST:
-			execute((TST) insn, data, registers);
-			break;
 		case WDR:
 			execute((WDR) insn, data, registers);
 			break;
@@ -506,6 +503,7 @@ public class TinyExecutor implements Instruction.Executor {
 	private void execute(BRBC insn, Memory mem, Registers regs) {
 		int mask = (1 << insn.s);
 		if ((regs.SREG & mask) == 0) {
+			System.out.println("BRANCHING TO: " + (regs.PC + insn.k + 1));
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
 			regs.PC = regs.PC + 1;
@@ -1091,7 +1089,15 @@ public class TinyExecutor implements Instruction.Executor {
 
 	private void execute(SBCI insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		byte Rd = mem.read(insn.Rd);
+		byte Rr = (byte) insn.K;
+		int C = (regs.SREG & CARRY_FLAG) >> 0;
+		// Perform operation
+		byte R = (byte) (Rd - Rr - C);
+		// Update Register file
+		mem.write(insn.Rd, R);
+		// Set Flags
+		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(SBI insn, Memory mem, Registers regs) {
@@ -1246,15 +1252,17 @@ public class TinyExecutor implements Instruction.Executor {
 
 	private void execute(SUBI insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		byte Rd = mem.read(insn.Rd);
+		byte Rr = (byte) insn.K;
+		// Perform operation
+		byte R = (byte) (Rd - Rr);
+		// Update Register file
+		mem.write(insn.Rd, R);
+		// Set Flags
+		setStatusRegister((byte) Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(SWAP insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(TST insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
