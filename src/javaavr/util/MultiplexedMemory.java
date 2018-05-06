@@ -1,6 +1,6 @@
 package javaavr.util;
 
-import javaavr.core.Memory;
+import javaavr.core.AVR.Memory;
 
 public class MultiplexedMemory implements Memory {
 	private Memory[] memories;

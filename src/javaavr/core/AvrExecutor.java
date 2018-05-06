@@ -1,16 +1,14 @@
-package javaavr.util;
+package javaavr.core;
 
-import javaavr.core.Instruction;
-import static javaavr.core.Instruction.*;
-import javaavr.core.Memory;
-import javaavr.core.MicroController;
-import static javaavr.core.MicroController.*;
-import javaavr.core.MicroController.Registers;
+import static javaavr.core.AvrInstruction.*;
+import static javaavr.core.AVR.*;
 
-public class TinyExecutor implements Instruction.Executor {
+import javaavr.util.ByteMemory;
+
+public class AvrExecutor implements AVR.Executor {
 
 	@Override
-	public void execute(Instruction insn, Memory data, Registers registers) {
+	public void execute(AvrInstruction insn, Memory data, Registers registers) {
 		switch (insn.getOpcode()) {
 		case ADC:
 			execute((ADC) insn, data, registers);
@@ -426,7 +424,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Update Register file
 		mem.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister((byte) Rd, Rr, R, regs);
+		setStatusRegister(Rd, Rr, R, regs);
 	}
 
 	private void execute(ADD insn, Memory mem, Registers regs) {
@@ -438,7 +436,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Update Register file
 		mem.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister((byte) Rd, Rr, R, regs);
+		setStatusRegister(Rd, Rr, R, regs);
 	}
 
 	private void execute(ADIW insn, Memory mem, Registers regs) {
@@ -467,7 +465,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Update Register file
 		mem.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister((byte) Rd, Rr, R, regs);
+		setStatusRegister(Rd, Rr, R, regs);
 	}
 
 	private void execute(ASR insn, Memory mem, Registers regs) {
@@ -751,7 +749,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Perform operation
 		byte R = (byte) (Rd - Rr);
 		// Set Flags
-		setStatusRegister((byte) Rd, (byte) -Rr, R, regs);
+		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(CPC insn, Memory mem, Registers regs) {
@@ -762,7 +760,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Perform operation
 		byte R = (byte) (Rd - Rr - C);
 		// Set Flags
-		setStatusRegister((byte) Rd, (byte) -Rr, R, regs);
+		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(CPI insn, Memory mem, Registers regs) {
@@ -772,7 +770,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Perform operation
 		byte R = (byte) (Rd - Rr);
 		// Set Flags
-		setStatusRegister((byte) Rd, (byte) -Rr, R, regs);
+		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(CPSE insn, Memory mem, Registers regs) {
@@ -789,7 +787,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Update Register file
 		mem.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister((byte) Rd, Rr, R, regs);
+		setStatusRegister(Rd, Rr, R, regs);
 	}
 
 	private void execute(EICALL insn, Memory mem, Registers regs) {
@@ -858,7 +856,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Update Register file
 		mem.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister((byte) Rd, Rr, R, regs);
+		setStatusRegister(Rd, Rr, R, regs);
 	}
 
 	private void execute(JMP insn, Memory mem, Registers regs) {
@@ -1020,7 +1018,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Update Register file
 		mem.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister((byte) Rd, Rr, R, regs);
+		setStatusRegister(Rd, Rr, R, regs);
 	}
 
 	private void execute(OUT insn, Memory mem, Registers regs) {
@@ -1259,7 +1257,7 @@ public class TinyExecutor implements Instruction.Executor {
 		// Update Register file
 		mem.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister((byte) Rd, (byte) -Rr, R, regs);
+		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(SWAP insn, Memory mem, Registers regs) {
@@ -1352,7 +1350,7 @@ public class TinyExecutor implements Instruction.Executor {
 	}
 
 	public static void main(String[] args) {
-		TinyExecutor exec = new TinyExecutor();
+		AvrExecutor exec = new AvrExecutor();
 		Registers registers = new Registers();
 		Memory data = new ByteMemory(512);
 		//

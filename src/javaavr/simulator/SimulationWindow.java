@@ -32,14 +32,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 
-import javaavr.core.Instruction;
-import javaavr.core.Memory;
-import javaavr.core.MicroController;
+import javaavr.core.AvrDecoder;
+import javaavr.core.AvrExecutor;
+import javaavr.core.AvrInstruction;
+import javaavr.core.AVR;
 import javaavr.io.HexFile;
 import javaavr.util.ByteMemory;
 import javaavr.util.MultiplexedMemory;
-import javaavr.util.TinyDecoder;
-import javaavr.util.TinyExecutor;
 
 public class SimulationWindow extends JFrame {
 	// Fonts
@@ -322,12 +321,12 @@ public class SimulationWindow extends JFrame {
 	}
 
 	public String[] disassemble() {
-		TinyDecoder decoder = new TinyDecoder();
-		Memory code = mcu.getCode();
+		AvrDecoder decoder = new AvrDecoder();
+		AVR.Memory code = mcu.getCode();
 		int size = code.size() / 2;
 		String[] instructions = new String[size];
 		for (int i = 0; i != size;) {
-			Instruction insn = decoder.decode(code, i);
+			AvrInstruction insn = decoder.decode(code, i);
 			instructions[i] = insn.toString();
 			i = i + insn.getWidth();
 		}
@@ -337,7 +336,7 @@ public class SimulationWindow extends JFrame {
 	public void resetMicroController() {
 		mcu.reset();
 		Random rand = new Random();
-		Memory data = mcu.getData();
+		AVR.Memory data = mcu.getData();
 		// Randomise SRAM
 		for(int i=0;i!=data.size();++i) {
 			byte item = (byte) rand.nextInt(255);
@@ -365,16 +364,16 @@ public class SimulationWindow extends JFrame {
 
 	public ExtendedMicroController constructMicroController() {
 		// This is the configuration for an ATTiny85.
-		Memory regs = new ByteMemory(32);
-		Memory io = new ByteMemory(64);
-		Memory SRAM = new ByteMemory(512);
-		Memory flash = new ByteMemory(8192);
-		Memory data = new MultiplexedMemory(regs,io,SRAM);
-		return new ExtendedMicroController(new TinyDecoder(), new TinyExecutor(), flash, data);
+		AVR.Memory regs = new ByteMemory(32);
+		AVR.Memory io = new ByteMemory(64);
+		AVR.Memory SRAM = new ByteMemory(512);
+		AVR.Memory flash = new ByteMemory(8192);
+		AVR.Memory data = new MultiplexedMemory(regs,io,SRAM);
+		return new ExtendedMicroController(new AvrDecoder(), new AvrExecutor(), flash, data);
 	}
 
-	public static class ExtendedMicroController extends MicroController {
-		public ExtendedMicroController(Instruction.Decoder decoder, Instruction.Executor executor, Memory flash, Memory data) {
+	public static class ExtendedMicroController extends AVR {
+		public ExtendedMicroController(AVR.Decoder decoder, AVR.Executor executor, Memory flash, Memory data) {
 			super(decoder,executor,flash,new InstrumentedMemory(data));
 		}
 

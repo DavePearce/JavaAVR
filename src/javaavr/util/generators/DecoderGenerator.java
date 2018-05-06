@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javaavr.core.Instruction;
-import javaavr.core.Instruction.Argument;
-import javaavr.core.Instruction.Opcode;
+import javaavr.core.AvrInstruction;
+import javaavr.core.AvrInstruction.Argument;
+import javaavr.core.AvrInstruction.Opcode;
 
 public class DecoderGenerator {
 
@@ -371,7 +371,7 @@ public class DecoderGenerator {
 		System.out.println("\tprivate static Instruction decode_" + id + "(int opcode, Memory mem, int pc) {");
 		if(g.isTerminal()) {
 			Opcode o = g.getTerminal();
-			Instruction.Argument[] args = o.getArguments();
+			AvrInstruction.Argument[] args = o.getArguments();
 			if(o.getOperandFormat() != null) {
 				System.out.println("\t\t\tint lsb = mem.read(pc+2) & 0xFF;");
 				System.out.println("\t\t\tint msb = mem.read(pc+3) & 0xFF;");
@@ -379,7 +379,7 @@ public class DecoderGenerator {
 			}
 			String argstr = "";
 			for(int i=0;i!=args.length;++i) {
-				Instruction.Argument arg = args[i];
+				AvrInstruction.Argument arg = args[i];
 				if(arg.signed) {
 					System.out.println("\t\t\tint " + arg.name + " = extract_s" + Integer.toBinaryString(arg.toMask(o)) + "(opcode);");
 				} else {
@@ -409,11 +409,11 @@ public class DecoderGenerator {
 
 	public static void printTransforms(Argument arg) {
 		for(int i=0;i!=arg.transforms.length;++i) {
-			Instruction.Transform t = arg.transforms[i];
-			if(t instanceof Instruction.ShiftLeft) {
+			AvrInstruction.Transform t = arg.transforms[i];
+			if(t instanceof AvrInstruction.ShiftLeft) {
 				System.out.println("\t\t\t" + arg.name + " = " + arg.name + " << 1;");
 			} else {
-				Instruction.Offset offset = (Instruction.Offset) t;
+				AvrInstruction.Offset offset = (AvrInstruction.Offset) t;
 				System.out.println("\t\t\t" + arg.name + " = " + arg.name + " + " + offset.offset + ";");
 			}
 		}
@@ -454,12 +454,12 @@ public class DecoderGenerator {
 	}
 
 	public static void printExtractor(String name, Opcode opcode, Argument arg) {
-		Instruction.Bits[] ranges = arg.getBitRanges(opcode);
+		AvrInstruction.Bits[] ranges = arg.getBitRanges(opcode);
 		int mask = arg.toMask(opcode);
 		System.out.println("\tprivate static int extract_" + name + "(int opcode) {");
 		int width = 0;
 		for(int i=0;i!=ranges.length;++i) {
-			Instruction.Bits r = ranges[i];
+			AvrInstruction.Bits r = ranges[i];
 			int offset = r.getStart() - width;
 			System.out.print("\t\t");
 			if(i == 0) {

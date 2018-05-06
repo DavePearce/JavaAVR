@@ -1,15 +1,13 @@
-package javaavr.util;
+package javaavr.core;
 
-import javaavr.core.Instruction;
-import javaavr.core.Instruction.Opcode;
-import static javaavr.core.Instruction.Opcode.*;
-import static javaavr.core.Instruction.*;
-import javaavr.core.Memory;
+import static javaavr.core.AvrInstruction.Opcode.*;
+import static javaavr.core.AvrInstruction.*;
+import static javaavr.core.AVR.Memory;
 
-public class TinyDecoder implements Instruction.Decoder {
+public class AvrDecoder implements AVR.Decoder {
 
 	@Override
-	public Instruction decode(Memory mem, int pc) {
+	public AvrInstruction decode(Memory mem, int pc) {
 		// Multiply address by 2
 		pc = pc * 2;
 		// Opcodes are in little endian format
@@ -19,7 +17,7 @@ public class TinyDecoder implements Instruction.Decoder {
 		return decode_0(opcode, mem, pc);
 	}
 
-	private static Instruction decode_0(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_0(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111000000000000) {
 		case 0b0011000000000000:
 			return decode_1(opcode,mem,pc);
@@ -57,13 +55,13 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_1(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_1(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int K = extract_u111100001111(opcode);
 			return new CPI(Rd, K);
 	}
-	private static Instruction decode_2(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_2(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111110000000000) {
 		case 0b0000000000000000:
 			return decode_3(opcode,mem,pc);
@@ -77,7 +75,7 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_3(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_3(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111100000000) {
 		case 0b0000000000000000:
 			return decode_4(opcode,mem,pc);
@@ -91,24 +89,24 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_4(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_4(int opcode, Memory mem, int pc) {
 			return new NOP();
 	}
-	private static Instruction decode_5(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_5(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd << 1;
 			int Rr = extract_u1111(opcode);
 			Rr = Rr << 1;
 			return new MOVW(Rd, Rr);
 	}
-	private static Instruction decode_6(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_6(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int Rr = extract_u1111(opcode);
 			Rr = Rr + 16;
 			return new MULS(Rd, Rr);
 	}
-	private static Instruction decode_7(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_7(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111110001000) {
 		case 0b0000001100000000:
 			return decode_8(opcode,mem,pc);
@@ -122,50 +120,50 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_8(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_8(int opcode, Memory mem, int pc) {
 			int Rd = extract_u1110000(opcode);
 			Rd = Rd + 16;
 			int Rr = extract_u111(opcode);
 			Rr = Rr + 16;
 			return new MULSU(Rd, Rr);
 	}
-	private static Instruction decode_9(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_9(int opcode, Memory mem, int pc) {
 			int Rd = extract_u1110000(opcode);
 			Rd = Rd + 16;
 			int Rr = extract_u111(opcode);
 			Rr = Rr + 16;
 			return new FMULS(Rd, Rr);
 	}
-	private static Instruction decode_10(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_10(int opcode, Memory mem, int pc) {
 			int Rd = extract_u1110000(opcode);
 			Rd = Rd + 16;
 			int Rr = extract_u111(opcode);
 			Rr = Rr + 16;
 			return new FMUL(Rd, Rr);
 	}
-	private static Instruction decode_11(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_11(int opcode, Memory mem, int pc) {
 			int Rd = extract_u1110000(opcode);
 			Rd = Rd + 16;
 			int Rr = extract_u111(opcode);
 			Rr = Rr + 16;
 			return new FMULSU(Rd, Rr);
 	}
-	private static Instruction decode_12(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_12(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new CPC(Rd, Rr);
 	}
-	private static Instruction decode_13(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_13(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new SBC(Rd, Rr);
 	}
-	private static Instruction decode_14(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_14(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new ADD(Rd, Rr);
 	}
-	private static Instruction decode_15(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_15(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111110000000000) {
 		case 0b0001000000000000:
 			return decode_16(opcode,mem,pc);
@@ -179,27 +177,27 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_16(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_16(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new CPSE(Rd, Rr);
 	}
-	private static Instruction decode_17(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_17(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new CP(Rd, Rr);
 	}
-	private static Instruction decode_18(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_18(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new SUB(Rd, Rr);
 	}
-	private static Instruction decode_19(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_19(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new ADC(Rd, Rr);
 	}
-	private static Instruction decode_20(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_20(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111110000000000) {
 		case 0b0010000000000000:
 			return decode_21(opcode,mem,pc);
@@ -213,51 +211,51 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_21(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_21(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new AND(Rd, Rr);
 	}
-	private static Instruction decode_22(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_22(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new EOR(Rd, Rr);
 	}
-	private static Instruction decode_23(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_23(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new OR(Rd, Rr);
 	}
-	private static Instruction decode_24(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_24(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new MOV(Rd, Rr);
 	}
-	private static Instruction decode_25(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_25(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int K = extract_u111100001111(opcode);
 			return new SBCI(Rd, K);
 	}
-	private static Instruction decode_26(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_26(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int K = extract_u111100001111(opcode);
 			return new SUBI(Rd, K);
 	}
-	private static Instruction decode_27(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_27(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int K = extract_u111100001111(opcode);
 			return new ORI(Rd, K);
 	}
-	private static Instruction decode_28(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_28(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int K = extract_u111100001111(opcode);
 			return new ANDI(Rd, K);
 	}
-	private static Instruction decode_29(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_29(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000001111) {
 		case 0b1000000000000000:
 			return decode_30(opcode,mem,pc);
@@ -271,23 +269,23 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_30(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_30(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_Z(Rd);
 	}
-	private static Instruction decode_31(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_31(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_Z(Rd);
 	}
-	private static Instruction decode_32(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_32(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_Y(Rd);
 	}
-	private static Instruction decode_33(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_33(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_Y(Rd);
 	}
-	private static Instruction decode_34(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_34(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111110000000000) {
 		case 0b1001000000000000:
 			return decode_35(opcode,mem,pc);
@@ -301,7 +299,7 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_35(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_35(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000001111) {
 		case 0b1001000000000000:
 			return decode_36(opcode,mem,pc);
@@ -355,7 +353,7 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_36(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_36(int opcode, Memory mem, int pc) {
 			int lsb = mem.read(pc+2) & 0xFF;
 			int msb = mem.read(pc+3) & 0xFF;
 			opcode = (msb << 24) | (lsb << 16) | opcode;
@@ -363,7 +361,7 @@ public class TinyDecoder implements Instruction.Decoder {
 			int k = extract_u1111111111111111(opcode);
 			return new LDSW(Rd, k);
 	}
-	private static Instruction decode_37(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_37(int opcode, Memory mem, int pc) {
 			int lsb = mem.read(pc+2) & 0xFF;
 			int msb = mem.read(pc+3) & 0xFF;
 			opcode = (msb << 24) | (lsb << 16) | opcode;
@@ -372,95 +370,95 @@ public class TinyDecoder implements Instruction.Decoder {
 			int k = extract_u1111111111111111(opcode);
 			return new STS_DATA_WIDE(Rd, k);
 	}
-	private static Instruction decode_38(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_38(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_Z_INC(Rd);
 	}
-	private static Instruction decode_39(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_39(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_Z_INC(Rd);
 	}
-	private static Instruction decode_40(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_40(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_Z_DEC(Rd);
 	}
-	private static Instruction decode_41(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_41(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_Z_DEC(Rd);
 	}
-	private static Instruction decode_42(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_42(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LPM_Z(Rd);
 	}
-	private static Instruction decode_43(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_43(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new XCH(Rd);
 	}
-	private static Instruction decode_44(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_44(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LPM_Z_INC(Rd);
 	}
-	private static Instruction decode_45(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_45(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LAS(Rd);
 	}
-	private static Instruction decode_46(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_46(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LAC(Rd);
 	}
-	private static Instruction decode_47(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_47(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LAT(Rd);
 	}
-	private static Instruction decode_48(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_48(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_Y_INC(Rd);
 	}
-	private static Instruction decode_49(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_49(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_Y_INC(Rd);
 	}
-	private static Instruction decode_50(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_50(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_Y_DEC(Rd);
 	}
-	private static Instruction decode_51(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_51(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_Y_DEC(Rd);
 	}
-	private static Instruction decode_52(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_52(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_X(Rd);
 	}
-	private static Instruction decode_53(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_53(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_X(Rd);
 	}
-	private static Instruction decode_54(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_54(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_X_INC(Rd);
 	}
-	private static Instruction decode_55(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_55(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_X_INC(Rd);
 	}
-	private static Instruction decode_56(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_56(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LD_X_DEC(Rd);
 	}
-	private static Instruction decode_57(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_57(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ST_X_DEC(Rd);
 	}
-	private static Instruction decode_58(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_58(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new POP(Rd);
 	}
-	private static Instruction decode_59(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_59(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new PUSH(Rd);
 	}
-	private static Instruction decode_60(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_60(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000000000) {
 		case 0b1001010000000000:
 			return decode_61(opcode,mem,pc);
@@ -470,7 +468,7 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_61(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_61(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000001110) {
 		case 0b1001010000000000:
 			return decode_62(opcode,mem,pc);
@@ -492,7 +490,7 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_62(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_62(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000001111) {
 		case 0b1001010000000000:
 			return decode_63(opcode,mem,pc);
@@ -502,15 +500,15 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_63(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_63(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new COM(Rd);
 	}
-	private static Instruction decode_64(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_64(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new NEG(Rd);
 	}
-	private static Instruction decode_65(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_65(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000001111) {
 		case 0b1001010000000010:
 			return decode_66(opcode,mem,pc);
@@ -520,19 +518,19 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_66(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_66(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new SWAP(Rd);
 	}
-	private static Instruction decode_67(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_67(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new INC(Rd);
 	}
-	private static Instruction decode_68(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_68(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ASR(Rd);
 	}
-	private static Instruction decode_69(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_69(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000001111) {
 		case 0b1001010000000110:
 			return decode_70(opcode,mem,pc);
@@ -542,15 +540,15 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_70(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_70(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new LSR(Rd);
 	}
-	private static Instruction decode_71(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_71(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new ROR(Rd);
 	}
-	private static Instruction decode_72(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_72(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111110001111) {
 		case 0b1001010000001000:
 			return decode_73(opcode,mem,pc);
@@ -568,15 +566,15 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_73(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_73(int opcode, Memory mem, int pc) {
 			int s = extract_u1110000(opcode);
 			return new BSET(s);
 	}
-	private static Instruction decode_74(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_74(int opcode, Memory mem, int pc) {
 			int s = extract_u1110000(opcode);
 			return new BCLR(s);
 	}
-	private static Instruction decode_75(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_75(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111111111111) {
 		case 0b1001010100001000:
 			return decode_76(opcode,mem,pc);
@@ -586,13 +584,13 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_76(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_76(int opcode, Memory mem, int pc) {
 			return new RET();
 	}
-	private static Instruction decode_77(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_77(int opcode, Memory mem, int pc) {
 			return new RETI();
 	}
-	private static Instruction decode_78(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_78(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111111111111) {
 		case 0b1001010110001000:
 			return decode_79(opcode,mem,pc);
@@ -610,25 +608,25 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_79(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_79(int opcode, Memory mem, int pc) {
 			return new SLEEP();
 	}
-	private static Instruction decode_80(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_80(int opcode, Memory mem, int pc) {
 			return new BREAK();
 	}
-	private static Instruction decode_81(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_81(int opcode, Memory mem, int pc) {
 			return new WDR();
 	}
-	private static Instruction decode_82(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_82(int opcode, Memory mem, int pc) {
 			return new LPM();
 	}
-	private static Instruction decode_83(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_83(int opcode, Memory mem, int pc) {
 			return new ELPM();
 	}
-	private static Instruction decode_84(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_84(int opcode, Memory mem, int pc) {
 			return new SPM();
 	}
-	private static Instruction decode_85(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_85(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111111111111) {
 		case 0b1001010000001001:
 			return decode_86(opcode,mem,pc);
@@ -638,13 +636,13 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_86(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_86(int opcode, Memory mem, int pc) {
 			return new IJMP();
 	}
-	private static Instruction decode_87(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_87(int opcode, Memory mem, int pc) {
 			return new EIJMP();
 	}
-	private static Instruction decode_88(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_88(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111111111111) {
 		case 0b1001010100001001:
 			return decode_89(opcode,mem,pc);
@@ -654,31 +652,31 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_89(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_89(int opcode, Memory mem, int pc) {
 			return new ICALL();
 	}
-	private static Instruction decode_90(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_90(int opcode, Memory mem, int pc) {
 			return new EICALL();
 	}
-	private static Instruction decode_91(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_91(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			return new DEC(Rd);
 	}
-	private static Instruction decode_92(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_92(int opcode, Memory mem, int pc) {
 			int lsb = mem.read(pc+2) & 0xFF;
 			int msb = mem.read(pc+3) & 0xFF;
 			opcode = (msb << 24) | (lsb << 16) | opcode;
 			int k = extract_s1111100011111111111111111(opcode);
 			return new JMP(k);
 	}
-	private static Instruction decode_93(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_93(int opcode, Memory mem, int pc) {
 			int lsb = mem.read(pc+2) & 0xFF;
 			int msb = mem.read(pc+3) & 0xFF;
 			opcode = (msb << 24) | (lsb << 16) | opcode;
 			int k = extract_s1111100011111111111111111(opcode);
 			return new CALL(k);
 	}
-	private static Instruction decode_94(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_94(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111100000000) {
 		case 0b1001011000000000:
 			return decode_95(opcode,mem,pc);
@@ -688,21 +686,21 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_95(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_95(int opcode, Memory mem, int pc) {
 			int Rd = extract_u110000(opcode);
 			Rd = Rd << 1;
 			Rd = Rd + 24;
 			int K = extract_u11001111(opcode);
 			return new ADIW(Rd, K);
 	}
-	private static Instruction decode_96(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_96(int opcode, Memory mem, int pc) {
 			int Rd = extract_u110000(opcode);
 			Rd = Rd << 1;
 			Rd = Rd + 24;
 			int K = extract_u11001111(opcode);
 			return new SBIW(Rd, K);
 	}
-	private static Instruction decode_97(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_97(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111100000000) {
 		case 0b1001100000000000:
 			return decode_98(opcode,mem,pc);
@@ -716,32 +714,32 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_98(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_98(int opcode, Memory mem, int pc) {
 			int A = extract_u11111000(opcode);
 			int b = extract_u111(opcode);
 			return new CBI(A, b);
 	}
-	private static Instruction decode_99(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_99(int opcode, Memory mem, int pc) {
 			int A = extract_u11111000(opcode);
 			int b = extract_u111(opcode);
 			return new SBIC(A, b);
 	}
-	private static Instruction decode_100(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_100(int opcode, Memory mem, int pc) {
 			int A = extract_u11111000(opcode);
 			int b = extract_u111(opcode);
 			return new SBI(A, b);
 	}
-	private static Instruction decode_101(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_101(int opcode, Memory mem, int pc) {
 			int A = extract_u11111000(opcode);
 			int b = extract_u111(opcode);
 			return new SBIS(A, b);
 	}
-	private static Instruction decode_102(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_102(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int Rr = extract_u1000001111(opcode);
 			return new MUL(Rd, Rr);
 	}
-	private static Instruction decode_103(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_103(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111100000000000) {
 		case 0b1010000000000000:
 			return decode_104(opcode,mem,pc);
@@ -751,19 +749,19 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_104(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_104(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int k = extract_u11100001111(opcode);
 			return new LDS(Rd, k);
 	}
-	private static Instruction decode_105(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_105(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int k = extract_u11100001111(opcode);
 			return new STS_DATA(Rd, k);
 	}
-	private static Instruction decode_106(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_106(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111100000000000) {
 		case 0b1011000000000000:
 			return decode_107(opcode,mem,pc);
@@ -773,31 +771,31 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_107(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_107(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int A = extract_u11000001111(opcode);
 			return new IN(Rd, A);
 	}
-	private static Instruction decode_108(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_108(int opcode, Memory mem, int pc) {
 			int A = extract_u11000001111(opcode);
 			int Rr = extract_u111110000(opcode);
 			return new OUT(A, Rr);
 	}
-	private static Instruction decode_109(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_109(int opcode, Memory mem, int pc) {
 			int k = extract_s111111111111(opcode);
 			return new RJMP(k);
 	}
-	private static Instruction decode_110(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_110(int opcode, Memory mem, int pc) {
 			int k = extract_s111111111111(opcode);
 			return new RCALL(k);
 	}
-	private static Instruction decode_111(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_111(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int K = extract_u111100001111(opcode);
 			return new LDI(Rd, K);
 	}
-	private static Instruction decode_112(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_112(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111110000000000) {
 		case 0b1111000000000000:
 			return decode_113(opcode,mem,pc);
@@ -811,17 +809,17 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_113(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_113(int opcode, Memory mem, int pc) {
 			int s = extract_u111(opcode);
 			int k = extract_s1111111000(opcode);
 			return new BRBS(s, k);
 	}
-	private static Instruction decode_114(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_114(int opcode, Memory mem, int pc) {
 			int s = extract_u111(opcode);
 			int k = extract_s1111111000(opcode);
 			return new BRBC(s, k);
 	}
-	private static Instruction decode_115(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_115(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000001000) {
 		case 0b1111100000000000:
 			return decode_116(opcode,mem,pc);
@@ -831,17 +829,17 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_116(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_116(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int b = extract_u111(opcode);
 			return new BLD(Rd, b);
 	}
-	private static Instruction decode_117(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_117(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int b = extract_u111(opcode);
 			return new BST(Rd, b);
 	}
-	private static Instruction decode_118(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_118(int opcode, Memory mem, int pc) {
 		switch(opcode & 0b1111111000001000) {
 		case 0b1111110000000000:
 			return decode_119(opcode,mem,pc);
@@ -851,12 +849,12 @@ public class TinyDecoder implements Instruction.Decoder {
 			return null;
 		}
 	}
-	private static Instruction decode_119(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_119(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int b = extract_u111(opcode);
 			return new SBRC(Rd, b);
 	}
-	private static Instruction decode_120(int opcode, Memory mem, int pc) {
+	private static AvrInstruction decode_120(int opcode, Memory mem, int pc) {
 			int Rd = extract_u111110000(opcode);
 			int b = extract_u111(opcode);
 			return new SBRS(Rd, b);

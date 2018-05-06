@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javaavr.core.Instruction;
-import javaavr.core.Memory;
+import javaavr.core.AVR;
+import javaavr.core.AvrDecoder;
+import javaavr.core.AvrInstruction;
 import javaavr.util.ByteMemory;
-import javaavr.util.TinyDecoder;
 
 public class HexFile {
 	private final Record[] records;
@@ -37,7 +37,7 @@ public class HexFile {
 	 *
 	 * @param memory
 	 */
-	public void uploadTo(Memory memory) {
+	public void uploadTo(AVR.Memory memory) {
 		for(int i=0;i!=records.length;++i) {
 			Record record = records[i];
 			if(record instanceof Data) {
@@ -246,9 +246,9 @@ public class HexFile {
 		// Now, upload and try to decode
 		ByteMemory mem = new ByteMemory(100);
 		hf.uploadTo(mem);
-		TinyDecoder decoder = new TinyDecoder();
+		AvrDecoder decoder = new AvrDecoder();
 		for(int i=0;i!=mem.size();) {
-			Instruction insn = decoder.decode(mem,i);
+			AvrInstruction insn = decoder.decode(mem,i);
 			System.out.println(String.format("%04X", i/2) + ": " + insn);
 			i = i + insn.getWidth();
 		}

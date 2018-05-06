@@ -4,8 +4,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
-import javaavr.core.Instruction;
-import javaavr.core.Instruction.Opcode;
+import javaavr.core.AvrInstruction;
+import javaavr.core.AvrInstruction.Opcode;
 
 public class InstructionGenerator {
 	private final Opcode[] values;
@@ -55,7 +55,7 @@ public class InstructionGenerator {
 
 	private void generateConstructor(Opcode opcode) {
 		out.print("    public " + opcode + "(");
-		Instruction.Argument[] args = opcode.getArguments();
+		AvrInstruction.Argument[] args = opcode.getArguments();
 		for(int i=0;i!=args.length;++i) {
 			if(i != 0) {
 				out.print(", ");
@@ -64,28 +64,28 @@ public class InstructionGenerator {
 		}
 		out.println(") {");
 		out.print("        super(Opcode." + opcode);
-		for (Instruction.Argument arg : opcode.getArguments()) {
+		for (AvrInstruction.Argument arg : opcode.getArguments()) {
 			out.print(", " + arg.id);
 		}
 		out.println(");");
-		for (Instruction.Argument arg : opcode.getArguments()) {
+		for (AvrInstruction.Argument arg : opcode.getArguments()) {
 			generateInvariantTest(arg);
 		}
 		out.println("    }");
 		out.println();
 	}
 
-	private void generateInvariantTest(Instruction.Argument arg) {
+	private void generateInvariantTest(AvrInstruction.Argument arg) {
 		int min = getMinInteger(arg.signed,arg.width);
 		int max = getMaxInteger(arg.signed,arg.width);
 		boolean shifted = false;
-		for(Instruction.Transform t : arg.transforms) {
-			if(t instanceof Instruction.ShiftLeft) {
+		for(AvrInstruction.Transform t : arg.transforms) {
+			if(t instanceof AvrInstruction.ShiftLeft) {
 				shifted = true;
 				min = min << 1;
 				max = max << 1;
 			} else {
-				Instruction.Offset o = (Instruction.Offset) t;
+				AvrInstruction.Offset o = (AvrInstruction.Offset) t;
 				min += o.offset;
 				max += o.offset;
 			}
@@ -119,11 +119,11 @@ public class InstructionGenerator {
 	private void generateEncoder(Opcode opcode) {
 		out.println("    public byte[] getBytes() {");
 		out.println("        int opcode = 0b" + Integer.toBinaryString(opcode.getBinaryBase()) + ";");
-		for (Instruction.Argument arg : opcode.getArguments()) {
-			Instruction.Bits[] bits = arg.getBitRanges(opcode);
+		for (AvrInstruction.Argument arg : opcode.getArguments()) {
+			AvrInstruction.Bits[] bits = arg.getBitRanges(opcode);
 			int width = 0;
 			for (int i = 0; i != bits.length; ++i) {
-				Instruction.Bits b = bits[i];
+				AvrInstruction.Bits b = bits[i];
 				int shift = b.getStart() - width;
 				out.println("        opcode |= (this." + arg.name + " << " + shift + ") & 0b"
 						+ Integer.toBinaryString(b.toMask()) + ";");
@@ -139,7 +139,7 @@ public class InstructionGenerator {
 	}
 
 	private String determineBaseClass(Opcode opcode) {
-		Instruction.Argument[] args = opcode.getArguments();
+		AvrInstruction.Argument[] args = opcode.getArguments();
 		if (args.length == 0) {
 			return "Instruction";
 		} else {

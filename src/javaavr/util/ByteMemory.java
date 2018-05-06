@@ -2,10 +2,10 @@ package javaavr.util;
 
 import java.util.List;
 
-import javaavr.core.Memory;
+import javaavr.core.AVR;
 import javaavr.io.HexFile;
 
-public class ByteMemory implements Memory {
+public class ByteMemory implements AVR.Memory {
 	private byte[] data;
 
 	public ByteMemory(int size) {

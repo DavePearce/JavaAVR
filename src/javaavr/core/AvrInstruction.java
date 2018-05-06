@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Instruction {
+public class AvrInstruction {
 	private static final Argument u5_A = new Argument(false, 5, Argument.Kind.Io, 'A');
 	private static final Argument u6_A = new Argument(false, 6, Argument.Kind.Io, 'A');
 	//
@@ -324,7 +324,7 @@ public class Instruction {
 
 	protected final Opcode opcode;
 
-	public Instruction(Opcode opcode) {
+	public AvrInstruction(Opcode opcode) {
 		this.opcode = opcode;
 	}
 
@@ -470,7 +470,7 @@ public class Instruction {
 	public static final class ShiftLeft extends Transform {
 	}
 
-	public static abstract class Address extends Instruction {
+	public static abstract class Address extends AvrInstruction {
 		public final int k;
 
 		public Address(Opcode opcode, int k) {
@@ -484,7 +484,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class IoRegister extends Instruction {
+	public static abstract class IoRegister extends AvrInstruction {
 		public final int A;
 		public final int Rr;
 
@@ -506,7 +506,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class RegisterIo extends Instruction {
+	public static abstract class RegisterIo extends AvrInstruction {
 		public final int A;
 		public final int Rd;
 
@@ -528,7 +528,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class IoBit extends Instruction {
+	public static abstract class IoBit extends AvrInstruction {
 		public final int A;
 		public final int b;
 
@@ -550,7 +550,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class Register extends Instruction {
+	public static abstract class Register extends AvrInstruction {
 		public final int Rd;
 
 		public Register(Opcode opcode, int Rd) {
@@ -564,7 +564,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class RegisterBit extends Instruction {
+	public static abstract class RegisterBit extends AvrInstruction {
 		public final int Rd;
 		public final int b;
 
@@ -586,7 +586,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class Flag extends Instruction {
+	public static abstract class Flag extends AvrInstruction {
 		public final int s;
 
 		public Flag(Opcode opcode, int s) {
@@ -600,7 +600,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class FlagRelativeAddress extends Instruction {
+	public static abstract class FlagRelativeAddress extends AvrInstruction {
 		public final int s;
 		public final int k;
 
@@ -619,7 +619,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class RegisterRelativeAddress extends Instruction {
+	public static abstract class RegisterRelativeAddress extends AvrInstruction {
 		public final int Rd;
 		public final int k;
 
@@ -638,7 +638,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class RegisterAbsoluteAddress extends Instruction {
+	public static abstract class RegisterAbsoluteAddress extends AvrInstruction {
 		public final int Rd;
 		public final int k;
 
@@ -660,7 +660,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class RegisterRegister extends Instruction {
+	public static abstract class RegisterRegister extends AvrInstruction {
 		public final int Rd;
 		public final int Rr;
 
@@ -682,7 +682,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class RegisterImmediate extends Instruction {
+	public static abstract class RegisterImmediate extends AvrInstruction {
 		public final int Rd;
 		public final int K;
 
@@ -704,7 +704,7 @@ public class Instruction {
 		}
 	}
 
-	public static abstract class RelativeAddress extends Instruction {
+	public static abstract class RelativeAddress extends AvrInstruction {
 		public final int k;
 
 		public RelativeAddress(Opcode opcode, int k) {
@@ -1014,7 +1014,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_1001_1000
 	 */
-	public static final class BREAK extends Instruction {
+	public static final class BREAK extends AvrInstruction {
 	    public BREAK() {
 	        super(Opcode.BREAK);
 	    }
@@ -1464,7 +1464,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_1000_1000
 	 */
-	public static final class CLC extends Instruction {
+	public static final class CLC extends AvrInstruction {
 	    public CLC() {
 	        super(Opcode.CLC);
 	    }
@@ -1481,7 +1481,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_1100_1000
 	 */
-	public static final class CLH extends Instruction {
+	public static final class CLH extends AvrInstruction {
 	    public CLH() {
 	        super(Opcode.CLH);
 	    }
@@ -1498,7 +1498,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_1111_1000
 	 */
-	public static final class CLI extends Instruction {
+	public static final class CLI extends AvrInstruction {
 	    public CLI() {
 	        super(Opcode.CLI);
 	    }
@@ -1515,7 +1515,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_1010_1000
 	 */
-	public static final class CLN extends Instruction {
+	public static final class CLN extends AvrInstruction {
 	    public CLN() {
 	        super(Opcode.CLN);
 	    }
@@ -1532,7 +1532,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_1100_1000
 	 */
-	public static final class CLS extends Instruction {
+	public static final class CLS extends AvrInstruction {
 	    public CLS() {
 	        super(Opcode.CLS);
 	    }
@@ -1549,7 +1549,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_1110_1000
 	 */
-	public static final class CLT extends Instruction {
+	public static final class CLT extends AvrInstruction {
 	    public CLT() {
 	        super(Opcode.CLT);
 	    }
@@ -1566,7 +1566,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_1011_1000
 	 */
-	public static final class CLV extends Instruction {
+	public static final class CLV extends AvrInstruction {
 	    public CLV() {
 	        super(Opcode.CLV);
 	    }
@@ -1583,7 +1583,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_1001_1000
 	 */
-	public static final class CLZ extends Instruction {
+	public static final class CLZ extends AvrInstruction {
 	    public CLZ() {
 	        super(Opcode.CLZ);
 	    }
@@ -1746,7 +1746,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_0001_1001
 	 */
-	public static final class EICALL extends Instruction {
+	public static final class EICALL extends AvrInstruction {
 	    public EICALL() {
 	        super(Opcode.EICALL);
 	    }
@@ -1763,7 +1763,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0001_1001
 	 */
-	public static final class EIJMP extends Instruction {
+	public static final class EIJMP extends AvrInstruction {
 	    public EIJMP() {
 	        super(Opcode.EIJMP);
 	    }
@@ -1780,7 +1780,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_1101_1000
 	 */
-	public static final class ELPM extends Instruction {
+	public static final class ELPM extends AvrInstruction {
 	    public ELPM() {
 	        super(Opcode.ELPM);
 	    }
@@ -1898,7 +1898,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_0000_1001
 	 */
-	public static final class ICALL extends Instruction {
+	public static final class ICALL extends AvrInstruction {
 	    public ICALL() {
 	        super(Opcode.ICALL);
 	    }
@@ -1915,7 +1915,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0000_1001
 	 */
-	public static final class IJMP extends Instruction {
+	public static final class IJMP extends AvrInstruction {
 	    public IJMP() {
 	        super(Opcode.IJMP);
 	    }
@@ -2338,7 +2338,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_1100_1000
 	 */
-	public static final class LPM extends Instruction {
+	public static final class LPM extends AvrInstruction {
 	    public LPM() {
 	        super(Opcode.LPM);
 	    }
@@ -2592,7 +2592,7 @@ public class Instruction {
 	 *
 	 * 0000_0000_0000_0000
 	 */
-	public static final class NOP extends Instruction {
+	public static final class NOP extends AvrInstruction {
 	    public NOP() {
 	        super(Opcode.NOP);
 	    }
@@ -2750,7 +2750,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_0000_1000
 	 */
-	public static final class RET extends Instruction {
+	public static final class RET extends AvrInstruction {
 	    public RET() {
 	        super(Opcode.RET);
 	    }
@@ -2767,7 +2767,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_0001_1000
 	 */
-	public static final class RETI extends Instruction {
+	public static final class RETI extends AvrInstruction {
 	    public RETI() {
 	        super(Opcode.RETI);
 	    }
@@ -3081,7 +3081,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0000_1000
 	 */
-	public static final class SEC extends Instruction {
+	public static final class SEC extends AvrInstruction {
 	    public SEC() {
 	        super(Opcode.SEC);
 	    }
@@ -3098,7 +3098,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0101_1000
 	 */
-	public static final class SEH extends Instruction {
+	public static final class SEH extends AvrInstruction {
 	    public SEH() {
 	        super(Opcode.SEH);
 	    }
@@ -3115,7 +3115,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0111_1000
 	 */
-	public static final class SEI extends Instruction {
+	public static final class SEI extends AvrInstruction {
 	    public SEI() {
 	        super(Opcode.SEI);
 	    }
@@ -3132,7 +3132,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0010_1000
 	 */
-	public static final class SEN extends Instruction {
+	public static final class SEN extends AvrInstruction {
 	    public SEN() {
 	        super(Opcode.SEN);
 	    }
@@ -3170,7 +3170,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0100_1000
 	 */
-	public static final class SES extends Instruction {
+	public static final class SES extends AvrInstruction {
 	    public SES() {
 	        super(Opcode.SES);
 	    }
@@ -3187,7 +3187,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0110_1000
 	 */
-	public static final class SET extends Instruction {
+	public static final class SET extends AvrInstruction {
 	    public SET() {
 	        super(Opcode.SET);
 	    }
@@ -3204,7 +3204,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0011_1000
 	 */
-	public static final class SEV extends Instruction {
+	public static final class SEV extends AvrInstruction {
 	    public SEV() {
 	        super(Opcode.SEV);
 	    }
@@ -3221,7 +3221,7 @@ public class Instruction {
 	 *
 	 * 1001_0100_0001_1000
 	 */
-	public static final class SEZ extends Instruction {
+	public static final class SEZ extends AvrInstruction {
 	    public SEZ() {
 	        super(Opcode.SEZ);
 	    }
@@ -3238,7 +3238,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_1000_1000
 	 */
-	public static final class SLEEP extends Instruction {
+	public static final class SLEEP extends AvrInstruction {
 	    public SLEEP() {
 	        super(Opcode.SLEEP);
 	    }
@@ -3255,7 +3255,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_1110_1000
 	 */
-	public static final class SPM extends Instruction {
+	public static final class SPM extends AvrInstruction {
 	    public SPM() {
 	        super(Opcode.SPM);
 	    }
@@ -3589,7 +3589,7 @@ public class Instruction {
 	 *
 	 * 1001_0101_1010_1000
 	 */
-	public static final class WDR extends Instruction {
+	public static final class WDR extends AvrInstruction {
 	    public WDR() {
 	        super(Opcode.WDR);
 	    }
@@ -3621,31 +3621,5 @@ public class Instruction {
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
-	}
-
-	/**
-	 * Generic interface for decoding an instruction at a given instruction
-	 * location. Observe that instruction locations are organised word-wise. This
-	 * means the address will be effectively multiplied by two in calculating the
-	 * actual address to read from.
-	 *
-	 * @author David J. Pearce
-	 *
-	 */
-	public interface Decoder {
-		Instruction decode(Memory programSpace, int pc);
-	}
-
-	/**
-	 * Generic interface for executing an instruction at a given instruction
-	 * location. Observe that instruction locations are organised word-wise. This
-	 * means the address will be effectively multiplied by two in calculating the
-	 * actual address to read from.
-	 *
-	 * @author David J. Pearce
-	 *
-	 */
-	public interface Executor {
-		void execute(Instruction insn, Memory data, MicroController.Registers registers);
 	}
 }
