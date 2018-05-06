@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javaavr.core.Instruction;
+import javaavr.core.Instruction.Argument;
 import javaavr.core.Instruction.Opcode;
 
 public class DecoderGenerator {
@@ -310,17 +311,7 @@ public class DecoderGenerator {
 		return new Variable(name,mask);
 	}
 
-	public static Variable[] extractVariables(Opcode opcode) {
-		String opcodeFormat = opcode.getOpcodeFormat().replaceAll("_", "");
-		String operandFormat = opcode.getOperandFormat();
-		operandFormat = (operandFormat == null) ? null : operandFormat.replaceAll("_", "");
-		char[] chars = extractVariables(opcodeFormat,operandFormat);
-		Variable[] vars = new Variable[chars.length];
-		for(int i=0;i!=vars.length;++i) {
-			vars[i] = extractVariable(chars[i],opcodeFormat,operandFormat);
-		}
-		return vars;
-	}
+
 
 	public static Map<Group,Integer> number(Group g) {
 		HashMap<Group,Integer> numbering = new HashMap<>();
@@ -380,19 +371,27 @@ public class DecoderGenerator {
 		System.out.println("\tprivate static Instruction decode_" + id + "(int opcode, Memory mem, int pc) {");
 		if(g.isTerminal()) {
 			Opcode o = g.getTerminal();
-			boolean hasOperands = (toValue(o.getOpcodeFormat()) != 0xFFFF);
-			if(hasOperands) {
-				if(o.getOperandFormat() == null) {
-					System.out.println("\t\t\treturn new " + o + "(extract_" + o.getOpcodeFormat() + "(opcode));");
-				} else {
-					System.out.println("\t\t\tint lsb = mem.read(pc+2) & 0xFF;");
-					System.out.println("\t\t\tint msb = mem.read(pc+3) & 0xFF;");
-					System.out.println("\t\t\topcode = (msb << 24) | (lsb << 16) | opcode;");
-					System.out.println("\t\t\treturn new " + o + "(extract_" + o.getOpcodeFormat() + "_" + o.getOperandFormat() + "(opcode));");
-				}
-			} else {
-				System.out.println("\t\t\treturn new " + o + "();");
+			Instruction.Argument[] args = o.getArguments();
+			if(o.getOperandFormat() != null) {
+				System.out.println("\t\t\tint lsb = mem.read(pc+2) & 0xFF;");
+				System.out.println("\t\t\tint msb = mem.read(pc+3) & 0xFF;");
+				System.out.println("\t\t\topcode = (msb << 24) | (lsb << 16) | opcode;");
 			}
+			String argstr = "";
+			for(int i=0;i!=args.length;++i) {
+				Instruction.Argument arg = args[i];
+				if(arg.signed) {
+					System.out.println("\t\t\tint " + arg.name + " = extract_s" + Integer.toBinaryString(arg.toMask(o)) + "(opcode);");
+				} else {
+					System.out.println("\t\t\tint " + arg.name + " = extract_u" + Integer.toBinaryString(arg.toMask(o)) + "(opcode);");
+				}
+				if(i != 0) {
+					argstr += ", ";
+				}
+				printTransforms(arg);
+				argstr = argstr + arg.name;
+			}
+			System.out.println("\t\t\treturn new " + o + "(" + argstr + ");");
 		} else {
 			String mask = toBinaryString(g.getMask());
 			System.out.println("\t\tswitch(opcode & " + mask + ") {");
@@ -408,55 +407,79 @@ public class DecoderGenerator {
 		System.out.println("\t}");
 	}
 
+	public static void printTransforms(Argument arg) {
+		for(int i=0;i!=arg.transforms.length;++i) {
+			Instruction.Transform t = arg.transforms[i];
+			if(t instanceof Instruction.ShiftLeft) {
+				System.out.println("\t\t\t" + arg.name + " = " + arg.name + " << 1;");
+			} else {
+				Instruction.Offset offset = (Instruction.Offset) t;
+				System.out.println("\t\t\t" + arg.name + " = " + arg.name + " + " + offset.offset + ";");
+			}
+		}
+	}
+
+	public static int getMinInt(boolean signed, int width) {
+		if(signed) {
+			return -1 << (width-1);
+		} else {
+			return 0;
+		}
+	}
+
+	public static int getMaxInt(boolean signed, int width) {
+		if(signed) {
+			return (1 << (width-1)) - 1;
+		} else {
+			return 0;
+		}
+	}
+
 	public static void printExtractors(Group g) {
 		HashSet<String> visited = new HashSet<>();
 		for(Opcode o : g.getAll()) {
 			String fmt = o.getOpcodeFormat();
-			boolean hasOperands = (toValue(fmt) != 0xFFFF);
-			if(hasOperands && !visited.contains(fmt)) {
-				visited.add(fmt);
-				printExtractor(o);
+			Argument[] args = o.getArguments();
+			for(int i=0;i!=args.length;++i) {
+				Argument arg = args[i];
+				int mask = arg.toMask(o);
+				String s = arg.signed ? "s" : "u";
+				s = s + Integer.toBinaryString(mask);
+				if(!visited.contains(s)) {
+					visited.add(s);
+					printExtractor(s,o,arg);
+				}
 			}
 		}
 	}
 
-	public static void printExtractor(Opcode o) {
-		String fmt = o.getOpcodeFormat();
-		String operand = o.getOperandFormat();
-		if(operand == null) {
-			System.out.println("\tprivate static int[] extract_" + fmt + "(int opcode) {");
-		} else {
-			System.out.println("\tprivate static int[] extract_" + fmt + "_" + operand + "(int opcode) {");
-		}
-		Variable[] variables = extractVariables(o);
-		for(Variable v : variables) {
-			printVariable(v);
-		}
-		System.out.print("\t\treturn new int[]{");
-		for(int i=0;i!=variables.length;++i) {
-			if(i != 0) {
-				System.out.print(", ");
-			}
-			System.out.print(variables[i].name);
-		}
-		System.out.println("};");
-		System.out.println("\t}");
-	}
-
-	private static void printVariable(Variable v) {
+	public static void printExtractor(String name, Opcode opcode, Argument arg) {
+		Instruction.Bits[] ranges = arg.getBitRanges(opcode);
+		int mask = arg.toMask(opcode);
+		System.out.println("\tprivate static int extract_" + name + "(int opcode) {");
 		int width = 0;
-		for(int i=0;i!=v.ranges.length;++i) {
-			Range r = v.ranges[i];
+		for(int i=0;i!=ranges.length;++i) {
+			Instruction.Bits r = ranges[i];
 			int offset = r.getStart() - width;
 			System.out.print("\t\t");
 			if(i == 0) {
-				System.out.print("int " + v.name + " = ");
+				System.out.print("int " + arg.name + " = ");
 			} else {
-				System.out.print(v.name + " |= ");
+				System.out.print(arg.name + " |= ");
 			}
 			System.out.println("(opcode & " + toBinaryString(r.toMask()) + ") >> " + offset + ";");
 			width += r.getWidth();
 		}
+		if(arg.signed) {
+			int shift = 32 - width;
+			System.out.println("\t\t" + arg.name + " = (" + arg.name + " << " + shift + ") >> " + shift + ";");
+		}
+		System.out.println("\t\treturn " + arg.name + ";");
+		System.out.println("\t}");
+	}
+
+	private static void printVariable(Variable v) {
+
 	}
 
 //	private static void printInstructions() {

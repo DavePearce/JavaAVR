@@ -1025,7 +1025,7 @@ public class TinyExecutor implements Instruction.Executor {
 
 	private void execute(OUT insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = mem.read(insn.Rr);
 		mem.write(insn.A + 32, Rd);
 	}
 

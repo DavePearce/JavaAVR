@@ -5,30 +5,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Instruction {
-	private static final Argument u5_A = new Argument(false, 5, Argument.Kind.Io, 'A', between(0, 31));
-	private static final Argument u6_A = new Argument(false, 6, Argument.Kind.Io, 'A',  between(0, 63));
+	private static final Argument u5_A = new Argument(false, 5, Argument.Kind.Io, 'A');
+	private static final Argument u6_A = new Argument(false, 6, Argument.Kind.Io, 'A');
 	//
-	private static final Argument u3_b = new Argument(false, 3, Argument.Kind.Bit, 'b', between(0, 7));
+	private static final Argument u3_b = new Argument(false, 3, Argument.Kind.Bit, 'b');
 	//
-	private static final Argument u3_r_16 = new Argument(false, 3, Argument.Kind.Register, 'r', "Rr", between(16, 31));
-	private static final Argument u5_r = new Argument(false, 5, Argument.Kind.Register, 'r', "Rr", between(0, 31));
-	private static final Argument u2_d_24m2 = new Argument(false, 2, Argument.Kind.Register, 'd', "Rd",
-			oneOf(24, 26, 28, 30));
-	private static final Argument u3_d_16 = new Argument(false, 3, Argument.Kind.Register, 'd', "Rd", between(16, 23));
-	private static final Argument u4_d_16 = new Argument(false, 4, Argument.Kind.Register, 'd', "Rd", between(16, 31));
-	private static final Argument u5_d = new Argument(false, 5, Argument.Kind.Register, 'd', "Rd", between(0, 31));
+	private static final Argument u3_r_16 = new Argument(false, 3, Argument.Kind.Register, 'r', "Rr", new Offset(16));
+	private static final Argument u5_r = new Argument(false, 5, Argument.Kind.Register, 'r', "Rr");
+	private static final Argument u4_r_16 = new Argument(false, 4, Argument.Kind.Register, 'r', "Rr", new Offset(16));
+	private static final Argument u4_r_m2 = new Argument(false, 4, Argument.Kind.Register, 'r', "Rr", new ShiftLeft());
+	private static final Argument u2_d_24m2 = new Argument(false, 2, Argument.Kind.Register, 'd', "Rd", new ShiftLeft(), new Offset(24));
+	private static final Argument u3_d_16 = new Argument(false, 3, Argument.Kind.Register, 'd', "Rd", new Offset(16));
+	private static final Argument u4_d_16 = new Argument(false, 4, Argument.Kind.Register, 'd', "Rd", new Offset(16));
+	private static final Argument u4_d_m2 = new Argument(false, 4, Argument.Kind.Register, 'd', "Rd", new ShiftLeft());
+	private static final Argument u5_d = new Argument(false, 5, Argument.Kind.Register, 'd', "Rd");
 	//
-	private static final Argument u6_K = new Argument(false, 6, Argument.Kind.Immediate, 'K', between(0, 63));
-	private static final Argument u8_K = new Argument(false, 8, Argument.Kind.Immediate, 'K', between(0, 255));
+	private static final Argument u6_K = new Argument(false, 6, Argument.Kind.Immediate, 'K');
+	private static final Argument u8_K = new Argument(false, 8, Argument.Kind.Immediate, 'K');
 	//
-	private static final Argument i7_k = new Argument(true, 7, Argument.Kind.RelativeAddress, 'k', between(-64, 63));
-	private static final Argument i21_k = new Argument(true, 21, Argument.Kind.RelativeAddress, 'k',
-			between(-1_048_576, 1_048_575));
-	private static final Argument u7_k = new Argument(false, 7, Argument.Kind.AbsoluteAddress, 'k', between(0, 127));
-	private static final Argument u16_k = new Argument(false, 16, Argument.Kind.AbsoluteAddress, 'k',
-			between(0, 65536));
+	private static final Argument i7_k = new Argument(true, 7, Argument.Kind.RelativeAddress, 'k');
+	private static final Argument i12_k = new Argument(true, 12, Argument.Kind.RelativeAddress, 'k');
+	private static final Argument i21_k = new Argument(true, 21, Argument.Kind.RelativeAddress, 'k');
+	private static final Argument u7_k = new Argument(false, 7, Argument.Kind.AbsoluteAddress, 'k');
+	private static final Argument u16_k = new Argument(false, 16, Argument.Kind.AbsoluteAddress, 'k');
 	//
-	private static final Argument u3_s = new Argument(false, 3, Argument.Kind.Flag, 's', between(0, 7));
+	private static final Argument u3_s = new Argument(false, 3, Argument.Kind.Flag, 's');
 	//
 	public enum Opcode {
 		ADC("Add with Carry","0001_11rd_dddd_rrrr", u5_d, u5_r),
@@ -73,12 +74,12 @@ public class Instruction {
 		CLT("Clear T Flag", "1001_0100_1110_1000"),
 		CLV("Clear Overflow Flag", "1001_0100_1011_1000"),
 		CLZ("Clear Zero Flag", "1001_0100_1001_1000"),
-		COM("One's Complement", "1001_010d_dddd_0000"),
+		COM("One's Complement", "1001_010d_dddd_0000", u5_d),
 		CP("Compare", "0001_01rd_dddd_rrrr", u5_d, u5_r),
 		CPC("Compare with Carry", "0000_01rd_dddd_rrrr", u5_d, u5_r),
 		CPI("Compare with Immediate", "0011_KKKK_dddd_KKKK", u4_d_16, u8_K),
 		CPSE("Compare Skip if Equal", "0001_00rd_dddd_rrrr", u5_d, u5_r),
-		DEC("Decrement", "1001_010d_dddd_1010"),
+		DEC("Decrement", "1001_010d_dddd_1010", u5_d),
 		EICALL("Extended Indirect Call to Subroutine", "1001_0101_0001_1001"),
 		EIJMP("Extended Indirect Jump", "1001_0100_0001_1001"),
 		ELPM("Extended Load Program Memory", "1001_0101_1101_1000"),
@@ -111,34 +112,34 @@ public class Instruction {
 		LDS("Load Direct from data space", "1010_0kkk_dddd_kkkk", u4_d_16,u7_k),
 		LDSW("Load Direct from data space", "1001_000d_dddd_0000", "kkkk_kkkk_kkkk_kkkk", u5_d, u16_k),
 		LPM("Load Program Memory", "1001_0101_1100_1000"),
-		LPM_Z("Load Program Memory", "1001_000d_dddd_0100"),
-		LPM_Z_INC("Load Program Memory", "1001_000d_dddd_0101"),
-		LSL("Logical Shift Left", "0000_11dd_dddd_dddd"),
-		LSR("Logical Shift Right", "1001_010d_dddd_0110"),
+		LPM_Z("Load Program Memory", "1001_000d_dddd_0100", u5_d),
+		LPM_Z_INC("Load Program Memory", "1001_000d_dddd_0101", u5_d),
+		LSL("Logical Shift Left", "0000_11rd_dddd_rrrr", u5_d, u5_r), // TODO: DROP r
+		LSR("Logical Shift Right", "1001_010d_dddd_0110", u5_d),
 		MOV("Copy Register", "0010_11rd_dddd_rrrr", u5_d, u5_r),
-		MOVW("Copy Register Word", "0000_0001_dddd_rrrr"),
+		MOVW("Copy Register Word", "0000_0001_dddd_rrrr", u4_d_m2, u4_r_m2),
 		MUL("Multiply Unsigned", "1001_11rd_dddd_rrrr", u5_d, u5_r),
-		MULS("Multiply Signed", "0000_0010_dddd_rrrr"),
-		MULSU("Multiply Signed with Unsigned", "0000_0011_0ddd_0rrr"),
-		NEG("Two's Complement", "1001_010d_dddd_0001"),
+		MULS("Multiply Signed", "0000_0010_dddd_rrrr", u4_d_16, u4_r_16),
+		MULSU("Multiply Signed with Unsigned", "0000_0011_0ddd_0rrr",u3_d_16,u3_r_16),
+		NEG("Two's Complement", "1001_010d_dddd_0001", u5_d),
 		NOP("No Operation", "0000_0000_0000_0000"),
 		OR("Logical OR", "0010_10rd_dddd_rrrr", u5_d, u5_r),
 		ORI("Logical OR with Immediate", "0110_KKKK_dddd_KKKK", u4_d_16, u8_K),
-		OUT("Store Register to I/O Location", "1011_1AAr_rrrr_AAAA"),
-		POP("Pop Register from Stack","1001_000d_dddd_1111"),
-		PUSH("Push Register on Stack", "1001_001d_dddd_1111"),
-		RCALL("Relative Call to Subroutine", "1101_kkkk_kkkk_kkkk"),
+		OUT("Store Register to I/O Location", "1011_1AAr_rrrr_AAAA", u6_A, u5_r),
+		POP("Pop Register from Stack","1001_000d_dddd_1111", u5_d),
+		PUSH("Push Register on Stack", "1001_001d_dddd_1111", u5_d),
+		RCALL("Relative Call to Subroutine", "1101_kkkk_kkkk_kkkk", i12_k),
 		RET("Return from Subroutine", "1001_0101_0000_1000"),
 		RETI("Return from Interrupt", "1001_0101_0001_1000"),
-		RJMP("Relative Jump", "1100_kkkk_kkkk_kkkk"),
-		ROL("Rotate Left trough Carry", "0001_11dd_dddd_dddd"),
-		ROR("Rotate Right through Carry", "1001_010d_dddd_0111"),
+		RJMP("Relative Jump", "1100_kkkk_kkkk_kkkk", i12_k),
+		ROL("Rotate Left through Carry", "0001_11rd_dddd_rrrr", u5_d, u5_r), // TODO: drop r
+		ROR("Rotate Right through Carry", "1001_010d_dddd_0111", u5_d),
 		SBC("Subtract with Carry", "0000_10rd_dddd_rrrr", u5_d, u5_r),
 		SBCI("Subtract Immediate with Carry", "0100_KKKK_dddd_KKKK", u4_d_16, u8_K),
 		SBI("Set Bit in I/O Register", "1001_1010_AAAA_Abbb", u5_A, u3_b),
 		SBIC("Skip if Bit in I/O Register is Cleared", "1001_1001_AAAA_Abbb", u5_A, u3_b),
 		SBIS("Skip if Bit in I/O Register is Set", "1001_1011_AAAA_Abbb", u5_A, u3_b),
-		SBIW("Subtract Immediate from Word", "1001_0111_KKdd_KKKK"),
+		SBIW("Subtract Immediate from Word", "1001_0111_KKdd_KKKK", u2_d_24m2, u6_K),
 		SBR("Set Bits in Register", "0110_KKKK_dddd_KKKK", u4_d_16, u8_K),
 		SBRC("Skip if Bit in Register is Cleared", "1111_110d_dddd_0bbb", u5_d, u3_b),
 		SBRS("Skip if Bit in Register is Set", "1111_111d_dddd_0bbb", u5_d, u3_b),
@@ -241,6 +242,12 @@ public class Instruction {
 			if (fmt.length() != 19) {
 				throw new RuntimeException("Invalid format string: " + fmt);
 			}
+			for(int i=0;i!=fmt.length();++i) {
+				char c = fmt.charAt(i);
+				if(!validArgument(c,args)) {
+					throw new RuntimeException("Invalid format string (missing arg '" + c + "'): " + fmt);
+				}
+			}
 			this.description = description;
 			this.opcodeFormat = fmt;
 			this.arguments = args;
@@ -249,6 +256,15 @@ public class Instruction {
 		private Opcode(String description, String opcodeFormat, String operandFormat, Argument... args) {
 			if (opcodeFormat.length() != 19) {
 				throw new RuntimeException("Invalid format string: " + opcodeFormat);
+			}
+			if (operandFormat.length() != 19) {
+				throw new RuntimeException("Invalid format string: " + opcodeFormat);
+			}
+			for(int i=0;i!=opcodeFormat.length();++i) {
+				char c = opcodeFormat.charAt(i);
+				if(!validArgument(c,args)) {
+					throw new RuntimeException("Invalid format string (missing arg '" + c + "'): " + opcodeFormat);
+				}
 			}
 			this.description = description;
 			this.opcodeFormat = opcodeFormat;
@@ -291,6 +307,19 @@ public class Instruction {
 		public boolean subsumes(Opcode opcode) {
 			return subsumedBy.get(opcode) == this;
 		}
+
+		private boolean validArgument(char c, Argument... args) {
+			if (c == '0' || c == '1' || c == '_') {
+				return true;
+			} else {
+				for (int j = 0; j != args.length; ++j) {
+					if (args[j].id == c) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
 	}
 
 	protected final Opcode opcode;
@@ -322,25 +351,21 @@ public class Instruction {
 		public final Kind kind;
 		public final char id;
 		public final String name;
-		public final Invariant invariant;
-		public Argument(boolean signed, int width, Kind kind, char id, Invariant invariant) {
-			this(signed,width,kind,id,"" + id,invariant);
+		public final Transform[] transforms;
+		public Argument(boolean signed, int width, Kind kind, char id, Transform... transforms) {
+			this(signed,width,kind,id,"" + id,transforms);
 		}
-		public Argument(boolean signed, int width, Kind kind, char id, String name, Invariant invariant) {
+		public Argument(boolean signed, int width, Kind kind, char id, String name, Transform... transforms) {
 			this.signed = signed;
 			this.width = width;
 			this.id = id;
 			this.name = name;
-			this.invariant = invariant;
+			this.transforms = transforms;
 			this.kind = kind;
 		}
 
 		public Bits[] getBitRanges(Opcode opcode) {
-			int mask = toMask(opcode.getOpcodeFormat());
-			if(opcode.getOperandFormat() != null) {
-				mask |= toMask(opcode.getOperandFormat()) << 16;
-			}
-			return getBitRanges(mask);
+			return getBitRanges(toMask(opcode));
 		}
 
 		private Bits[] getBitRanges(int mask) {
@@ -374,8 +399,12 @@ public class Instruction {
 		 * @param format
 		 * @return
 		 */
-		public int toMask(String format) {
+		public int toMask(Opcode opcode) {
 			// Remove all underscores.
+			String format = opcode.getOpcodeFormat();
+			if(opcode.getOperandFormat() != null) {
+				format += opcode.getOperandFormat();
+			}
 			format = format.replaceAll("_", "");
 			//
 			int mask = 0;
@@ -391,7 +420,7 @@ public class Instruction {
 		}
 	}
 
-	public static class Bits extends Invariant {
+	public static class Bits extends Transform {
 		private int start;
 		private int end;
 
@@ -426,34 +455,19 @@ public class Instruction {
 		}
 	}
 
-	private static Range between(int start, int end) {
-		return new Range(start, end);
-	}
-
-	private static Union oneOf(int... elements) {
-		return new Union(elements);
-	}
-
-	public static abstract class Invariant {
+	public static abstract class Transform {
 
 	}
 
-	public static final class Range extends Invariant {
-		public final int start;
-		public final int end;
+	public static final class Offset extends Transform {
+		public final int offset;
 
-		public Range(int start, int end) {
-			this.start = start;
-			this.end = end;
+		public Offset(int start) {
+			this.offset = start;
 		}
 	}
 
-	public static final class Union extends Invariant {
-		public final int[] values;
-
-		public Union(int... values) {
-			this.values = values;
-		}
+	public static final class ShiftLeft extends Transform {
 	}
 
 	public static abstract class Address extends Instruction {
@@ -472,23 +486,23 @@ public class Instruction {
 
 	public static abstract class IoRegister extends Instruction {
 		public final int A;
-		public final int Rd;
+		public final int Rr;
 
-		public IoRegister(Opcode opcode, int A, int Rd) {
+		public IoRegister(Opcode opcode, int A, int Rr) {
 			super(opcode);
 			if (A < 0 || A >= 64) {
 				throw new IllegalArgumentException("invalid I/O port: " + A);
 			}
-			if (Rd < 0 || Rd >= 32) {
-				throw new IllegalArgumentException("invalid register: " + Rd);
+			if (Rr < 0 || Rr >= 32) {
+				throw new IllegalArgumentException("invalid register: " + Rr);
 			}
 			this.A = A;
-			this.Rd = Rd;
+			this.Rr = Rr;
 		}
 
 		@Override
 		public String toString() {
-			return super.toString() + " 0x" + Integer.toHexString(A) + ", r" + Rd;
+			return super.toString() + " 0x" + Integer.toHexString(A) + ", r" + Rr;
 		}
 	}
 
@@ -766,7 +780,7 @@ public class Instruction {
 	public static final class ADIW extends RegisterImmediate {
 	    public ADIW(int d, int K) {
 	        super(Opcode.ADIW, d, K);
-	        if(d != 24 && d != 26 && d != 28 && d != 30) {
+	        if(d < 24 || d > 30 || (d % 2) != 0) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }
 	        if(K < 0 || K > 63) {
@@ -1415,9 +1429,8 @@ public class Instruction {
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000001110;
-	        opcode |= (this.k << 0) & 0b1;
-	        opcode |= (this.k << 3) & 0b111110000;
-	        opcode |= (this.k << 10) & 0b11111111111111110000000000000000;
+	        opcode |= (this.k << 0) & 0b11111111111111111;
+	        opcode |= (this.k << 3) & 0b1111100000000000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}
@@ -1587,15 +1600,19 @@ public class Instruction {
 	 *
 	 * 1001_010d_dddd_0000
 	 */
-	public static final class COM extends Instruction {
-	    public COM() {
-	        super(Opcode.COM);
+	public static final class COM extends Register {
+	    public COM(int d) {
+	        super(Opcode.COM, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "One's Complement"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000000000;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -1708,15 +1725,19 @@ public class Instruction {
 	 *
 	 * 1001_010d_dddd_1010
 	 */
-	public static final class DEC extends Instruction {
-	    public DEC() {
-	        super(Opcode.DEC);
+	public static final class DEC extends Register {
+	    public DEC(int d) {
+	        super(Opcode.DEC, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "Decrement"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000001010;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -1808,7 +1829,7 @@ public class Instruction {
 	        if(d < 16 || d > 23) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }
-	        if(r < 16 || r > 31) {
+	        if(r < 16 || r > 23) {
 	            throw new IllegalArgumentException("invalid argument r");
 	        }
 	    }
@@ -1833,7 +1854,7 @@ public class Instruction {
 	        if(d < 16 || d > 23) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }
-	        if(r < 16 || r > 31) {
+	        if(r < 16 || r > 23) {
 	            throw new IllegalArgumentException("invalid argument r");
 	        }
 	    }
@@ -1858,7 +1879,7 @@ public class Instruction {
 	        if(d < 16 || d > 23) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }
-	        if(r < 16 || r > 31) {
+	        if(r < 16 || r > 23) {
 	            throw new IllegalArgumentException("invalid argument r");
 	        }
 	    }
@@ -1974,9 +1995,8 @@ public class Instruction {
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000001100;
-	        opcode |= (this.k << 0) & 0b1;
-	        opcode |= (this.k << 3) & 0b111110000;
-	        opcode |= (this.k << 10) & 0b11111111111111110000000000000000;
+	        opcode |= (this.k << 0) & 0b11111111111111111;
+	        opcode |= (this.k << 3) & 0b1111100000000000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}
@@ -2296,7 +2316,7 @@ public class Instruction {
 	        if(d < 0 || d > 31) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }
-	        if(k < 0 || k > 65536) {
+	        if(k < 0 || k > 65535) {
 	            throw new IllegalArgumentException("invalid argument k");
 	        }
 	    }
@@ -2308,8 +2328,8 @@ public class Instruction {
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001000000000000;
-	        opcode |= (this.Rd << 4) & 0b111110000;
-	        opcode |= (this.k << 16) & 0b11111111111111110000000000000000;
+	        opcode |= (this.Rd << 20) & 0b1111100000000000000000000;
+	        opcode |= (this.k << 0) & 0b1111111111111111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}
@@ -2335,15 +2355,19 @@ public class Instruction {
 	 *
 	 * 1001_000d_dddd_0100
 	 */
-	public static final class LPM_Z extends Instruction {
-	    public LPM_Z() {
-	        super(Opcode.LPM_Z);
+	public static final class LPM_Z extends Register {
+	    public LPM_Z(int d) {
+	        super(Opcode.LPM_Z, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "Load Program Memory"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001000000000100;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2352,32 +2376,45 @@ public class Instruction {
 	 *
 	 * 1001_000d_dddd_0101
 	 */
-	public static final class LPM_Z_INC extends Instruction {
-	    public LPM_Z_INC() {
-	        super(Opcode.LPM_Z_INC);
+	public static final class LPM_Z_INC extends Register {
+	    public LPM_Z_INC(int d) {
+	        super(Opcode.LPM_Z_INC, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "Load Program Memory"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001000000000101;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
 	/**
 	 * Logical Shift Left.
 	 *
-	 * 0000_11dd_dddd_dddd
+	 * 0000_11rd_dddd_rrrr
 	 */
-	public static final class LSL extends Instruction {
-	    public LSL() {
-	        super(Opcode.LSL);
+	public static final class LSL extends RegisterRegister {
+	    public LSL(int d, int r) {
+	        super(Opcode.LSL, d, r);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
+	        if(r < 0 || r > 31) {
+	            throw new IllegalArgumentException("invalid argument r");
+	        }
 	    }
 
 	    public String getDescription() { return "Logical Shift Left"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b110000000000;
+	        opcode |= (this.Rd << 4) & 0b111110000;
+	        opcode |= (this.Rr << 0) & 0b1111;
+	        opcode |= (this.Rr << 5) & 0b1000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2386,15 +2423,19 @@ public class Instruction {
 	 *
 	 * 1001_010d_dddd_0110
 	 */
-	public static final class LSR extends Instruction {
-	    public LSR() {
-	        super(Opcode.LSR);
+	public static final class LSR extends Register {
+	    public LSR(int d) {
+	        super(Opcode.LSR, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "Logical Shift Right"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000000110;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2429,15 +2470,23 @@ public class Instruction {
 	 *
 	 * 0000_0001_dddd_rrrr
 	 */
-	public static final class MOVW extends Instruction {
-	    public MOVW() {
-	        super(Opcode.MOVW);
+	public static final class MOVW extends RegisterRegister {
+	    public MOVW(int d, int r) {
+	        super(Opcode.MOVW, d, r);
+	        if(d < 0 || d > 30 || (d % 2) != 0) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
+	        if(r < 0 || r > 30 || (r % 2) != 0) {
+	            throw new IllegalArgumentException("invalid argument r");
+	        }
 	    }
 
 	    public String getDescription() { return "Copy Register Word"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b100000000;
+	        opcode |= (this.Rd << 4) & 0b11110000;
+	        opcode |= (this.Rr << 0) & 0b1111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2472,15 +2521,23 @@ public class Instruction {
 	 *
 	 * 0000_0010_dddd_rrrr
 	 */
-	public static final class MULS extends Instruction {
-	    public MULS() {
-	        super(Opcode.MULS);
+	public static final class MULS extends RegisterRegister {
+	    public MULS(int d, int r) {
+	        super(Opcode.MULS, d, r);
+	        if(d < 16 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
+	        if(r < 16 || r > 31) {
+	            throw new IllegalArgumentException("invalid argument r");
+	        }
 	    }
 
 	    public String getDescription() { return "Multiply Signed"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1000000000;
+	        opcode |= (this.Rd << 4) & 0b11110000;
+	        opcode |= (this.Rr << 0) & 0b1111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2489,15 +2546,23 @@ public class Instruction {
 	 *
 	 * 0000_0011_0ddd_0rrr
 	 */
-	public static final class MULSU extends Instruction {
-	    public MULSU() {
-	        super(Opcode.MULSU);
+	public static final class MULSU extends RegisterRegister {
+	    public MULSU(int d, int r) {
+	        super(Opcode.MULSU, d, r);
+	        if(d < 16 || d > 23) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
+	        if(r < 16 || r > 23) {
+	            throw new IllegalArgumentException("invalid argument r");
+	        }
 	    }
 
 	    public String getDescription() { return "Multiply Signed with Unsigned"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1100000000;
+	        opcode |= (this.Rd << 4) & 0b1110000;
+	        opcode |= (this.Rr << 0) & 0b111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2506,15 +2571,19 @@ public class Instruction {
 	 *
 	 * 1001_010d_dddd_0001
 	 */
-	public static final class NEG extends Instruction {
-	    public NEG() {
-	        super(Opcode.NEG);
+	public static final class NEG extends Register {
+	    public NEG(int d) {
+	        super(Opcode.NEG, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "Two's Complement"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000000001;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2592,15 +2661,24 @@ public class Instruction {
 	 *
 	 * 1011_1AAr_rrrr_AAAA
 	 */
-	public static final class OUT extends Instruction {
-	    public OUT() {
-	        super(Opcode.OUT);
+	public static final class OUT extends IoRegister {
+	    public OUT(int A, int r) {
+	        super(Opcode.OUT, A, r);
+	        if(A < 0 || A > 63) {
+	            throw new IllegalArgumentException("invalid argument A");
+	        }
+	        if(r < 0 || r > 31) {
+	            throw new IllegalArgumentException("invalid argument r");
+	        }
 	    }
 
 	    public String getDescription() { return "Store Register to I/O Location"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1011100000000000;
+	        opcode |= (this.A << 0) & 0b1111;
+	        opcode |= (this.A << 5) & 0b11000000000;
+	        opcode |= (this.Rr << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2609,15 +2687,19 @@ public class Instruction {
 	 *
 	 * 1001_000d_dddd_1111
 	 */
-	public static final class POP extends Instruction {
-	    public POP() {
-	        super(Opcode.POP);
+	public static final class POP extends Register {
+	    public POP(int d) {
+	        super(Opcode.POP, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "Pop Register from Stack"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001000000001111;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2626,15 +2708,19 @@ public class Instruction {
 	 *
 	 * 1001_001d_dddd_1111
 	 */
-	public static final class PUSH extends Instruction {
-	    public PUSH() {
-	        super(Opcode.PUSH);
+	public static final class PUSH extends Register {
+	    public PUSH(int d) {
+	        super(Opcode.PUSH, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "Push Register on Stack"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001001000001111;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2643,15 +2729,19 @@ public class Instruction {
 	 *
 	 * 1101_kkkk_kkkk_kkkk
 	 */
-	public static final class RCALL extends Instruction {
-	    public RCALL() {
-	        super(Opcode.RCALL);
+	public static final class RCALL extends RelativeAddress {
+	    public RCALL(int k) {
+	        super(Opcode.RCALL, k);
+	        if(k < -2048 || k > 2047) {
+	            throw new IllegalArgumentException("invalid argument k");
+	        }
 	    }
 
 	    public String getDescription() { return "Relative Call to Subroutine"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1101000000000000;
+	        opcode |= (this.k << 0) & 0b111111111111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2694,32 +2784,45 @@ public class Instruction {
 	 *
 	 * 1100_kkkk_kkkk_kkkk
 	 */
-	public static final class RJMP extends Instruction {
-	    public RJMP() {
-	        super(Opcode.RJMP);
+	public static final class RJMP extends RelativeAddress {
+	    public RJMP(int k) {
+	        super(Opcode.RJMP, k);
+	        if(k < -2048 || k > 2047) {
+	            throw new IllegalArgumentException("invalid argument k");
+	        }
 	    }
 
 	    public String getDescription() { return "Relative Jump"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1100000000000000;
+	        opcode |= (this.k << 0) & 0b111111111111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
 	/**
-	 * Rotate Left trough Carry.
+	 * Rotate Left through Carry.
 	 *
-	 * 0001_11dd_dddd_dddd
+	 * 0001_11rd_dddd_rrrr
 	 */
-	public static final class ROL extends Instruction {
-	    public ROL() {
-	        super(Opcode.ROL);
+	public static final class ROL extends RegisterRegister {
+	    public ROL(int d, int r) {
+	        super(Opcode.ROL, d, r);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
+	        if(r < 0 || r > 31) {
+	            throw new IllegalArgumentException("invalid argument r");
+	        }
 	    }
 
-	    public String getDescription() { return "Rotate Left trough Carry"; }
+	    public String getDescription() { return "Rotate Left through Carry"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1110000000000;
+	        opcode |= (this.Rd << 4) & 0b111110000;
+	        opcode |= (this.Rr << 0) & 0b1111;
+	        opcode |= (this.Rr << 5) & 0b1000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2728,15 +2831,19 @@ public class Instruction {
 	 *
 	 * 1001_010d_dddd_0111
 	 */
-	public static final class ROR extends Instruction {
-	    public ROR() {
-	        super(Opcode.ROR);
+	public static final class ROR extends Register {
+	    public ROR(int d) {
+	        super(Opcode.ROR, d);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
 	    }
 
 	    public String getDescription() { return "Rotate Right through Carry"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000000111;
+	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2872,15 +2979,24 @@ public class Instruction {
 	 *
 	 * 1001_0111_KKdd_KKKK
 	 */
-	public static final class SBIW extends Instruction {
-	    public SBIW() {
-	        super(Opcode.SBIW);
+	public static final class SBIW extends RegisterImmediate {
+	    public SBIW(int d, int K) {
+	        super(Opcode.SBIW, d, K);
+	        if(d < 24 || d > 30 || (d % 2) != 0) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
+	        if(K < 0 || K > 63) {
+	            throw new IllegalArgumentException("invalid argument K");
+	        }
 	    }
 
 	    public String getDescription() { return "Subtract Immediate from Word"; }
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001011100000000;
+	        opcode |= (this.Rd << 4) & 0b110000;
+	        opcode |= (this.K << 0) & 0b1111;
+	        opcode |= (this.K << 2) & 0b11000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -3378,7 +3494,7 @@ public class Instruction {
 	        if(d < 16 || d > 31) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }
-	        if(k < 0 || k > 65536) {
+	        if(k < 0 || k > 65535) {
 	            throw new IllegalArgumentException("invalid argument k");
 	        }
 	    }
@@ -3390,8 +3506,8 @@ public class Instruction {
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001001000000000;
-	        opcode |= (this.Rd << 4) & 0b111110000;
-	        opcode |= (this.k << 16) & 0b11111111111111110000000000000000;
+	        opcode |= (this.Rd << 20) & 0b1111100000000000000000000;
+	        opcode |= (this.k << 0) & 0b1111111111111111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}

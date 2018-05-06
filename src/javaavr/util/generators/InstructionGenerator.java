@@ -76,24 +76,44 @@ public class InstructionGenerator {
 	}
 
 	private void generateInvariantTest(Instruction.Argument arg) {
-		Instruction.Invariant inv = arg.invariant;
-		out.print("        if(");
-		if (inv instanceof Instruction.Range) {
-			Instruction.Range range = (Instruction.Range) inv;
-			out.print(arg.id + " < " + range.start + " || " + arg.id + " > " + range.end);
-		} else {
-			Instruction.Union union = (Instruction.Union) inv;
-			for (int i = 0; i != union.values.length; ++i) {
-				if (i != 0) {
-					out.print(" && ");
-				}
-				out.print(arg.id + " != " + union.values[i]);
+		int min = getMinInteger(arg.signed,arg.width);
+		int max = getMaxInteger(arg.signed,arg.width);
+		boolean shifted = false;
+		for(Instruction.Transform t : arg.transforms) {
+			if(t instanceof Instruction.ShiftLeft) {
+				shifted = true;
+				min = min << 1;
+				max = max << 1;
+			} else {
+				Instruction.Offset o = (Instruction.Offset) t;
+				min += o.offset;
+				max += o.offset;
 			}
+		}
+		out.print("        if(");
+		out.print(arg.id + " < " + min + " || " + arg.id + " > " + max);
+		if(shifted) {
+			out.print(" || (" + arg.id  + " % 2) != 0");
 		}
 		out.println(") {");
 		out.println("            throw new IllegalArgumentException(\"invalid argument " + arg.id + "\");");
 		out.println("        }");
+	}
 
+	private int getMinInteger(boolean signed, int width) {
+		if(signed) {
+			return -1 << (width-1);
+		} else {
+			return 0;
+		}
+	}
+
+	private int getMaxInteger(boolean signed, int width) {
+		if(signed) {
+			return (1 << (width-1))-1;
+		} else {
+			return (1 << width) - 1;
+		}
 	}
 
 	private void generateEncoder(Opcode opcode) {
