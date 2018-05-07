@@ -501,7 +501,6 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(BRBC insn, Memory mem, Registers regs) {
 		int mask = (1 << insn.s);
 		if ((regs.SREG & mask) == 0) {
-			System.out.println("BRANCHING TO: " + (regs.PC + insn.k + 1));
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
 			regs.PC = regs.PC + 1;
@@ -1029,28 +1028,33 @@ public class AvrExecutor implements AVR.Executor {
 
 	private void execute(POP insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = pop(mem);
+		byte Rd = popByte(mem);
 		mem.write(insn.Rd, Rd);
 	}
 
 	private void execute(PUSH insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = mem.read(insn.Rd);
-		push(Rd,mem);
+		pushByte(Rd,mem);
 	}
 
 	private void execute(RCALL insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte lsb = (byte) (regs.PC & 0xFF);
-		byte msb = (byte) (regs.PC >> 8);
-		push(msb, mem);
-		push(lsb, mem);
+		pushWord(regs.PC, mem);
 		regs.PC = regs.PC + insn.k;
 	}
 
+	/**
+	 * Returns from subroutine. The return address is loaded from the STACK. The
+	 * Stack Pointer uses a pre-increment scheme during RET.
+	 *
+	 * @param insn
+	 * @param mem
+	 * @param regs
+	 */
 	private void execute(RET insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		int address = popWord(mem);
+		regs.PC = address;
 	}
 
 	private void execute(RETI insn, Memory mem, Registers regs) {
@@ -1067,9 +1071,29 @@ public class AvrExecutor implements AVR.Executor {
 		throw new RuntimeException("implement me!");
 	}
 
+	/**
+	 * Shifts all bits in Rd one place to the right. The C Flag is shifted into bit
+	 * 7 of Rd. Bit 0 is shifted into the C Flag. This operation, combined with
+	 * ASR, effectively divides multi-byte signed values by two. Combined with LSR
+	 * it effectively divides multi- byte unsigned values by two. The Carry Flag can
+	 * be used to round the result
+	 *
+	 * @param insn
+	 * @param mem
+	 * @param regs
+	 */
 	private void execute(ROR insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		// Read carry flag
+		int C = (regs.SREG & CARRY_FLAG) << 7;
+		// Read register
+		byte Rd = mem.read(insn.Rd);
+		// Perform operation
+		regs.SREG &= ~1;
+		regs.SREG |= (Rd & 1);
+		Rd = (byte) (C | (Rd >>> 1));
+		// Update Register file
+		mem.write(insn.Rd, Rd);
 	}
 
 	private void execute(SBC insn, Memory mem, Registers regs) {
@@ -1115,7 +1139,14 @@ public class AvrExecutor implements AVR.Executor {
 
 	private void execute(SBIW insn, Memory mem, Registers regs) {
 		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		int Rd = readWord(insn.Rd, mem);
+		byte Rr = (byte) insn.K;
+		// Perform operation
+		int R = (Rd - Rr);
+		// Update Register file
+		writeWord(insn.Rd, R, mem);
+		// Set Flags
+		setStatusRegister(Rd, R, regs);
 	}
 
 	private void execute(SBR insn, Memory mem, Registers regs) {
@@ -1129,8 +1160,13 @@ public class AvrExecutor implements AVR.Executor {
 	}
 
 	private void execute(SBRS insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		int mask = 1 << insn.b;
+		byte Rd = mem.read(insn.Rd);
+		if((Rd & mask) != 0) {
+			regs.PC = regs.PC + 2;
+		} else {
+			regs.PC = regs.PC + 1;
+		}
 	}
 
 	private void execute(SEC insn, Memory mem, Registers regs) {
@@ -1294,10 +1330,29 @@ public class AvrExecutor implements AVR.Executor {
 		setStatusRegister(C,Z,N,V,S,H,regs);
 	}
 
-	private void push(byte data, Memory mem) {
+	/**
+	 * Set status register after arithmetic operations involing a word.
+	 *
+	 * @param Rd
+	 * @param Rr
+	 * @param R
+	 * @param regs
+	 */
+	private void setStatusRegister(int Rd, int R, Registers regs) {
+		boolean Rdh7 = (Rd & 0b1000_0000_0000_0000) != 0;
+		boolean R15 = (R & 0b1000_0000_0000_0000) != 0;
+		//
+		boolean C = R15 & !Rdh7;
+		boolean Z = (R == 0);
+		boolean N = R15;
+		boolean V = Rdh7 & !R15;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C,Z,N,V,S,regs);
+	}
+	private void pushByte(byte data, Memory mem) {
 		// Construct SP contents
 		int SP = readWord(SPL_ADDRESS,mem);
-		System.out.println("STACK POINTER: " + SP);
 		// Write data
 		mem.write(SP, data);
 		// Post-decrement stack pointer
@@ -1305,7 +1360,7 @@ public class AvrExecutor implements AVR.Executor {
 		writeWord(SPL_ADDRESS,SP,mem);
 	}
 
-	private byte pop(Memory mem) {
+	private byte popByte(Memory mem) {
 		// Construct SP contents
 		int SP = readWord(SPL_ADDRESS,mem);
 		// Pre-increment stack pointer
@@ -1313,6 +1368,27 @@ public class AvrExecutor implements AVR.Executor {
 		writeWord(SPL_ADDRESS,SP,mem);
 		// read data
 		return mem.read(SP);
+	}
+
+	private void pushWord(int data, Memory mem) {
+		// Construct SP contents
+		int SP = readWord(SPL_ADDRESS, mem);
+		// Write data
+		SP = SP - 1;
+		writeWord(SP, data, mem);
+		// Post-decrement stack pointer
+		SP = SP - 1;
+		writeWord(SPL_ADDRESS, SP, mem);
+	}
+
+	private int popWord(Memory mem) {
+		// Construct SP contents
+		int SP = readWord(SPL_ADDRESS,mem);
+		// Pre-increment stack pointer
+		SP = SP + 2;
+		writeWord(SPL_ADDRESS,SP,mem);
+		// read data
+		return readWord(SP-1, mem);
 	}
 
 	private void setStatusRegister(boolean C, boolean Z, boolean N, boolean V, boolean S, Registers regs) {

@@ -44,23 +44,25 @@ public abstract class AbstractSerialPeripheral implements AvrPeripheral {
 
 	@Override
 	public void clock() {
+		// Clock data wires so effect visible. We're not worried about whether they're
+		// rising on not, only what their current value is.
+		MOSI.clock();
+		MISO.clock();
+		SS.clock();
 		// Process their meaning
 		if (SS.read()) {
 			// Device active when Slave Select low. Therefore, do nothing in this case.
 			return;
 		} else if (SCLK.isRising()) {
-			System.out.println("WRITING BIT (" + position + ")");
 			write(MOSI.read());
 			next();
 		} else {
 			// Otherwise, just write our data to output line
 			MISO.write(read());
 		}
-		// Clock all wires so their effect is visible
+		// NOTE: clock SCLK last in order to detect a rising edge. The issue is that,
+		// once the wire is clocked, it will be high.
 		SCLK.clock();
-		MOSI.clock();
-		MISO.clock();
-		SS.clock();
 	}
 
 	/**

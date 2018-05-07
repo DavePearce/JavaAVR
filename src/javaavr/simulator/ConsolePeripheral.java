@@ -50,7 +50,7 @@ public class ConsolePeripheral extends JFrame {
 	}
 
 	private class Console extends AbstractSerialPeripheral {
-		private StringBuffer text = new StringBuffer("Console");
+		private StringBuffer text = new StringBuffer();
 
 		public Console() {
 			super(1); // transmit one byte at a time
