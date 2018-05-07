@@ -1,6 +1,6 @@
 package javaavr.util;
 
-import javaavr.util.IoMemory.Wire;
+import javaavr.core.Wire;
 
 public class WireArrayPort implements IoMemory.Port {
 	private int DR;
@@ -57,10 +57,10 @@ public class WireArrayPort implements IoMemory.Port {
 	@Override
 	public void writeDataRegister(byte data) {
 		int mask = 1;
-		for(int i=0;i!=pins.length;++i) {
+		for (int i = 0; i != pins.length; ++i) {
 			Wire p = pins[i];
-			if(p != null) {
-				p.write(i,(data & mask) != 0);
+			if (p != null) {
+				p.write((data & mask) != 0);
 			}
 			mask = mask << 1;
 		}

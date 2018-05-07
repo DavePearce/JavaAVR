@@ -16,6 +16,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,8 +36,11 @@ import javax.swing.table.TableModel;
 import javaavr.core.AvrDecoder;
 import javaavr.core.AvrExecutor;
 import javaavr.core.AvrInstruction;
+import javaavr.core.AvrPeripheral;
+import javaavr.core.Wire;
 import javaavr.core.AVR;
 import javaavr.io.HexFile;
+import javaavr.util.AbstractSerialPeripheral;
 import javaavr.util.ByteMemory;
 import javaavr.util.IoMemory;
 import javaavr.util.MultiplexedMemory;
@@ -55,14 +59,16 @@ public class SimulationWindow extends JFrame {
 	private final static long CLOCK_RATE = 8_000_000; // MHz
 	private String[] instructions;
 	private final ClockThread clock;
-	private final IoMemory.Wire[] iopins;
+	private final Wire[] iopins;
+	private final ArrayList<AvrPeripheral> peripherals;
 	private final ExtendedMicroController mcu;
 	private long totalNumberOfCycles;
 
 	public SimulationWindow() {
 		super("Java AVR Simulator");
 		// Initialise Stuff
-		this.iopins = new IoMemory.Wire[6];
+		this.iopins = new Wire[6];
+		this.peripherals = new ArrayList<>();
 		this.mcu = constructMicroController();
 		this.clock = new ClockThread(500, 1, this);
 		this.instructions = disassemble();
@@ -118,41 +124,35 @@ public class SimulationWindow extends JFrame {
 		final JButton stopButton = new JButton(new AbstractAction("STOP") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				clock.pause();
 			}
 		});
 		// The step button allows the simulation to take a single step
 		final JButton stepButton = new JButton(new AbstractAction("STEP") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mcu.step();
-				repaint();
+				clock(0);
 			}
 		});
+		String[] hzLabels = new String[] { "1Hz", "10Hz", "100Hz", "1Khz"};
+		final int[] hzDelays = new int[] { 1000, 100, 10, 1 };
+		final JComboBox timeSelect = new JComboBox(hzLabels) {
+
+		};
 		// The play button starts the simulation going
 		final JButton playButton = new JButton(new AbstractAction("PLAY") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		final JButton play2Button = new JButton(new AbstractAction("PLAY x 5") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-			}
-		});
-		final JButton play4Button = new JButton(new AbstractAction("PLAY x 10") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
+				int index = timeSelect.getSelectedIndex();
+				clock.setDelay(hzDelays[index]);
+				clock.enable();
 			}
 		});
 		toolBar.add(newButton);
 		toolBar.add(stopButton);
 		toolBar.add(stepButton);
 		toolBar.add(playButton);
-		toolBar.add(play2Button);
-		toolBar.add(play4Button);
+		toolBar.add(timeSelect);
 		toolBar.add(Box.createHorizontalGlue());
 		toolBar.add(new JLabel("Time: 0s") {
 			@Override
@@ -379,6 +379,20 @@ public class SimulationWindow extends JFrame {
 		AVR.Memory flash = new ByteMemory(8192);
 		AVR.Memory data = new MultiplexedMemory(regs,io,SRAM);
 		//
+		// Connect pretend device
+		AbstractSerialPeripheral p = new AbstractSerialPeripheral(1) {
+			@Override
+			public void received(byte[] data) {
+				System.out.println("RECEIVED: " + Byte.toString(data[0]));
+			}
+		};
+		//
+		peripherals.add(p);
+		iopins[0] = p.SCLK();
+		iopins[1] = p.MOSI();
+		iopins[2] = p.MISO();
+		iopins[3] = p.SS();
+		//
 		return new ExtendedMicroController(new AvrDecoder(), new AvrExecutor(), flash, data);
 	}
 
@@ -388,11 +402,11 @@ public class SimulationWindow extends JFrame {
 		}
 
 		@Override
-		public void step() {
+		public void clock() {
 			InstrumentedMemory data = (InstrumentedMemory) getData();
 			data.readsLastCycle.clear();
 			data.writesLastCycle.clear();
-			super.step();
+			super.clock();
 		}
 
 		public boolean wasRead(int address) {
@@ -471,7 +485,14 @@ public class SimulationWindow extends JFrame {
 	}
 
 	public void clock(long delay) {
-
+		// Clock all peripherals
+		for(int i=0;i!=peripherals.size();++i) {
+			peripherals.get(i).clock();
+		}
+		// Clock the AVR
+		mcu.clock();
+		// Repaint the display
+		repaint();
 	}
 
 	public void error(String message, Exception e) {

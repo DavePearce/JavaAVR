@@ -49,7 +49,7 @@ public class AVR {
 		registers = new Registers();
 	}
 
-	public void step() {
+	public void clock() {
 		AvrInstruction instruction = decoder.decode(flash, registers.PC);
 		executor.execute(instruction, data, registers);
 	}

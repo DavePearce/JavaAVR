@@ -172,28 +172,4 @@ public class IoMemory implements AVR.Memory {
 		 */
 		public void writePinRegister(byte data);
 	}
-
-	/**
-	 * Represents a pin on the AVR which can be read or written to.
-	 *
-	 * @author David J. Pearce
-	 *
-	 */
-	public interface Wire {
-		/**
-		 * Read current state of pin.
-		 *
-		 * @param i
-		 * @return
-		 */
-		public boolean read();
-
-		/**
-		 * Write current state of pin.
-		 *
-		 * @param i
-		 * @return
-		 */
-		public void write(int i, boolean value);
-	}
 }
