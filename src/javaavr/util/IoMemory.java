@@ -78,15 +78,10 @@ public class IoMemory implements AVR.Memory {
 	public void poke(int address, byte data) {
 		for(int i=0;i!=ports.length;++i) {
 			Port port = ports[i];
-			if(port.getDataRegister() == address) {
-				port.writeDataRegister(data);
-				break;
-			} else if(port.getDirectionRegister() == address) {
-				port.writeDirectionRegister(data);
-				break;
-			} else if(port.getPinRegister() == address) {
-				port.writePinRegister(data);
-				break;
+			if (port.getDataRegister() == address || port.getDirectionRegister() == address
+					|| port.getPinRegister() == address) {
+				// I/O doesn't respond to being poked.
+				return;
 			}
 		}
 		// Always write-thru

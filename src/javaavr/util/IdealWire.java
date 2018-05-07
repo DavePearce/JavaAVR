@@ -27,7 +27,7 @@ public class IdealWire implements Wire {
 	}
 
 	@Override
-	public synchronized boolean write(boolean state) {
+	public boolean write(boolean state) {
 		if (read() != state) {
 			// Indicates a change has occurred
 			this.state = state ? State.RISING : State.FALLING;
@@ -39,17 +39,17 @@ public class IdealWire implements Wire {
 	}
 
 	@Override
-	public synchronized boolean read() {
+	public boolean read() {
 		return (state == State.HIGH || state == State.FALLING);
 	}
 
 	@Override
-	public synchronized boolean isRising() {
+	public boolean isRising() {
 		return state == State.RISING;
 	}
 
 	@Override
-	public synchronized boolean clock() {
+	public boolean clock() {
 		switch (state) {
 		case RISING:
 			state = State.HIGH;
