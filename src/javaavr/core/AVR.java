@@ -59,7 +59,6 @@ public class AVR {
 		public int SREG;
 	}
 
-
 	/**
 	 * Generic interface for decoding an instruction at a given instruction
 	 * location. Observe that instruction locations are organised word-wise. This

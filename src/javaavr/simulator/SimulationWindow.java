@@ -38,7 +38,9 @@ import javaavr.core.AvrInstruction;
 import javaavr.core.AVR;
 import javaavr.io.HexFile;
 import javaavr.util.ByteMemory;
+import javaavr.util.IoMemory;
 import javaavr.util.MultiplexedMemory;
+import javaavr.util.WireArrayPort;
 
 public class SimulationWindow extends JFrame {
 	// Fonts
@@ -53,12 +55,14 @@ public class SimulationWindow extends JFrame {
 	private final static long CLOCK_RATE = 8_000_000; // MHz
 	private String[] instructions;
 	private final ClockThread clock;
+	private final IoMemory.Wire[] iopins;
 	private final ExtendedMicroController mcu;
 	private long totalNumberOfCycles;
 
 	public SimulationWindow() {
 		super("Java AVR Simulator");
 		// Initialise Stuff
+		this.iopins = new IoMemory.Wire[6];
 		this.mcu = constructMicroController();
 		this.clock = new ClockThread(500, 1, this);
 		this.instructions = disassemble();
@@ -364,11 +368,17 @@ public class SimulationWindow extends JFrame {
 
 	public ExtendedMicroController constructMicroController() {
 		// This is the configuration for an ATTiny85.
+		final int PINB = 0x16;
+		final int DDRB = 0x17;
+		final int PORTB = 0x18;
+		//
+		WireArrayPort port = new WireArrayPort(PORTB,DDRB,PINB,iopins);
 		AVR.Memory regs = new ByteMemory(32);
-		AVR.Memory io = new ByteMemory(64);
+		AVR.Memory io = new IoMemory(new ByteMemory(64),port);
 		AVR.Memory SRAM = new ByteMemory(512);
 		AVR.Memory flash = new ByteMemory(8192);
 		AVR.Memory data = new MultiplexedMemory(regs,io,SRAM);
+		//
 		return new ExtendedMicroController(new AvrDecoder(), new AvrExecutor(), flash, data);
 	}
 
