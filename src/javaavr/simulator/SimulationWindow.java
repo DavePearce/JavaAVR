@@ -380,12 +380,8 @@ public class SimulationWindow extends JFrame {
 		AVR.Memory data = new MultiplexedMemory(regs,io,SRAM);
 		//
 		// Connect pretend device
-		AbstractSerialPeripheral p = new AbstractSerialPeripheral(1) {
-			@Override
-			public void received(byte[] data) {
-				System.out.println("RECEIVED: " + Byte.toString(data[0]));
-			}
-		};
+		ConsolePeripheral c = new ConsolePeripheral();
+		AbstractSerialPeripheral p = c.getSerialInterface();
 		//
 		peripherals.add(p);
 		iopins[0] = p.SCLK();
