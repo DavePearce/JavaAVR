@@ -12,9 +12,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
+import javaavr.core.AvrPeripheral;
 import javaavr.util.AbstractSerialPeripheral;
 
-public class ConsolePeripheral extends JFrame {
+public class ConsolePeripheral extends JPeripheral {
+	// The descriptor provides a generic mechanism for creating and hooking up this
+	// component.
+	public final static JPeripheral.Descriptor DESCRIPTOR = new Descriptor();
+	//
 	private Console spi;
 	private JTextArea textArea;
 
@@ -27,8 +32,14 @@ public class ConsolePeripheral extends JFrame {
 		setVisible(true);
 	}
 
-	public AbstractSerialPeripheral getSerialInterface() {
+	@Override
+	public AvrPeripheral getPeripheral() {
 		return spi;
+	}
+
+	@Override
+	public void clock() {
+		spi.clock();
 	}
 
 	@Override
@@ -58,8 +69,33 @@ public class ConsolePeripheral extends JFrame {
 
 		@Override
 		public void received(byte[] data) {
+			System.out.println("RECEIVED DATA: " + data[0]);
 			text.append((char) data[0]);
 			repaint();
 		}
+	}
+
+	private static final class Descriptor implements JPeripheral.Descriptor {
+
+		@Override
+		public String getName() {
+			return "Console";
+		}
+
+		@Override
+		public String getDescription() {
+			return "A simple ASCII console which operates over SPI";
+		}
+
+		@Override
+		public String[] getWireLabels() {
+			return new String[] { "SCLK", "MOSI", "MISO", "SS" };
+		}
+
+		@Override
+		public JPeripheral construct() {
+			return new ConsolePeripheral();
+		}
+
 	}
 }

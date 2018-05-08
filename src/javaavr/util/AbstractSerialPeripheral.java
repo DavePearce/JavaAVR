@@ -43,6 +43,11 @@ public abstract class AbstractSerialPeripheral implements AvrPeripheral {
 	}
 
 	@Override
+	public Wire[] getWires() {
+		return new Wire[] { SCLK, MOSI, MISO, SS };
+	}
+
+	@Override
 	public void clock() {
 		// Clock data wires so effect visible. We're not worried about whether they're
 		// rising on not, only what their current value is.

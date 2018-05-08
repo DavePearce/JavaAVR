@@ -56,18 +56,22 @@ public class SimulationWindow extends JFrame {
 	private final static Color LIGHT_RED = new Color(227,174,174);
 	private final static Color LIGHT_GREEN = new Color(174,227,174);
 	//
+	private final static JPeripheral.Descriptor[] PERIPHERAL_DESCRIPTORS = {
+		ConsolePeripheral.DESCRIPTOR
+	};
+	//
 	private final static long CLOCK_RATE = 8_000_000; // MHz
 	private String[] instructions;
 	private final ClockThread clock;
-	private final Wire[] iopins;
-	private final ArrayList<AvrPeripheral> peripherals;
+	private final String[] IoPinLabels = new String[] { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5" };
+	private final Wire[] IoPinWires = new Wire[6];
+	private final ArrayList<JPeripheral> peripherals;
 	private final ExtendedMicroController mcu;
 	private long totalNumberOfCycles;
 
 	public SimulationWindow() {
 		super("Java AVR Simulator");
 		// Initialise Stuff
-		this.iopins = new Wire[6];
 		this.peripherals = new ArrayList<>();
 		this.mcu = constructMicroController();
 		this.clock = new ClockThread(500, 1, this);
@@ -92,9 +96,14 @@ public class SimulationWindow extends JFrame {
 	}
 
 	private JMenuBar constructMenuBar() {
-		JMenu fileMenu = new JMenu("File");
 		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(fileMenu);
+		menuBar.add(createFileMenu());
+		menuBar.add(createConnectMenu());
+		return menuBar;
+	}
+
+	private JMenu createFileMenu() {
+		JMenu fileMenu = new JMenu("File");
 		fileMenu.add(new JMenuItem(new AbstractAction("Load") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -108,7 +117,22 @@ public class SimulationWindow extends JFrame {
 				}
 			}
 		}));
-		return menuBar;
+		return fileMenu;
+	}
+
+	private JMenu createConnectMenu() {
+		JMenu menu = new JMenu("Connect");
+		for (final JPeripheral.Descriptor d : PERIPHERAL_DESCRIPTORS) {
+			menu.add(new JMenuItem(new AbstractAction(d.getName()) {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					new ConnectionWindow(d, peripherals, IoPinWires, IoPinLabels);
+				}
+
+			}));
+		}
+		return menu;
 	}
 
 	private JToolBar constructToolBar() {
@@ -372,22 +396,12 @@ public class SimulationWindow extends JFrame {
 		final int DDRB = 0x17;
 		final int PORTB = 0x18;
 		//
-		WireArrayPort port = new WireArrayPort(PORTB,DDRB,PINB,iopins);
+		WireArrayPort port = new WireArrayPort(PORTB,DDRB,PINB,IoPinWires);
 		AVR.Memory regs = new ByteMemory(32);
 		AVR.Memory io = new IoMemory(new ByteMemory(64),port);
 		AVR.Memory SRAM = new ByteMemory(512);
 		AVR.Memory flash = new ByteMemory(8192);
 		AVR.Memory data = new MultiplexedMemory(regs,io,SRAM);
-		//
-		// Connect pretend device
-		ConsolePeripheral c = new ConsolePeripheral();
-		AbstractSerialPeripheral p = c.getSerialInterface();
-		//
-		peripherals.add(p);
-		iopins[0] = p.SCLK();
-		iopins[1] = p.MOSI();
-		iopins[2] = p.MISO();
-		iopins[3] = p.SS();
 		//
 		return new ExtendedMicroController(new AvrDecoder(), new AvrExecutor(), flash, data);
 	}
