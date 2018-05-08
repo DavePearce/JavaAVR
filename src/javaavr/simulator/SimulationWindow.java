@@ -57,7 +57,8 @@ public class SimulationWindow extends JFrame {
 	private final static Color LIGHT_GREEN = new Color(174,227,174);
 	//
 	private final static JPeripheral.Descriptor[] PERIPHERAL_DESCRIPTORS = {
-		ConsolePeripheral.DESCRIPTOR
+		ConsolePeripheral.DESCRIPTOR,
+		DisplayPeripheral.DESCRIPTOR
 	};
 	//
 	private final static long CLOCK_RATE = 8_000_000; // MHz
