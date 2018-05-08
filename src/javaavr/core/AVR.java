@@ -17,6 +17,13 @@ public class AVR {
 	public final static int SPH_ADDRESS = 0x3e + 32;
 	public final static int SPL_ADDRESS = 0x3d + 32;
 	//
+	public final static int XL_ADDRESS = 0x1a;
+	public final static int XH_ADDRESS = 0x1b;
+	public final static int YL_ADDRESS = 0x1c;
+	public final static int YH_ADDRESS = 0x1d;
+	public final static int ZL_ADDRESS = 0x1e;
+	public final static int ZH_ADDRESS = 0x1f;
+	//
 	private final Decoder decoder;
 	private final Executor executor;
 	private final Memory data;
@@ -51,7 +58,7 @@ public class AVR {
 
 	public void clock() {
 		AvrInstruction instruction = decoder.decode(flash, registers.PC);
-		executor.execute(instruction, data, registers);
+		executor.execute(instruction, flash, data, registers);
 	}
 
 	public static final class Registers {
@@ -82,7 +89,7 @@ public class AVR {
 	 *
 	 */
 	public interface Executor {
-		void execute(AvrInstruction insn, Memory data, AVR.Registers registers);
+		void execute(AvrInstruction insn, Memory code, Memory data, AVR.Registers registers);
 	}
 
 	public interface Memory {

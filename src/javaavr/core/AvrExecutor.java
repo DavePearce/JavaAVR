@@ -8,473 +8,480 @@ import javaavr.util.ByteMemory;
 public class AvrExecutor implements AVR.Executor {
 
 	@Override
-	public void execute(AvrInstruction insn, Memory data, Registers registers) {
+	public void execute(AvrInstruction insn, Memory code, Memory data, Registers registers) {
 		switch (insn.getOpcode()) {
 		case ADC:
-			execute((ADC) insn, data, registers);
+			execute((ADC) insn, code, data, registers);
 			break;
 		case ADD:
-			execute((ADD) insn, data, registers);
+			execute((ADD) insn, code, data, registers);
 			break;
 		case ADIW:
-			execute((ADIW) insn, data, registers);
+			execute((ADIW) insn, code, data, registers);
 			break;
 		case AND:
-			execute((AND) insn, data, registers);
+			execute((AND) insn, code, data, registers);
 			break;
 		case ANDI:
-			execute((ANDI) insn, data, registers);
+			execute((ANDI) insn, code, data, registers);
 			break;
 		case ASR:
-			execute((ASR) insn, data, registers);
+			execute((ASR) insn, code, data, registers);
 			break;
 		case BCLR:
-			execute((BCLR) insn, data, registers);
+			execute((BCLR) insn, code, data, registers);
 			break;
 		case BLD:
-			execute((BLD) insn, data, registers);
+			execute((BLD) insn, code, data, registers);
 			break;
 		case BRBC:
-			execute((BRBC) insn, data, registers);
+			execute((BRBC) insn, code, data, registers);
 			break;
 		case BRBS:
-			execute((BRBS) insn, data, registers);
+			execute((BRBS) insn, code, data, registers);
 			break;
 		case BRCC:
-			execute((BRCC) insn, data, registers);
+			execute((BRCC) insn, code, data, registers);
 			break;
 		case BRCS:
-			execute((BRCS) insn, data, registers);
+			execute((BRCS) insn, code, data, registers);
 			break;
 		case BREAK:
-			execute((BREAK) insn, data, registers);
+			execute((BREAK) insn, code, data, registers);
 			break;
 		case BREQ:
-			execute((BREQ) insn, data, registers);
+			execute((BREQ) insn, code, data, registers);
 			break;
 		case BRGE:
-			execute((BRGE) insn, data, registers);
+			execute((BRGE) insn, code, data, registers);
 			break;
 		case BRHC:
-			execute((BRHC) insn, data, registers);
+			execute((BRHC) insn, code, data, registers);
 			break;
 		case BRHS:
-			execute((BRHS) insn, data, registers);
+			execute((BRHS) insn, code, data, registers);
 			break;
 		case BRID:
-			execute((BRID) insn, data, registers);
+			execute((BRID) insn, code, data, registers);
 			break;
 		case BRIE:
-			execute((BRIE) insn, data, registers);
+			execute((BRIE) insn, code, data, registers);
 			break;
 		case BRLO:
-			execute((BRLO) insn, data, registers);
+			execute((BRLO) insn, code, data, registers);
 			break;
 		case BRLT:
-			execute((BRLT) insn, data, registers);
+			execute((BRLT) insn, code, data, registers);
 			break;
 		case BRMI:
-			execute((BRMI) insn, data, registers);
+			execute((BRMI) insn, code, data, registers);
 			break;
 		case BRNE:
-			execute((BRNE) insn, data, registers);
+			execute((BRNE) insn, code, data, registers);
 			break;
 		case BRPL:
-			execute((BRPL) insn, data, registers);
+			execute((BRPL) insn, code, data, registers);
 			break;
 		case BRSH:
-			execute((BRSH) insn, data, registers);
+			execute((BRSH) insn, code, data, registers);
 			break;
 		case BRTC:
-			execute((BRTC) insn, data, registers);
+			execute((BRTC) insn, code, data, registers);
 			break;
 		case BRTS:
-			execute((BRTS) insn, data, registers);
+			execute((BRTS) insn, code, data, registers);
 			break;
 		case BRVC:
-			execute((BRVC) insn, data, registers);
+			execute((BRVC) insn, code, data, registers);
 			break;
 		case BRVS:
-			execute((BRVS) insn, data, registers);
+			execute((BRVS) insn, code, data, registers);
 			break;
 		case BSET:
-			execute((BSET) insn, data, registers);
+			execute((BSET) insn, code, data, registers);
 			break;
 		case BST:
-			execute((BST) insn, data, registers);
+			execute((BST) insn, code, data, registers);
 			break;
 		case CALL:
-			execute((CALL) insn, data, registers);
+			execute((CALL) insn, code, data, registers);
 			break;
 		case CBI:
-			execute((CBI) insn, data, registers);
+			execute((CBI) insn, code, data, registers);
 			break;
 		case CLC:
-			execute((CLC) insn, data, registers);
+			execute((CLC) insn, code, data, registers);
 			break;
 		case CLH:
-			execute((CLH) insn, data, registers);
+			execute((CLH) insn, code, data, registers);
 			break;
 		case CLI:
-			execute((CLI) insn, data, registers);
+			execute((CLI) insn, code, data, registers);
 			break;
 		case CLN:
-			execute((CLN) insn, data, registers);
+			execute((CLN) insn, code, data, registers);
 			break;
 		case CLS:
-			execute((CLS) insn, data, registers);
+			execute((CLS) insn, code, data, registers);
 			break;
 		case CLT:
-			execute((CLT) insn, data, registers);
+			execute((CLT) insn, code, data, registers);
 			break;
 		case CLV:
-			execute((CLV) insn, data, registers);
+			execute((CLV) insn, code, data, registers);
 			break;
 		case CLZ:
-			execute((CLZ) insn, data, registers);
+			execute((CLZ) insn, code, data, registers);
 			break;
 		case COM:
-			execute((COM) insn, data, registers);
+			execute((COM) insn, code, data, registers);
 			break;
 		case CP:
-			execute((CP) insn, data, registers);
+			execute((CP) insn, code, data, registers);
 			break;
 		case CPC:
-			execute((CPC) insn, data, registers);
+			execute((CPC) insn, code, data, registers);
 			break;
 		case CPI:
-			execute((CPI) insn, data, registers);
+			execute((CPI) insn, code, data, registers);
 			break;
 		case CPSE:
-			execute((CPSE) insn, data, registers);
+			execute((CPSE) insn, code, data, registers);
 			break;
 		case DEC:
-			execute((DEC) insn, data, registers);
+			execute((DEC) insn, code, data, registers);
 			break;
 		case EICALL:
-			execute((EICALL) insn, data, registers);
+			execute((EICALL) insn, code, data, registers);
 			break;
 		case EIJMP:
-			execute((EIJMP) insn, data, registers);
+			execute((EIJMP) insn, code, data, registers);
 			break;
 		case ELPM:
-			execute((ELPM) insn, data, registers);
+			execute((ELPM) insn, code, data, registers);
 			break;
 		case EOR:
-			execute((EOR) insn, data, registers);
+			execute((EOR) insn, code, data, registers);
 			break;
 		case FMUL:
-			execute((FMUL) insn, data, registers);
+			execute((FMUL) insn, code, data, registers);
 			break;
 		case FMULS:
-			execute((FMULS) insn, data, registers);
+			execute((FMULS) insn, code, data, registers);
 			break;
 		case FMULSU:
-			execute((FMULSU) insn, data, registers);
+			execute((FMULSU) insn, code, data, registers);
 			break;
 		case ICALL:
-			execute((ICALL) insn, data, registers);
+			execute((ICALL) insn, code, data, registers);
 			break;
 		case IJMP:
-			execute((IJMP) insn, data, registers);
+			execute((IJMP) insn, code, data, registers);
 			break;
 		case IN:
-			execute((IN) insn, data, registers);
+			execute((IN) insn, code, data, registers);
 			break;
 		case INC:
-			execute((INC) insn, data, registers);
+			execute((INC) insn, code, data, registers);
 			break;
 		case JMP:
-			execute((JMP) insn, data, registers);
+			execute((JMP) insn, code, data, registers);
 			break;
 		case LAC:
-			execute((LAC) insn, data, registers);
+			execute((LAC) insn, code, data, registers);
 			break;
 		case LAS:
-			execute((LAS) insn, data, registers);
+			execute((LAS) insn, code, data, registers);
 			break;
 		case LAT:
-			execute((LAT) insn, data, registers);
+			execute((LAT) insn, code, data, registers);
 			break;
 		case LD_X:
-			execute_X((LD_X) insn, data, registers);
+			execute((LD_X) insn, code, data, registers);
 			break;
 		case LD_X_INC:
-			execute_X_INC((LD_X_INC) insn, data, registers);
+			execute((LD_X_INC) insn, code, data, registers);
 			break;
 		case LD_X_DEC:
-			execute_X_DEC((LD_X_DEC) insn, data, registers);
+			execute((LD_X_DEC) insn, code, data, registers);
 			break;
 		case LD_Y:
-			execute_Y((LD_Y) insn, data, registers);
+			execute((LD_Y) insn, code, data, registers);
 			break;
 		case LD_Y_INC:
-			execute_Y_INC((LD_Y_INC) insn, data, registers);
+			execute((LD_Y_INC) insn, code, data, registers);
 			break;
 		case LD_Y_DEC:
-			execute_Y_DEC((LD_Y_DEC) insn, data, registers);
+			execute((LD_Y_DEC) insn, code, data, registers);
 			break;
 		case LD_Z:
-			execute_Z((LD_Z) insn, data, registers);
+			execute((LD_Z) insn, code, data, registers);
 			break;
 		case LD_Z_INC:
-			execute_Z_INC((LD_Z_INC) insn, data, registers);
+			execute((LD_Z_INC) insn, code, data, registers);
 			break;
 		case LD_Z_DEC:
-			execute_Z_DEC((LD_Z_DEC) insn, data, registers);
+			execute((LD_Z_DEC) insn, code, data, registers);
 			break;
 		case LDI:
-			execute((LDI) insn, data, registers);
+			execute((LDI) insn, code, data, registers);
 			break;
 		case LDS:
-			execute((LDS) insn, data, registers);
+			execute((LDS) insn, code, data, registers);
 			break;
 		case LDSW:
-			execute((LDSW) insn, data, registers);
+			execute((LDSW) insn, code, data, registers);
 			break;
 		case LPM:
-			execute((LPM) insn, data, registers);
+			execute((LPM) insn, code, data, registers);
 			break;
 		case LPM_Z:
-			execute_Z((LPM_Z) insn, data, registers);
+			execute((LPM_Z) insn, code, data, registers);
 			break;
 		case LPM_Z_INC:
-			execute_Z_INC((LPM_Z_INC) insn, data, registers);
+			execute((LPM_Z_INC) insn, code, data, registers);
 			break;
 		case LSL:
-			execute((LSL) insn, data, registers);
+			execute((LSL) insn, code, data, registers);
 			break;
 		case LSR:
-			execute((LSR) insn, data, registers);
+			execute((LSR) insn, code, data, registers);
 			break;
 		case MOV:
-			execute((MOV) insn, data, registers);
+			execute((MOV) insn, code, data, registers);
 			break;
 		case MOVW:
-			execute((MOVW) insn, data, registers);
+			execute((MOVW) insn, code, data, registers);
 			break;
 		case MUL:
-			execute((MUL) insn, data, registers);
+			execute((MUL) insn, code, data, registers);
 			break;
 		case MULS:
-			execute((MULS) insn, data, registers);
+			execute((MULS) insn, code, data, registers);
 			break;
 		case MULSU:
-			execute((MULSU) insn, data, registers);
+			execute((MULSU) insn, code, data, registers);
 			break;
 		case NEG:
-			execute((NEG) insn, data, registers);
+			execute((NEG) insn, code, data, registers);
 			break;
 		case NOP:
-			execute((NOP) insn, data, registers);
+			execute((NOP) insn, code, data, registers);
 			break;
 		case OR:
-			execute((OR) insn, data, registers);
+			execute((OR) insn, code, data, registers);
 			break;
 		case ORI:
-			execute((ORI) insn, data, registers);
+			execute((ORI) insn, code, data, registers);
 			break;
 		case OUT:
-			execute((OUT) insn, data, registers);
+			execute((OUT) insn, code, data, registers);
 			break;
 		case POP:
-			execute((POP) insn, data, registers);
+			execute((POP) insn, code, data, registers);
 			break;
 		case PUSH:
-			execute((PUSH) insn, data, registers);
+			execute((PUSH) insn, code, data, registers);
 			break;
 		case RCALL:
-			execute((RCALL) insn, data, registers);
+			execute((RCALL) insn, code, data, registers);
 			break;
 		case RET:
-			execute((RET) insn, data, registers);
+			execute((RET) insn, code, data, registers);
 			break;
 		case RETI:
-			execute((RETI) insn, data, registers);
+			execute((RETI) insn, code, data, registers);
 			break;
 		case RJMP:
-			execute((RJMP) insn, data, registers);
+			execute((RJMP) insn, code, data, registers);
 			break;
 		case ROL:
-			execute((ROL) insn, data, registers);
+			execute((ROL) insn, code, data, registers);
 			break;
 		case ROR:
-			execute((ROR) insn, data, registers);
+			execute((ROR) insn, code, data, registers);
 			break;
 		case SBC:
-			execute((SBC) insn, data, registers);
+			execute((SBC) insn, code, data, registers);
 			break;
 		case SBCI:
-			execute((SBCI) insn, data, registers);
+			execute((SBCI) insn, code, data, registers);
 			break;
 		case SBI:
-			execute((SBI) insn, data, registers);
+			execute((SBI) insn, code, data, registers);
 			break;
 		case SBIC:
-			execute((SBIC) insn, data, registers);
+			execute((SBIC) insn, code, data, registers);
 			break;
 		case SBIS:
-			execute((SBIS) insn, data, registers);
+			execute((SBIS) insn, code, data, registers);
 			break;
 		case SBIW:
-			execute((SBIW) insn, data, registers);
+			execute((SBIW) insn, code, data, registers);
 			break;
 		case SBR:
-			execute((SBR) insn, data, registers);
+			execute((SBR) insn, code, data, registers);
 			break;
 		case SBRC:
-			execute((SBRC) insn, data, registers);
+			execute((SBRC) insn, code, data, registers);
 			break;
 		case SBRS:
-			execute((SBRS) insn, data, registers);
+			execute((SBRS) insn, code, data, registers);
 			break;
 		case SEC:
-			execute((SEC) insn, data, registers);
+			execute((SEC) insn, code, data, registers);
 			break;
 		case SEH:
-			execute((SEH) insn, data, registers);
+			execute((SEH) insn, code, data, registers);
 			break;
 		case SEI:
-			execute((SEI) insn, data, registers);
+			execute((SEI) insn, code, data, registers);
 			break;
 		case SEN:
-			execute((SEN) insn, data, registers);
+			execute((SEN) insn, code, data, registers);
 			break;
 		case SER:
-			execute((SER) insn, data, registers);
+			execute((SER) insn, code, data, registers);
 			break;
 		case SES:
-			execute((SES) insn, data, registers);
+			execute((SES) insn, code, data, registers);
 			break;
 		case SET:
-			execute((SET) insn, data, registers);
+			execute((SET) insn, code, data, registers);
 			break;
 		case SEV:
-			execute((SEV) insn, data, registers);
+			execute((SEV) insn, code, data, registers);
 			break;
 		case SEZ:
-			execute((SEZ) insn, data, registers);
+			execute((SEZ) insn, code, data, registers);
 			break;
 		case SLEEP:
-			execute((SLEEP) insn, data, registers);
+			execute((SLEEP) insn, code, data, registers);
 			break;
 		case SPM:
-			execute((SPM) insn, data, registers);
+			execute((SPM) insn, code, data, registers);
 			break;
 		case ST_X:
-			execute_X((ST_X) insn, data, registers);
+			execute((ST_X) insn, code, data, registers);
 			break;
 		case ST_X_INC:
-			execute_X_INC((ST_X_INC) insn, data, registers);
+			execute((ST_X_INC) insn, code, data, registers);
 			break;
 		case ST_X_DEC:
-			execute_X_DEC((ST_X_DEC) insn, data, registers);
+			execute((ST_X_DEC) insn, code, data, registers);
 			break;
 		case ST_Y:
-			execute_Y((ST_Y) insn, data, registers);
+			execute((ST_Y) insn, code, data, registers);
 			break;
 		case ST_Y_INC:
-			execute_Y_INC((ST_Y_INC) insn, data, registers);
+			execute((ST_Y_INC) insn, code, data, registers);
 			break;
 		case ST_Y_DEC:
-			execute_Y_DEC((ST_Y_DEC) insn, data, registers);
+			execute((ST_Y_DEC) insn, code, data, registers);
 			break;
 		case ST_Z:
-			execute_Z((ST_Z) insn, data, registers);
+			execute((ST_Z) insn, code, data, registers);
 			break;
 		case ST_Z_INC:
-			execute_Z_INC((ST_Z_INC) insn, data, registers);
+			execute((ST_Z_INC) insn, code, data, registers);
 			break;
 		case ST_Z_DEC:
-			execute_Z_DEC((ST_Z_DEC) insn, data, registers);
+			execute((ST_Z_DEC) insn, code, data, registers);
 			break;
 		case STS_DATA:
-			execute_DATA((STS_DATA) insn, data, registers);
+			execute((STS_DATA) insn, code, data, registers);
 			break;
 		case STS_DATA_WIDE:
-			execute_DATA_WIDE((STS_DATA_WIDE) insn, data, registers);
+			execute((STS_DATA_WIDE) insn, code, data, registers);
 			break;
 		case SUB:
-			execute((SUB) insn, data, registers);
+			execute((SUB) insn, code, data, registers);
 			break;
 		case SUBI:
-			execute((SUBI) insn, data, registers);
+			execute((SUBI) insn, code, data, registers);
 			break;
 		case SWAP:
-			execute((SWAP) insn, data, registers);
+			execute((SWAP) insn, code, data, registers);
 			break;
 		case WDR:
-			execute((WDR) insn, data, registers);
+			execute((WDR) insn, code, data, registers);
 			break;
 		case XCH:
-			execute((XCH) insn, data, registers);
+			execute((XCH) insn, code, data, registers);
 			break;
 		default:
 			throw new IllegalArgumentException("invalid opcode encountered: " + insn.getOpcode());
 		}
 	}
 
-	private void execute(ADC insn, Memory mem, Registers regs) {
+	private void execute(ADC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.Rr);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.Rr);
 		int C = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
 		byte R = (byte) (Rd + Rr + C);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(ADD insn, Memory mem, Registers regs) {
+	private void execute(ADD insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.Rr);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.Rr);
 		// Perform operation
 		byte R = (byte) (Rd + Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(ADIW insn, Memory mem, Registers regs) {
+	private void execute(ADIW insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		int Rd = readWord(insn.Rd, data);
+		byte Rr = (byte) insn.K;
+		// Perform operation
+		int R = (Rd + Rr);
+		// Update Register file
+		writeWord(insn.Rd, R, data);
+		// Set Flags
+		setStatusRegister(Rd, R, regs);
 	}
 
-	private void execute(AND insn, Memory mem, Registers regs) {
+	private void execute(AND insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.Rr);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.Rr);
 		// Perform operation
 		byte R = (byte) (Rd & Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(ANDI insn, Memory mem, Registers regs) {
+	private void execute(ANDI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		byte Rr = (byte) insn.K;
 		// Perform operation
 		byte R = (byte) (Rd & Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(ASR insn, Memory mem, Registers regs) {
+	private void execute(ASR insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		// Perform operation
 		byte R = (byte) (Rd >> 1);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		boolean C = (Rd & 0b1000_0001) != 0;
 		boolean Z = (R == 0);
@@ -484,21 +491,21 @@ public class AvrExecutor implements AVR.Executor {
 		setStatusRegister(C,Z,N,V,S,regs);
 	}
 
-	private void execute(BCLR insn, Memory mem, Registers regs) {
+	private void execute(BCLR insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~(1 << insn.s);
 	}
 
-	private void execute(BLD insn, Memory mem, Registers regs) {
+	private void execute(BLD insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		int Rd = mem.read(insn.Rd);
+		int Rd = data.read(insn.Rd);
 		int mask = (1 << insn.b);
 		Rd = Rd & mask;
 		Rd |= (regs.SREG & BITCOPY_FLAG) != 0 ? mask : 0;
-		mem.write(insn.Rd, (byte) Rd);
+		data.write(insn.Rd, (byte) Rd);
 	}
 
-	private void execute(BRBC insn, Memory mem, Registers regs) {
+	private void execute(BRBC insn, Memory code, Memory data, Registers regs) {
 		int mask = (1 << insn.s);
 		if ((regs.SREG & mask) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
@@ -507,7 +514,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRBS insn, Memory mem, Registers regs) {
+	private void execute(BRBS insn, Memory code, Memory data, Registers regs) {
 		int mask = (1 << insn.s);
 		if ((regs.SREG & mask) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
@@ -516,7 +523,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRCC insn, Memory mem, Registers regs) {
+	private void execute(BRCC insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & CARRY_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -524,7 +531,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRCS insn, Memory mem, Registers regs) {
+	private void execute(BRCS insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & CARRY_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -532,11 +539,11 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BREAK insn, Memory mem, Registers regs) {
+	private void execute(BREAK insn, Memory code, Memory data, Registers regs) {
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(BREQ insn, Memory mem, Registers regs) {
+	private void execute(BREQ insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & ZERO_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -544,7 +551,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRGE insn, Memory mem, Registers regs) {
+	private void execute(BRGE insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & SIGN_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -552,7 +559,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRHC insn, Memory mem, Registers regs) {
+	private void execute(BRHC insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & HALFCARRY_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -560,7 +567,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRHS insn, Memory mem, Registers regs) {
+	private void execute(BRHS insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & HALFCARRY_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -568,7 +575,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRID insn, Memory mem, Registers regs) {
+	private void execute(BRID insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & INTERRUPT_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -576,7 +583,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRIE insn, Memory mem, Registers regs) {
+	private void execute(BRIE insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & INTERRUPT_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -584,7 +591,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRLO insn, Memory mem, Registers regs) {
+	private void execute(BRLO insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & CARRY_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -592,7 +599,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRLT insn, Memory mem, Registers regs) {
+	private void execute(BRLT insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & SIGN_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -600,7 +607,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRMI insn, Memory mem, Registers regs) {
+	private void execute(BRMI insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & NEGATIVE_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -608,7 +615,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRNE insn, Memory mem, Registers regs) {
+	private void execute(BRNE insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & ZERO_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -616,7 +623,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRPL insn, Memory mem, Registers regs) {
+	private void execute(BRPL insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & NEGATIVE_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -624,7 +631,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRSH insn, Memory mem, Registers regs) {
+	private void execute(BRSH insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & CARRY_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -632,7 +639,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRTC insn, Memory mem, Registers regs) {
+	private void execute(BRTC insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & BITCOPY_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -640,7 +647,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRTS insn, Memory mem, Registers regs) {
+	private void execute(BRTS insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & BITCOPY_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -648,7 +655,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRVC insn, Memory mem, Registers regs) {
+	private void execute(BRVC insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & OVERFLOW_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -656,7 +663,7 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BRVS insn, Memory mem, Registers regs) {
+	private void execute(BRVS insn, Memory code, Memory data, Registers regs) {
 		if ((regs.SREG & OVERFLOW_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -664,97 +671,97 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(BSET insn, Memory mem, Registers regs) {
+	private void execute(BSET insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= (1 << insn.s);
 	}
 
-	private void execute(BST insn, Memory mem, Registers regs) {
+	private void execute(BST insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		int Rd = mem.read(insn.Rd);
+		int Rd = data.read(insn.Rd);
 		int mask = (1 << insn.b);
 		boolean T = (Rd & mask) != 0;
 		regs.SREG |= T ? (1 << 6) : 0;
 	}
 
-	private void execute(CALL insn, Memory mem, Registers regs) {
+	private void execute(CALL insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(CBI insn, Memory mem, Registers regs) {
+	private void execute(CBI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		int A = mem.read(insn.A + 32);
+		int A = data.read(insn.A + 32);
 		int mask = (1 << insn.b);
 		A &= ~mask;
-		mem.write(insn.A + 32, (byte) A);
+		data.write(insn.A + 32, (byte) A);
 	}
 
-	private void execute(CLC insn, Memory mem, Registers regs) {
+	private void execute(CLC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~CARRY_FLAG;
 	}
 
-	private void execute(CLH insn, Memory mem, Registers regs) {
+	private void execute(CLH insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~HALFCARRY_FLAG;
 	}
 
-	private void execute(CLI insn, Memory mem, Registers regs) {
+	private void execute(CLI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~INTERRUPT_FLAG;
 	}
 
-	private void execute(CLN insn, Memory mem, Registers regs) {
+	private void execute(CLN insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~NEGATIVE_FLAG;
 	}
 
-	private void execute(CLS insn, Memory mem, Registers regs) {
+	private void execute(CLS insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~SIGN_FLAG;
 	}
 
-	private void execute(CLT insn, Memory mem, Registers regs) {
+	private void execute(CLT insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~BITCOPY_FLAG;
 	}
 
-	private void execute(CLV insn, Memory mem, Registers regs) {
+	private void execute(CLV insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~OVERFLOW_FLAG;
 	}
 
-	private void execute(CLZ insn, Memory mem, Registers regs) {
+	private void execute(CLZ insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~ZERO_FLAG;
 	}
 
-	private void execute(COM insn, Memory mem, Registers regs) {
+	private void execute(COM insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		// Perform operation
 		byte R = (byte) (0xFF - Rd);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister((byte) 0xFF, (byte) -Rd, R, regs);
 	}
 
-	private void execute(CP insn, Memory mem, Registers regs) {
+	private void execute(CP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.Rr);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.Rr);
 		// Perform operation
 		byte R = (byte) (Rd - Rr);
 		// Set Flags
 		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
-	private void execute(CPC insn, Memory mem, Registers regs) {
+	private void execute(CPC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.Rr);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.Rr);
 		int C = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
 		byte R = (byte) (Rd - Rr - C);
@@ -762,285 +769,348 @@ public class AvrExecutor implements AVR.Executor {
 		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
-	private void execute(CPI insn, Memory mem, Registers regs) {
+	private void execute(CPI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.K);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.K);
 		// Perform operation
 		byte R = (byte) (Rd - Rr);
 		// Set Flags
 		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
-	private void execute(CPSE insn, Memory mem, Registers regs) {
+	private void execute(CPSE insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(DEC insn, Memory mem, Registers regs) {
+	private void execute(DEC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		byte Rr = -1;
 		// Perform operation
 		byte R = (byte) (Rd + Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(EICALL insn, Memory mem, Registers regs) {
+	private void execute(EICALL insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(EIJMP insn, Memory mem, Registers regs) {
+	private void execute(EIJMP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(ELPM insn, Memory mem, Registers regs) {
+	private void execute(ELPM insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(EOR insn, Memory mem, Registers regs) {
+	private void execute(EOR insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.Rr);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.Rr);
 		// Perform operation
 		byte R = (byte) (Rd ^ Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(FMUL insn, Memory mem, Registers regs) {
+	private void execute(FMUL insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(FMULS insn, Memory mem, Registers regs) {
+	private void execute(FMULS insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(FMULSU insn, Memory mem, Registers regs) {
+	private void execute(FMULSU insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(ICALL insn, Memory mem, Registers regs) {
+	private void execute(ICALL insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(IJMP insn, Memory mem, Registers regs) {
+	private void execute(IJMP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(IN insn, Memory mem, Registers regs) {
+	private void execute(IN insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		byte Rd = data.read(insn.A + 32);
+		data.write(insn.Rd, Rd);
 	}
 
-	private void execute(INC insn, Memory mem, Registers regs) {
+	private void execute(INC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		byte Rr = +1;
 		// Perform operation
 		byte R = (byte) (Rd + Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(JMP insn, Memory mem, Registers regs) {
+	private void execute(JMP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = insn.k;
 	}
 
-	private void execute(LAC insn, Memory mem, Registers regs) {
+	private void execute(LAC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(LAS insn, Memory mem, Registers regs) {
+	private void execute(LAS insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(LAT insn, Memory mem, Registers regs) {
+	private void execute(LAT insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_X(LD_X insn, Memory mem, Registers regs) {
+	private void execute(LD_X insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load X register
+		int X = readWord(AVR.XL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(X);
+		data.write(insn.Rd, Rd);
+	}
+
+	private void execute(LD_X_INC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load X register
+		int X = readWord(AVR.XL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(X);
+		data.write(insn.Rd, Rd);
+		// Post increment
+		writeWord(AVR.XL_ADDRESS, X + 1, data);
+	}
+
+	private void execute(LD_X_DEC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load X register
+		int X = readWord(AVR.XL_ADDRESS, data);
+		// Pre decrement
+		X = X - 1;
+		writeWord(AVR.XL_ADDRESS, X, data);
+		// Perform operation
+		byte Rd = data.read(X);
+		data.write(insn.Rd, Rd);
+	}
+
+	private void execute(LD_Y insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Y register
+		int Y = readWord(AVR.YL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(Y);
+		data.write(insn.Rd, Rd);
+	}
+
+	private void execute(LD_Y_INC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Y register
+		int Y = readWord(AVR.YL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(Y);
+		data.write(insn.Rd, Rd);
+		// Post increment
+		writeWord(AVR.YL_ADDRESS, Y + 1, data);
+	}
+
+	private void execute(LD_Y_DEC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Y register
+		int Y = readWord(AVR.YL_ADDRESS, data);
+		// Pre decrement
+		Y = Y - 1;
+		writeWord(AVR.YL_ADDRESS, Y, data);
+		// Perform operation
+		byte Rd = data.read(Y);
+		data.write(insn.Rd, Rd);
+	}
+
+	private void execute(LD_Z insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(Z);
+		data.write(insn.Rd, Rd);
+	}
+
+	private void execute(LD_Z_INC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(Z);
+		data.write(insn.Rd, Rd);
+		// Post increment
+		writeWord(AVR.ZL_ADDRESS, Z + 1, data);
+	}
+
+	private void execute(LD_Z_DEC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Pre decrement
+		Z = Z - 1;
+		writeWord(AVR.ZL_ADDRESS, Z, data);
+		// Perform operation
+		byte Rd = data.read(Z);
+		data.write(insn.Rd, Rd);
+	}
+
+	private void execute(LDI insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		data.write(insn.Rd, (byte) insn.K);
+	}
+
+	private void execute(LDS insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_X_INC(LD_X_INC insn, Memory mem, Registers regs) {
+	private void execute(LDSW insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_X_DEC(LD_X_DEC insn, Memory mem, Registers regs) {
+	private void execute(LPM insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_Y(LD_Y insn, Memory mem, Registers regs) {
+	private void execute(LPM_Z insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Perform operation
+		byte Rd = code.read(Z);
+		data.write(insn.Rd, Rd);
+	}
+
+	private void execute(LPM_Z_INC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Perform operation
+		byte Rd = code.read(Z);
+		data.write(insn.Rd, Rd);
+		// Post increment
+		writeWord(AVR.ZL_ADDRESS, Z + 1, data);
+	}
+
+	private void execute(LSL insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_Y_INC(LD_Y_INC insn, Memory mem, Registers regs) {
+	private void execute(LSR insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_Y_DEC(LD_Y_DEC insn, Memory mem, Registers regs) {
+	private void execute(MOV insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_Z(LD_Z insn, Memory mem, Registers regs) {
+	private void execute(MOVW insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		int word = readWord(insn.Rr,data);
+		writeWord(insn.Rd,word,data);
+	}
+
+	private void execute(MUL insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_Z_INC(LD_Z_INC insn, Memory mem, Registers regs) {
+	private void execute(MULS insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_Z_DEC(LD_Z_DEC insn, Memory mem, Registers regs) {
+	private void execute(MULSU insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(LDI insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		mem.write(insn.Rd, (byte) insn.K);
-	}
-
-	private void execute(LDS insn, Memory mem, Registers regs) {
+	private void execute(NEG insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(LDSW insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(LPM insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_Z(LPM_Z insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_Z_INC(LPM_Z_INC insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(LSL insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(LSR insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(MOV insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(MOVW insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(MUL insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(MULS insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(MULSU insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(NEG insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(NOP insn, Memory mem, Registers regs) {
+	private void execute(NOP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 	}
 
-	private void execute(OR insn, Memory mem, Registers regs) {
+	private void execute(OR insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.Rr);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.Rr);
 		// Perform operation
 		byte R = (byte) (Rd | Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(ORI insn, Memory mem, Registers regs) {
+	private void execute(ORI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		byte Rr = (byte) insn.K;
 		// Perform operation
 		byte R = (byte) (Rd | Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, Rr, R, regs);
 	}
 
-	private void execute(OUT insn, Memory mem, Registers regs) {
+	private void execute(OUT insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rr);
-		mem.write(insn.A + 32, Rd);
+		byte Rd = data.read(insn.Rr);
+		data.write(insn.A + 32, Rd);
 	}
 
-	private void execute(POP insn, Memory mem, Registers regs) {
+	private void execute(POP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = popByte(mem);
-		mem.write(insn.Rd, Rd);
+		byte Rd = popByte(data);
+		data.write(insn.Rd, Rd);
 	}
 
-	private void execute(PUSH insn, Memory mem, Registers regs) {
+	private void execute(PUSH insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		pushByte(Rd,mem);
+		byte Rd = data.read(insn.Rd);
+		pushByte(Rd,data);
 	}
 
-	private void execute(RCALL insn, Memory mem, Registers regs) {
+	private void execute(RCALL insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		pushWord(regs.PC, mem);
+		pushWord(regs.PC, data);
 		regs.PC = regs.PC + insn.k;
 	}
 
@@ -1049,24 +1119,24 @@ public class AvrExecutor implements AVR.Executor {
 	 * Stack Pointer uses a pre-increment scheme during RET.
 	 *
 	 * @param insn
-	 * @param mem
+	 * @param data
 	 * @param regs
 	 */
-	private void execute(RET insn, Memory mem, Registers regs) {
-		int address = popWord(mem);
+	private void execute(RET insn, Memory code, Memory data, Registers regs) {
+		int address = popWord(data);
 		regs.PC = address;
 	}
 
-	private void execute(RETI insn, Memory mem, Registers regs) {
+	private void execute(RETI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(RJMP insn, Memory mem, Registers regs) {
+	private void execute(RJMP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + insn.k + 1;
 	}
 
-	private void execute(ROL insn, Memory mem, Registers regs) {
+	private void execute(ROL insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1079,89 +1149,94 @@ public class AvrExecutor implements AVR.Executor {
 	 * be used to round the result
 	 *
 	 * @param insn
-	 * @param mem
+	 * @param data
 	 * @param regs
 	 */
-	private void execute(ROR insn, Memory mem, Registers regs) {
+	private void execute(ROR insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Read carry flag
 		int C = (regs.SREG & CARRY_FLAG) << 7;
 		// Read register
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		// Perform operation
 		regs.SREG &= ~1;
 		regs.SREG |= (Rd & 1);
 		Rd = (byte) (C | (Rd >>> 1));
 		// Update Register file
-		mem.write(insn.Rd, Rd);
+		data.write(insn.Rd, Rd);
 	}
 
-	private void execute(SBC insn, Memory mem, Registers regs) {
+	private void execute(SBC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
-		byte Rr = mem.read(insn.Rr);
+		byte Rd = data.read(insn.Rd);
+		byte Rr = data.read(insn.Rr);
 		int C = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
 		byte R = (byte) (Rd - Rr - C);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
-	private void execute(SBCI insn, Memory mem, Registers regs) {
+	private void execute(SBCI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		byte Rr = (byte) insn.K;
 		int C = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
 		byte R = (byte) (Rd - Rr - C);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
-	private void execute(SBI insn, Memory mem, Registers regs) {
+	private void execute(SBI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SBIC insn, Memory mem, Registers regs) {
+	private void execute(SBIC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SBIS insn, Memory mem, Registers regs) {
+	private void execute(SBIS insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SBIW insn, Memory mem, Registers regs) {
+	private void execute(SBIW insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		int Rd = readWord(insn.Rd, mem);
+		int Rd = readWord(insn.Rd, data);
 		byte Rr = (byte) insn.K;
 		// Perform operation
 		int R = (Rd - Rr);
 		// Update Register file
-		writeWord(insn.Rd, R, mem);
+		writeWord(insn.Rd, R, data);
 		// Set Flags
 		setStatusRegister(Rd, R, regs);
 	}
 
-	private void execute(SBR insn, Memory mem, Registers regs) {
+	private void execute(SBR insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SBRC insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(SBRS insn, Memory mem, Registers regs) {
+	private void execute(SBRC insn, Memory code, Memory data, Registers regs) {
 		int mask = 1 << insn.b;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
+		if((Rd & mask) == 0) {
+			regs.PC = regs.PC + 2;
+		} else {
+			regs.PC = regs.PC + 1;
+		}
+	}
+
+	private void execute(SBRS insn, Memory code, Memory data, Registers regs) {
+		int mask = 1 << insn.b;
+		byte Rd = data.read(insn.Rd);
 		if((Rd & mask) != 0) {
 			regs.PC = regs.PC + 2;
 		} else {
@@ -1169,144 +1244,195 @@ public class AvrExecutor implements AVR.Executor {
 		}
 	}
 
-	private void execute(SEC insn, Memory mem, Registers regs) {
+	private void execute(SEC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SEH insn, Memory mem, Registers regs) {
+	private void execute(SEH insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SEI insn, Memory mem, Registers regs) {
+	private void execute(SEI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SEN insn, Memory mem, Registers regs) {
+	private void execute(SEN insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SER insn, Memory mem, Registers regs) {
+	private void execute(SER insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SES insn, Memory mem, Registers regs) {
+	private void execute(SES insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SET insn, Memory mem, Registers regs) {
+	private void execute(SET insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SEV insn, Memory mem, Registers regs) {
+	private void execute(SEV insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SEZ insn, Memory mem, Registers regs) {
+	private void execute(SEZ insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SLEEP insn, Memory mem, Registers regs) {
+	private void execute(SLEEP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(SPM insn, Memory mem, Registers regs) {
+	private void execute(SPM insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_X(ST_X insn, Memory mem, Registers regs) {
+	private void execute(ST_X insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load X register
+		int X = readWord(AVR.XL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(X, Rd);
+	}
+
+	private void execute(ST_X_INC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load X register
+		int X = readWord(AVR.XL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(X, Rd);
+		// Post increment
+		writeWord(AVR.XL_ADDRESS, X + 1, data);
+	}
+
+	private void execute(ST_X_DEC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load X register
+		int X = readWord(AVR.XL_ADDRESS, data);
+		// Pre decrement
+		X = X - 1;
+		writeWord(AVR.XL_ADDRESS, X, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(X, Rd);
+	}
+
+	private void execute(ST_Y insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Y register
+		int Y = readWord(AVR.YL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(Y, Rd);
+	}
+
+	private void execute(ST_Y_INC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Y register
+		int Y = readWord(AVR.YL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(Y, Rd);
+		// Post increment
+		writeWord(AVR.YL_ADDRESS, Y + 1, data);
+	}
+
+	private void execute(ST_Y_DEC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Y register
+		int Y = readWord(AVR.YL_ADDRESS, data);
+		// Pre decrement
+		Y = Y - 1;
+		writeWord(AVR.YL_ADDRESS, Y, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(Y, Rd);
+	}
+
+	private void execute(ST_Z insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(Z, Rd);
+	}
+
+	private void execute(ST_Z_INC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(Z, Rd);
+		// Post increment
+		writeWord(AVR.ZL_ADDRESS, Z + 1, data);
+	}
+
+	private void execute(ST_Z_DEC insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Pre decrement
+		Z = Z - 1;
+		writeWord(AVR.ZL_ADDRESS, Z, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(Z, Rd);
+	}
+
+	private void execute(STS_DATA insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_X_INC(ST_X_INC insn, Memory mem, Registers regs) {
+	private void execute(STS_DATA_WIDE insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_X_DEC(ST_X_DEC insn, Memory mem, Registers regs) {
+	private void execute(SUB insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute_Y(ST_Y insn, Memory mem, Registers regs) {
+	private void execute(SUBI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_Y_INC(ST_Y_INC insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_Y_DEC(ST_Y_DEC insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_Z(ST_Z insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_Z_INC(ST_Z_INC insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_Z_DEC(ST_Z_DEC insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_DATA(STS_DATA insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute_DATA_WIDE(STS_DATA_WIDE insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(SUB insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
-	}
-
-	private void execute(SUBI insn, Memory mem, Registers regs) {
-		regs.PC = regs.PC + 1;
-		byte Rd = mem.read(insn.Rd);
+		byte Rd = data.read(insn.Rd);
 		byte Rr = (byte) insn.K;
 		// Perform operation
 		byte R = (byte) (Rd - Rr);
 		// Update Register file
-		mem.write(insn.Rd, R);
+		data.write(insn.Rd, R);
 		// Set Flags
 		setStatusRegister(Rd, (byte) -Rr, R, regs);
 	}
 
-	private void execute(SWAP insn, Memory mem, Registers regs) {
+	private void execute(SWAP insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(WDR insn, Memory mem, Registers regs) {
+	private void execute(WDR insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
 
-	private void execute(XCH insn, Memory mem, Registers regs) {
+	private void execute(XCH insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1350,45 +1476,46 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Status Register
 		setStatusRegister(C,Z,N,V,S,regs);
 	}
-	private void pushByte(byte data, Memory mem) {
+
+	private void pushByte(byte bite, Memory data) {
 		// Construct SP contents
-		int SP = readWord(SPL_ADDRESS,mem);
+		int SP = readWord(SPL_ADDRESS, data);
 		// Write data
-		mem.write(SP, data);
+		data.write(SP, bite);
 		// Post-decrement stack pointer
 		SP = SP - 1;
-		writeWord(SPL_ADDRESS,SP,mem);
+		writeWord(SPL_ADDRESS, SP, data);
 	}
 
-	private byte popByte(Memory mem) {
+	private byte popByte(Memory data) {
 		// Construct SP contents
-		int SP = readWord(SPL_ADDRESS,mem);
+		int SP = readWord(SPL_ADDRESS,data);
 		// Pre-increment stack pointer
 		SP = SP + 1;
-		writeWord(SPL_ADDRESS,SP,mem);
+		writeWord(SPL_ADDRESS,SP,data);
 		// read data
-		return mem.read(SP);
+		return data.read(SP);
 	}
 
-	private void pushWord(int data, Memory mem) {
+	private void pushWord(int word, Memory data) {
 		// Construct SP contents
-		int SP = readWord(SPL_ADDRESS, mem);
+		int SP = readWord(SPL_ADDRESS, data);
 		// Write data
 		SP = SP - 1;
-		writeWord(SP, data, mem);
+		writeWord(SP, word, data);
 		// Post-decrement stack pointer
 		SP = SP - 1;
-		writeWord(SPL_ADDRESS, SP, mem);
+		writeWord(SPL_ADDRESS, SP, data);
 	}
 
-	private int popWord(Memory mem) {
+	private int popWord(Memory data) {
 		// Construct SP contents
-		int SP = readWord(SPL_ADDRESS,mem);
+		int SP = readWord(SPL_ADDRESS,data);
 		// Pre-increment stack pointer
 		SP = SP + 2;
-		writeWord(SPL_ADDRESS,SP,mem);
+		writeWord(SPL_ADDRESS,SP,data);
 		// read data
-		return readWord(SP-1, mem);
+		return readWord(SP-1, data);
 	}
 
 	private void setStatusRegister(boolean C, boolean Z, boolean N, boolean V, boolean S, Registers regs) {
@@ -1414,26 +1541,14 @@ public class AvrExecutor implements AVR.Executor {
 		regs.SREG |= H ? 0b1 << 5 : 0;
 	}
 
-	public int readWord(int address, Memory mem) {
-		int msb = mem.read(address+1) & 0xFF;
-		int lsb = mem.read(address) & 0xFF;
+	public int readWord(int address, Memory data) {
+		int msb = data.read(address+1) & 0xFF;
+		int lsb = data.read(address) & 0xFF;
 		return (msb << 8) | lsb;
 	}
 
-	public void writeWord(int address, int word, Memory mem) {
-		mem.write(address, (byte) (word & 0xFF));
-		mem.write(address+1, (byte) (word >> 8));
-	}
-
-	public static void main(String[] args) {
-		AvrExecutor exec = new AvrExecutor();
-		Registers registers = new Registers();
-		Memory data = new ByteMemory(512);
-		//
-		data.write(0, (byte) -65);
-		exec.execute(new ADC(0,0), data, registers);
-		//
-		System.out.println("RESULT: " + data.read(0));
-		System.out.println("STATUS: " + Integer.toBinaryString(registers.SREG));
+	public void writeWord(int address, int word, Memory data) {
+		data.write(address, (byte) (word & 0xFF));
+		data.write(address+1, (byte) (word >> 8));
 	}
 }
