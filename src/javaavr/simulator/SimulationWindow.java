@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileReader;
@@ -17,6 +19,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -88,9 +91,10 @@ public class SimulationWindow extends JFrame {
 		add(dataPanel, BorderLayout.EAST);
 		// Make window visible
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//setResizable(false);
+		//
 		pack();
 		setVisible(true);
+		center(this);
 		// Start clock ticking
 		resetMicroController();
 		clock.start();
@@ -128,7 +132,8 @@ public class SimulationWindow extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					new ConnectionWindow(d, peripherals, IoPinWires, IoPinLabels);
+					JDialog dialog = new ConnectionWindow(d, peripherals, IoPinWires, IoPinLabels);
+					center(dialog);
 				}
 
 			}));
@@ -347,6 +352,18 @@ public class SimulationWindow extends JFrame {
 		centerPanel.setBorder(cb);
 		centerPanel.add(scrollPane, BorderLayout.EAST);
 		return centerPanel;
+	}
+
+
+	public static void center(java.awt.Component component) {
+		int cwidth = component.getWidth();
+		int cheight = component.getHeight();
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int width = gd.getDisplayMode().getWidth();
+		int height = gd.getDisplayMode().getHeight();
+		int x = (width/2) - (cwidth/2);
+		int y = (height/2) - (cheight/2);
+		component.setBounds(x, y, cwidth, cheight);
 	}
 
 	public String[] disassemble() {

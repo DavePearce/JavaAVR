@@ -119,6 +119,8 @@ public class ConnectionWindow extends JDialog {
 		}
 		// Connect up to the peripheral list so that it will be clocked.
 		peripherals.add(peripheral);
+		// Center the peripheral
+		SimulationWindow.center(peripheral);
 		// Finally, dispose of this dialog as we're finished.
 		dispose();
 		//

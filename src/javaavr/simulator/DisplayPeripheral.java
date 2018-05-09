@@ -1,18 +1,41 @@
 package javaavr.simulator;
 
+import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.border.Border;
 
 import javaavr.core.AvrPeripheral;
 import javaavr.util.AbstractSerialPeripheral;
 
+/**
+ * A simple dot-matrix display which communicates over SPI. The width and height
+ * are configured on construction time. The SPI transmission is simply the
+ * complete list of bits to display where each line is rounded up to a byte
+ * boundary.
+ *
+ * @author David J. Pearce
+ *
+ */
 public class DisplayPeripheral extends JPeripheral {
 	// The descriptor provides a generic mechanism for creating and hooking up this
 	// component.
 	public final static JPeripheral.Descriptor DESCRIPTOR = new Descriptor();
-	//
-	private Display spi;
+	// The underlying AVR peripheral
+	private final Display spi;
 
 	public DisplayPeripheral(int width, int height) {
 		super("Display Peripheral");
@@ -20,6 +43,12 @@ public class DisplayPeripheral extends JPeripheral {
 			throw new IllegalArgumentException("Width must be multiple of 8");
 		}
 		this.spi = new Display(width, height);
+		// Configure panels
+		DisplayCanvas canvas = new DisplayCanvas(width,height);
+		add(createPanel(canvas));
+		add(createToolBar(width,height,canvas),BorderLayout.PAGE_START);
+		// Done
+		//setResizable(false);
 		pack();
 		setVisible(true);
 	}
@@ -34,19 +63,63 @@ public class DisplayPeripheral extends JPeripheral {
 		spi.clock();
 	}
 
-	@Override
-	public void paint(Graphics g) {
-		int pw = getWidth() / spi.width;
-		int ph = getHeight() / spi.height;
-		g.setColor(Color.WHITE);
-		g.fillRect(0,0,getWidth(),getHeight());
+	private JToolBar createToolBar(int width, int height, DisplayCanvas canvas) {
+	    final JToolBar toolBar = new JToolBar();
+	    toolBar.add(createMultiplerButton(width,height,1, canvas));
+	    toolBar.add(createMultiplerButton(width,height,2, canvas));
+	    toolBar.add(createMultiplerButton(width,height,4, canvas));
+	    toolBar.add(createMultiplerButton(width,height,8, canvas));
+	    toolBar.add(createMultiplerButton(width,height,16, canvas));
+	    return toolBar;
+	}
+
+	public JButton createMultiplerButton(int width, int height, int multiplier, final DisplayCanvas canvas) {
+		return new JButton(new AbstractAction("x " + multiplier) {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Dimension dims = new Dimension(width * multiplier, height * multiplier);
+				canvas.setPreferredSize(dims);
+				canvas.setMinimumSize(dims);
+				canvas.setMaximumSize(dims);
+				DisplayPeripheral.this.pack();
+				DisplayPeripheral.this.repaint();
+			}
+
+		});
+	}
+
+	public JPanel createPanel(DisplayCanvas canvas) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		Border cb = BorderFactory.createEmptyBorder(3, 3, 3, 3);
+		panel.setBorder(cb);
 		//
-		g.setColor(Color.BLACK);
-		for(int y=0;y!=spi.height;++y) {
-			for(int x=0;x!=spi.width;++x) {
-				boolean pixel = spi.isSet(x,y);
-				if(pixel) {
-					g.fillRect(x*pw, y*ph, pw, ph);
+		panel.add(canvas, BorderLayout.CENTER);
+		return panel;
+	}
+
+	private class DisplayCanvas extends JPanel {
+		public DisplayCanvas(int width, int height) {
+			setBounds(0, 0, width * 4, height * 4);
+		    setPreferredSize(new Dimension(width * 4, height * 4));
+			pack();
+			setVisible(true);
+		}
+		@Override
+		public void paint(Graphics g) {
+			int pw = getWidth() / spi.width;
+			int ph = getHeight() / spi.height;
+			g.setColor(Color.WHITE);
+			g.fillRect(0,0,getWidth(),getHeight());
+			//
+			g.setColor(Color.BLACK);
+			for(int y=0;y!=spi.height;++y) {
+				for(int x=0;x!=spi.width;++x) {
+					boolean pixel = spi.isSet(x,y);
+					if(pixel) {
+						g.fillRect(x*pw, y*ph, pw, ph);
+					}
 				}
 			}
 		}
@@ -104,8 +177,7 @@ public class DisplayPeripheral extends JPeripheral {
 
 		@Override
 		public JPeripheral construct() {
-			//return new DisplayPeripheral(80,48);
-			return new DisplayPeripheral(8,4);
+			return new DisplayPeripheral(80,48);
 		}
 	}
 }
