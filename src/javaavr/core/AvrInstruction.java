@@ -109,8 +109,8 @@ public class AvrInstruction {
 		// LD_Z_Q("10q0_qq0d_dddd_0qqq", "Load Indirect From data space to Register"),
 		// using Index Z
 		LDI("Load Immediate", "1110_KKKK_dddd_KKKK", u4_d_16, u8_K),
-		LDS("Load Direct from data space", "1010_0kkk_dddd_kkkk", u4_d_16,u7_k),
-		LDSW("Load Direct from data space", "1001_000d_dddd_0000", "kkkk_kkkk_kkkk_kkkk", u5_d, u16_k),
+		LDS_WIDE("Load Direct from data space", "1010_0kkk_dddd_kkkk", u4_d_16,u7_k),
+		LDS("Load Direct from data space", "1001_000d_dddd_0000", "kkkk_kkkk_kkkk_kkkk", u5_d, u16_k),
 		LPM("Load Program Memory", "1001_0101_1100_1000"),
 		LPM_Z("Load Program Memory", "1001_000d_dddd_0100", u5_d),
 		LPM_Z_INC("Load Program Memory", "1001_000d_dddd_0101", u5_d),
@@ -2283,9 +2283,9 @@ public class AvrInstruction {
 	 *
 	 * 1010_0kkk_dddd_kkkk
 	 */
-	public static final class LDS extends RegisterAbsoluteAddress {
-	    public LDS(int d, int k) {
-	        super(Opcode.LDS, d, k);
+	public static final class LDS_WIDE extends RegisterAbsoluteAddress {
+	    public LDS_WIDE(int d, int k) {
+	        super(Opcode.LDS_WIDE, d, k);
 	        if(d < 16 || d > 31) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }
@@ -2310,9 +2310,9 @@ public class AvrInstruction {
 	 * 1001_000d_dddd_0000
 	 * kkkk_kkkk_kkkk_kkkk
 	 */
-	public static final class LDSW extends RegisterAbsoluteAddress {
-	    public LDSW(int d, int k) {
-	        super(Opcode.LDSW, d, k);
+	public static final class LDS extends RegisterAbsoluteAddress {
+	    public LDS(int d, int k) {
+	        super(Opcode.LDS, d, k);
 	        if(d < 0 || d > 31) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }

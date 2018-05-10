@@ -359,7 +359,7 @@ public class AvrDecoder implements AVR.Decoder {
 			opcode = (msb << 24) | (lsb << 16) | opcode;
 			int Rd = extract_u1111100000000000000000000(opcode);
 			int k = extract_u1111111111111111(opcode);
-			return new LDSW(Rd, k);
+			return new LDS(Rd, k);
 	}
 	private static AvrInstruction decode_37(int opcode, Memory mem, int pc) {
 			int lsb = mem.read(pc+2) & 0xFF;
@@ -753,7 +753,7 @@ public class AvrDecoder implements AVR.Decoder {
 			int Rd = extract_u11110000(opcode);
 			Rd = Rd + 16;
 			int k = extract_u11100001111(opcode);
-			return new LDS(Rd, k);
+			return new LDS_WIDE(Rd, k);
 	}
 	private static AvrInstruction decode_105(int opcode, Memory mem, int pc) {
 			int Rd = extract_u11110000(opcode);
