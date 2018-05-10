@@ -766,7 +766,7 @@ public class AvrExecutor implements AVR.Executor {
 		// Perform operation
 		byte R = (byte) (Rd - Rr - C);
 		// Set Flags
-		setStatusRegister(Rd, (byte) -Rr, R, regs);
+		setStatusRegisterWithZ(Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(CPI insn, Memory code, Memory data, Registers regs) {
@@ -1176,7 +1176,7 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, (byte) -Rr, R, regs);
+		setStatusRegisterWithZ(Rd, (byte) -Rr, R, regs);
 	}
 
 	private void execute(SBCI insn, Memory code, Memory data, Registers regs) {
@@ -1416,7 +1416,6 @@ public class AvrExecutor implements AVR.Executor {
 		byte Rr = (byte) insn.K;
 		// Perform operation
 		byte R = (byte) (Rd - Rr);
-		System.out.println("SUBI: " + Rd + " - K = " + R);
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
@@ -1449,6 +1448,25 @@ public class AvrExecutor implements AVR.Executor {
 		//
 		boolean C = (Rd7 & Rr7) | (Rr7 & !R7) | (!R7 & Rd7);
 		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = (Rd7 & Rr7 & !R7) | (!Rd7 & !Rr7 & R7);
+		boolean S = N ^ V;
+		boolean H = (Rd3 & Rr3) | (Rr3 & !R3) | (!R3 & Rd3);
+		// Update Status Register
+		setStatusRegister(C,Z,N,V,S,H,regs);
+	}
+
+	private void setStatusRegisterWithZ(byte Rd, byte Rr, byte R, Registers regs) {
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean Rr3 = (Rr & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		//
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean Rr7 = (Rr & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (Rd7 & Rr7) | (Rr7 & !R7) | (!R7 & Rd7);
+		boolean Z = (R == 0) && ((regs.SREG & ZERO_FLAG) != 0);
 		boolean N = R7;
 		boolean V = (Rd7 & Rr7 & !R7) | (!Rd7 & !Rr7 & R7);
 		boolean S = N ^ V;
