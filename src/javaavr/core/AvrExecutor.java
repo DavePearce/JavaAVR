@@ -1416,10 +1416,11 @@ public class AvrExecutor implements AVR.Executor {
 		byte Rr = (byte) insn.K;
 		// Perform operation
 		byte R = (byte) (Rd - Rr);
+		System.out.println("SUBI: " + Rd + " - K = " + R);
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, (byte) -Rr, R, regs);
+		setStatusRegister(Rd, R, regs);
 	}
 
 	private void execute(SWAP insn, Memory code, Memory data, Registers regs) {
