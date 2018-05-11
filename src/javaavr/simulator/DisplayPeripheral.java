@@ -135,13 +135,6 @@ public class DisplayPeripheral extends JPeripheral {
 			this.width = width;
 			this.height = height;
 			this.pixels = new byte[height * (width/8)];
-			for(int i=0;i<pixels.length;i=i+1) {
-				if(i%2 == 0) {
-					pixels[i] = (byte) 0b1010101010;
-				} else {
-					pixels[i] = (byte) 0b0101010101;
-				}
-			}
 		}
 
 		@Override
@@ -177,7 +170,7 @@ public class DisplayPeripheral extends JPeripheral {
 
 		@Override
 		public JPeripheral construct() {
-			return new DisplayPeripheral(80,48);
+			return new DisplayPeripheral(16,16);
 		}
 	}
 }
