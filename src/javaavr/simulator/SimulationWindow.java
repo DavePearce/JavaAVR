@@ -113,7 +113,7 @@ public class SimulationWindow extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Create file chooser
-				final JFileChooser fc = new JFileChooser();
+				final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
 				int returnVal = fc.showOpenDialog(SimulationWindow.this);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 		            loadHexFile(fc.getSelectedFile());
@@ -161,11 +161,11 @@ public class SimulationWindow extends JFrame {
 		final JButton stepButton = new JButton(new AbstractAction("STEP") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				clock(0);
+				clock();
 			}
 		});
-		String[] hzLabels = new String[] { "1Hz", "10Hz", "100Hz", "1Khz"};
-		final int[] hzDelays = new int[] { 1000, 100, 10, 1 };
+		String[] hzLabels = new String[] { "1Hz", "10Hz", "100Hz", "1Khz", "1Mhz"};
+		final int[] hzDelays = new int[] { 1000_000_000, 100_000_000, 10_000_000, 1_000_000, 1_000, };
 		final JComboBox timeSelect = new JComboBox(hzLabels) {
 
 		};
@@ -512,7 +512,7 @@ public class SimulationWindow extends JFrame {
 		}
 	}
 
-	public void clock(long delay) {
+	public void clock() {
 		// Clock all peripherals
 		for(int i=0;i!=peripherals.size();++i) {
 			peripherals.get(i).clock();

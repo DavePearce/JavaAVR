@@ -18,11 +18,15 @@ int main (void){
   DDRB = 0b00001111;
   PORTB = 0b00000000;
   //
-  for(int j=0;j!=32;++j) {
-    spi_write_byte(0b00001111);
-  }
-  for(int j=0;j!=32;++j) {
-    spi_write_byte(0b11110000);
+  while(1) {
+    for(int j=0;j!=32;++j) {
+      spi_write_byte(0b00001111);
+    }
+    _delay_ms(50);
+    for(int j=0;j!=32;++j) {
+      spi_write_byte(0b11110000);
+    }
+    _delay_ms(50);    
   }
 
   //
