@@ -427,13 +427,27 @@ public class AvrExecutor implements AVR.Executor {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
-		int C = (regs.SREG & CARRY_FLAG) >> 0;
+		int CF = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
-		byte R = (byte) (Rd + Rr + C);
+		byte R = (byte) (Rd + Rr + CF);
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean Rr3 = (Rr & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean Rr7 = (Rr & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (Rd7 & Rr7) | (Rr7 & !R7) | (!R7 & Rd7);
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = (Rd7 & Rr7 & !R7) | (!Rd7 & !Rr7 & R7);
+		boolean S = N ^ V;
+		boolean H = (Rd3 & Rr3) | (Rr3 & !R3) | (!R3 & Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -454,7 +468,21 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean Rr3 = (Rr & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean Rr7 = (Rr & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (Rd7 & Rr7) | (Rr7 & !R7) | (!R7 & Rd7);
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = (Rd7 & Rr7 & !R7) | (!Rd7 & !Rr7 & R7);
+		boolean S = N ^ V;
+		boolean H = (Rd3 & Rr3) | (Rr3 & !R3) | (!R3 & Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -476,7 +504,16 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		writeWord(insn.Rd, R, data);
 		// Set Flags
-		setStatusRegister(Rd, R, regs);
+		boolean Rdh7 = (Rd & 0b1000_0000_0000_0000) != 0;
+		boolean R15 = (R & 0b1000_0000_0000_0000) != 0;
+		//
+		boolean C = !R15 & Rdh7;
+		boolean Z = (R == 0);
+		boolean N = R15;
+		boolean V = !Rdh7 & R15;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -497,7 +534,15 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = false;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -518,7 +563,15 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = false;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -1197,7 +1250,15 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister((byte) 0xFF, (byte) -Rd, R, regs);
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = true;
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = false;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -1217,7 +1278,22 @@ public class AvrExecutor implements AVR.Executor {
 		// Perform operation
 		byte R = (byte) (Rd - Rr);
 		// Set Flags
-		setStatusRegister(Rd, (byte) -Rr, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean Rr3 = (Rr & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		//
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean Rr7 = (Rr & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (!Rd7 & Rr7) | (Rr7 & R7) | (R7 & !Rd7);
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = (Rd7 & !Rr7 & !R7) | (!Rd7 & Rr7 & R7);
+		boolean S = N ^ V;
+		boolean H = (!Rd3 & Rr3) | (Rr3 & R3) | (R3 & !Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -1234,11 +1310,25 @@ public class AvrExecutor implements AVR.Executor {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
-		int C = (regs.SREG & CARRY_FLAG) >> 0;
+		int CF = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
-		byte R = (byte) (Rd - Rr - C);
+		byte R = (byte) (Rd - Rr - CF);
 		// Set Flags
-		setStatusRegisterWithZ(Rd, (byte) -Rr, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean Rr3 = (Rr & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean Rr7 = (Rr & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (!Rd7 & Rr7) | (Rr7 & R7) | (R7 & !Rd7);
+		boolean Z = (R == 0) && ((regs.SREG & ZERO_FLAG) != 0);
+		boolean N = R7;
+		boolean V = (Rd7 & !Rr7 & !R7) | (!Rd7 & Rr7 & R7);
+		boolean S = N ^ V;
+		boolean H = (!Rd3 & Rr3) | (Rr3 & R3) | (R3 & !Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -1254,11 +1344,25 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(CPI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
-		byte Rr = data.read(insn.K);
+		byte K = (byte) insn.K;
 		// Perform operation
-		byte R = (byte) (Rd - Rr);
+		byte R = (byte) (Rd - K);
 		// Set Flags
-		setStatusRegister(Rd, (byte) -Rr, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean K3 = (K & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean K7 = (K & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (!Rd7 & K7) | (K7 & R7) | (R7 & !Rd7);
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = (Rd7 & !K7 & !R7) | (!Rd7 & K7 & R7);
+		boolean S = N ^ V;
+		boolean H = (!Rd3 & K3) | (K3 & R3) | (R3 & !Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -1303,7 +1407,22 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean R0 = (R & 0b0000_0001) != 0;
+		boolean R1 = (R & 0b0000_0010) != 0;
+		boolean R2 = (R & 0b0000_0100) != 0;
+		boolean R3 = (R & 0b0000_1000) != 0;
+		boolean R4 = (R & 0b0001_0000) != 0;
+		boolean R5 = (R & 0b0010_0000) != 0;
+		boolean R6 = (R & 0b0100_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean Z = !R7 & R6 & R5 & R4 & R3 & R2 & R1 & R0;
+		boolean N = R7;
+		boolean V = (R == 0b1000_0000);
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -1378,7 +1497,15 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = false;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -1494,7 +1621,22 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean R0 = (R & 0b0000_0001) != 0;
+		boolean R1 = (R & 0b0000_0010) != 0;
+		boolean R2 = (R & 0b0000_0100) != 0;
+		boolean R3 = (R & 0b0000_1000) != 0;
+		boolean R4 = (R & 0b0001_0000) != 0;
+		boolean R5 = (R & 0b0010_0000) != 0;
+		boolean R6 = (R & 0b0100_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = R7 & !R6 & !R5 & !R4 & !R3 & !R2 & !R1 & !R0;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -1869,7 +2011,18 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rd, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = Rd7;
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = N ^ C;
+		boolean S = N ^ V;
+		boolean H = Rd3;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -1892,7 +2045,7 @@ public class AvrExecutor implements AVR.Executor {
 		byte R = (byte) (Rd >>> 1);
 		// Update Register file
 		data.write(insn.Rd, R);
-		//
+		// Set flags
 		boolean Rd0 = (Rd & 0b0000_0001) != 0;
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
@@ -2021,7 +2174,15 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = false;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -2042,7 +2203,15 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, Rr, R, regs);
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = false;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -2240,13 +2409,27 @@ public class AvrExecutor implements AVR.Executor {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
-		int C = (regs.SREG & CARRY_FLAG) >> 0;
+		int CF = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
-		byte R = (byte) (Rd - Rr - C);
+		byte R = (byte) (Rd - Rr - CF);
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegisterWithZ(Rd, (byte) -Rr, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean Rr3 = (Rr & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean Rr7 = (Rr & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (!Rd7 & Rr7) | (Rr7 & R7) | (R7 & !Rd7);
+		boolean Z = (R == 0) & ((regs.SREG & ZERO_FLAG) != 0);
+		boolean N = R7;
+		boolean V = (Rd7 & !Rr7 & !R7) | (!Rd7 & Rr7 & R7);
+		boolean S = N ^ V;
+		boolean H = (!Rd3 & Rr3) | (Rr3 & R3) | (R3 & !Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -2261,14 +2444,29 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(SBCI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
-		byte Rr = (byte) insn.K;
-		int C = (regs.SREG & CARRY_FLAG) >> 0;
+		byte K = (byte) insn.K;
+		int CF = (regs.SREG & CARRY_FLAG) >> 0;
 		// Perform operation
-		byte R = (byte) (Rd - Rr - C);
+		byte R = (byte) (Rd - K - CF);
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, (byte) -Rr, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean K3 = (K & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		//
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean K7 = (K & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (!Rd7 & K7) | (K7 & R7) | (R7 & !Rd7);
+		boolean Z = (R == 0) & ((regs.SREG & ZERO_FLAG) != 0);
+		boolean N = R7;
+		boolean V = (Rd7 & !K7 & !R7) | (!Rd7 & K7 & R7);
+		boolean S = N ^ V;
+		boolean H = (!Rd3 & K3) | (K3 & R3) | (R3 & !Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -2344,7 +2542,16 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		writeWord(insn.Rd, R, data);
 		// Set Flags
-		setStatusRegister(Rd, R, regs);
+		boolean Rdh7 = (Rd & 0b1000_0000_0000_0000) != 0;
+		boolean R15 = (R & 0b1000_0000_0000_0000) != 0;
+		//
+		boolean C = R15 & !Rdh7;
+		boolean Z = (R == 0);
+		boolean N = R15;
+		boolean V = R15 & !Rdh7;
+		boolean S = N ^ V;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	/**
@@ -2799,7 +3006,21 @@ public class AvrExecutor implements AVR.Executor {
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegisterWithZ(Rd, (byte) -Rr, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean Rr3 = (Rr & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean Rr7 = (Rr & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (!Rd7 & Rr7) | (Rr7 & R7) | (R7 & !Rd7);
+		boolean Z = (R == 0) & ((regs.SREG & ZERO_FLAG) != 0);
+		boolean N = R7;
+		boolean V = (Rd7 & !Rr7 & !R7) | (!Rd7 & Rr7 & R7);
+		boolean S = N ^ V;
+		boolean H = (!Rd3 & Rr3) | (Rr3 & R3) | (R3 & !Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -2815,13 +3036,27 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(SUBI insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
-		byte Rr = (byte) insn.K;
+		byte K = (byte) insn.K;
 		// Perform operation
-		byte R = (byte) (Rd - Rr);
+		byte R = (byte) (Rd - K);
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
-		setStatusRegister(Rd, R, regs);
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean K3 = (K & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+		boolean K7 = (K & 0b1000_0000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (!Rd7 & K7) | (K7 & R7) | (R7 & !Rd7);
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = (Rd7 & !K7 & !R7) | (!Rd7 & K7 & R7);
+		boolean S = N ^ V;
+		boolean H = (!Rd3 & K3) | (K3 & R3) | (R3 & !Rd3);
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
@@ -2877,65 +3112,6 @@ public class AvrExecutor implements AVR.Executor {
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		data.write(insn.Rd, data.read(Z));
 		data.write(Z, Rd);
-	}
-
-	private void setStatusRegister(byte Rd, byte Rr, byte R, Registers regs) {
-		boolean Rd3 = (Rd & 0b1000) != 0;
-		boolean Rr3 = (Rr & 0b1000) != 0;
-		boolean R3 = (R & 0b1000) != 0;
-		//
-		boolean Rd7 = (Rd & 0b1000_0000) != 0;
-		boolean Rr7 = (Rr & 0b1000_0000) != 0;
-		boolean R7 = (R & 0b1000_0000) != 0;
-		//
-		boolean C = (Rd7 & Rr7) | (Rr7 & !R7) | (!R7 & Rd7);
-		boolean Z = (R == 0);
-		boolean N = R7;
-		boolean V = (Rd7 & Rr7 & !R7) | (!Rd7 & !Rr7 & R7);
-		boolean S = N ^ V;
-		boolean H = (Rd3 & Rr3) | (Rr3 & !R3) | (!R3 & Rd3);
-		// Update Status Register
-		setStatusRegister(C, Z, N, V, S, H, regs);
-	}
-
-	private void setStatusRegisterWithZ(byte Rd, byte Rr, byte R, Registers regs) {
-		boolean Rd3 = (Rd & 0b1000) != 0;
-		boolean Rr3 = (Rr & 0b1000) != 0;
-		boolean R3 = (R & 0b1000) != 0;
-		//
-		boolean Rd7 = (Rd & 0b1000_0000) != 0;
-		boolean Rr7 = (Rr & 0b1000_0000) != 0;
-		boolean R7 = (R & 0b1000_0000) != 0;
-		//
-		boolean C = (Rd7 & Rr7) | (Rr7 & !R7) | (!R7 & Rd7);
-		boolean Z = (R == 0) && ((regs.SREG & ZERO_FLAG) != 0);
-		boolean N = R7;
-		boolean V = (Rd7 & Rr7 & !R7) | (!Rd7 & !Rr7 & R7);
-		boolean S = N ^ V;
-		boolean H = (Rd3 & Rr3) | (Rr3 & !R3) | (!R3 & Rd3);
-		// Update Status Register
-		setStatusRegister(C, Z, N, V, S, H, regs);
-	}
-
-	/**
-	 * Set status register after arithmetic operations involing a word.
-	 *
-	 * @param Rd
-	 * @param Rr
-	 * @param R
-	 * @param regs
-	 */
-	private void setStatusRegister(int Rd, int R, Registers regs) {
-		boolean Rdh7 = (Rd & 0b1000_0000_0000_0000) != 0;
-		boolean R15 = (R & 0b1000_0000_0000_0000) != 0;
-		//
-		boolean C = R15 & !Rdh7;
-		boolean Z = (R == 0);
-		boolean N = R15;
-		boolean V = Rdh7 & !R15;
-		boolean S = N ^ V;
-		// Update Status Register
-		setStatusRegister(C, Z, N, V, S, regs);
 	}
 
 	private void pushByte(byte bite, Memory data) {
