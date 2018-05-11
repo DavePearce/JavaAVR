@@ -19,11 +19,11 @@ int main (void){
   PORTB = 0b00000000;
   //
   while(1) {
-    for(int j=0;j!=32;++j) {
+    for(int j=0;j!=(64*8);++j) {
       spi_write_byte(0b00001111);
     }
     _delay_ms(50);
-    for(int j=0;j!=32;++j) {
+    for(int j=0;j!=(64*8);++j) {
       spi_write_byte(0b11110000);
     }
     _delay_ms(50);    

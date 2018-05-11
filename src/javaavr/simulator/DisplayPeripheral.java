@@ -170,7 +170,7 @@ public class DisplayPeripheral extends JPeripheral {
 
 		@Override
 		public JPeripheral construct() {
-			return new DisplayPeripheral(16,16);
+			return new DisplayPeripheral(64,64);
 		}
 	}
 }
