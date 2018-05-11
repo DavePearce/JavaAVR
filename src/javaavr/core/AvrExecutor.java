@@ -1401,9 +1401,8 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(DEC insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
-		byte Rr = -1;
 		// Perform operation
-		byte R = (byte) (Rd + Rr);
+		byte R = (byte) (Rd - 1);
 		// Update Register file
 		data.write(insn.Rd, R);
 		// Set Flags
@@ -1416,10 +1415,11 @@ public class AvrExecutor implements AVR.Executor {
 		boolean R6 = (R & 0b0100_0000) != 0;
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
+		//
 		boolean C = (regs.SREG & CARRY_FLAG) != 0;
-		boolean Z = !R7 & R6 & R5 & R4 & R3 & R2 & R1 & R0;
+		boolean Z = (R == 0);
 		boolean N = R7;
-		boolean V = (R == 0b1000_0000);
+		boolean V = !R7 & R6 & R5 & R4 & R3 & R2 & R1 & R0;;
 		boolean S = N ^ V;
 		// Update Status Register
 		setStatusRegister(C, Z, N, V, S, regs);
