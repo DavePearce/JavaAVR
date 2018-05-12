@@ -3,6 +3,7 @@ package javrsim.peripherals;
 import javax.swing.JFrame;
 
 import javr.core.AvrPeripheral;
+import javr.core.Wire;
 
 public abstract class JPeripheral extends JFrame {
 
@@ -47,6 +48,6 @@ public abstract class JPeripheral extends JFrame {
 		 *
 		 * @return
 		 */
-		public JPeripheral construct();
+		public JPeripheral construct(Wire[] wires);
 	}
 }

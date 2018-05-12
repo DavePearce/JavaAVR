@@ -17,7 +17,7 @@ public class ClockThread extends Thread {
 	private volatile int delayNanos; // delay between ticks in ms
 	private volatile boolean enabled;
 
-	public ClockThread(int delay, int clockMultiplier, SimulationWindow display) {
+	public ClockThread(int delay, SimulationWindow display) {
 		this.delayMillis = delay / 1000000;
 		this.delayNanos = delay % 1000000;
 		this.display = display;

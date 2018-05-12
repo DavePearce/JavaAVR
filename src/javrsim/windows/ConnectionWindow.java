@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,7 +27,7 @@ import javrsim.peripherals.JPeripheral;
 import javrsim.peripherals.JPeripheral.Descriptor;
 
 public class ConnectionWindow extends JDialog {
-	private HashMap<String, JComboBox<String>> connections = new HashMap<>();
+	private ArrayList<JComboBox<String>> connections = new ArrayList<>();
 	private List<JPeripheral> peripherals;
 	private Wire[] avrPins;
 
@@ -82,8 +83,9 @@ public class ConnectionWindow extends JDialog {
 		c.gridx = 1;
 		String[] labels = toPinLabels(avrPins);
 		JComboBox<String> combo = new JComboBox<>(labels);
-		combo.setSelectedItem(labels[y]);
-		connections.put(title, combo);
+		// +1 to skip the +5v pin
+		combo.setSelectedItem(labels[y+1]);
+		connections.add(combo);
 		owner.add(combo, c);
 	}
 
@@ -109,15 +111,14 @@ public class ConnectionWindow extends JDialog {
 	}
 
 	private void finishDialog(JPeripheral.Descriptor descriptor) {
-		JPeripheral peripheral = descriptor.construct();
-		Wire[] wires = peripheral.getPeripheral().getWires();
+		Wire[] wires = new Wire[descriptor.getWireLabels().length];
 		for (int i = 0; i != wires.length; ++i) {
-			Wire w = wires[i];
-			JComboBox<String> cb = connections.get(w.getLabel());
+			JComboBox<String> cb = connections.get(i);
 			int index = cb.getSelectedIndex();
-			// FIXME: this is not an ideal way to make a connection!!
-			avrPins[index] = w;
+			wires[i] = avrPins[index];
 		}
+		JPeripheral peripheral = descriptor.construct(wires);
+
 		// Connect up to the peripheral list so that it will be clocked.
 		peripherals.add(peripheral);
 		// Center the peripheral

@@ -12,18 +12,25 @@ import javr.core.Wire;
  *
  */
 public abstract class AbstractSerialPeripheral implements AvrPeripheral {
-	private final Wire SCLK = new IdealWire("SCLK");
-	private final Wire MOSI = new IdealWire("MOSI");
-	private final Wire MISO = new IdealWire("MISO");
-	private final Wire SS = new IdealWire("SS");
+	private final Wire SCLK;
+	private final Wire MOSI;
+	private final Wire MISO;
+	private final Wire SS;
 	private final byte[] input;
 	private final byte[] output;
 	private int position;
 
-	public AbstractSerialPeripheral(int width) {
+	public AbstractSerialPeripheral(int width, Wire[] wires) {
+		if(wires.length != 4) {
+			throw new IllegalArgumentException("invalid number of wires");
+		}
 		this.input = new byte[width];
 		this.output = new byte[width];
 		this.position = 0;
+		this.SCLK = wires[0];
+		this.MOSI = wires[1];
+		this.MISO = wires[2];
+		this.SS = wires[3];
 	}
 
 	public Wire SCLK() {

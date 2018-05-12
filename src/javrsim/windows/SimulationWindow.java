@@ -58,7 +58,20 @@ import javrsim.views.CodeView;
 import javrsim.views.JAvrView;
 
 public class SimulationWindow extends JFrame {
-	//
+	private final static int _1Hz = 1000_000_000;
+	private final static int _10Hz = 100_000_000;
+	private final static int _100Hz = 10_000_000;
+	private final static int _1KHz = 1_000_000;
+	private final static int _1MHz = 1_000;
+	private final static int _8MHz = 125;
+	private final static int _20MHz = 50;
+	/**
+	 * The set of available clock rates
+	 */
+	private final static int[] CLOCK_RATES = { _1Hz, _10Hz, _100Hz, _1KHz, _1MHz, _8MHz, _20MHz };
+	/**
+	 * Provides the heartbeat necessary to drive the simulation
+	 */
 	private final ClockThread clock;
 	/**
 	 * The list of instantiated peripheral windows. This is important
@@ -96,7 +109,7 @@ public class SimulationWindow extends JFrame {
 		this.mcu = avr;
 		this.peripheralDescriptors = peripherals;
 		this.viewDescriptors = views;
-		this.clock = new ClockThread(500, 1, this);
+		this.clock = new ClockThread(_8MHz, this);
 		//
 		JMenuBar menuBar = constructMenuBar();
 		JToolBar toolBar = constructToolBar();
@@ -181,7 +194,7 @@ public class SimulationWindow extends JFrame {
 			}
 		});
 		// The stop button pauses the simulation
-		final JButton stopButton = new JButton(new AbstractAction("STOP",makeImageIcon("stock_stop.png")) {
+		final JButton stopButton = new JButton(new AbstractAction("STOP") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clock.pause();
@@ -194,17 +207,16 @@ public class SimulationWindow extends JFrame {
 				clock();
 			}
 		});
-		String[] hzLabels = new String[] { "1Hz", "10Hz", "100Hz", "1Khz", "1Mhz", "8Mhz", "20Mhz"};
-		final int[] hzDelays = new int[] { 1000_000_000, 100_000_000, 10_000_000, 1_000_000, 1_000, 125, 50};
-		final JComboBox<String> timeSelect = new JComboBox<String>(hzLabels) {
+		final JComboBox<String> timeSelect = new JComboBox<String>(toHzLabels(CLOCK_RATES)) {
 
 		};
+		timeSelect.setSelectedItem("8MHz");
 		// The play button starts the simulation going
 		final JButton playButton = new JButton(new AbstractAction("PLAY") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int index = timeSelect.getSelectedIndex();
-				clock.setDelay(hzDelays[index]);
+				clock.setDelay(CLOCK_RATES[index]);
 				clock.enable();
 			}
 		});
@@ -252,6 +264,24 @@ public class SimulationWindow extends JFrame {
 			repaint();
 		} catch (Exception e) {
 			error("Problem loading file", e);
+		}
+	}
+
+	private String[] toHzLabels(int[] rates) {
+		String[] labels = new String[rates.length];
+		for(int i=0;i!=labels.length;++i) {
+			labels[i] = toHzLabel(rates[i]);
+		}
+		return labels;
+	}
+
+	public String toHzLabel(int rate) {
+		if(rate <= 1000) {
+			return Integer.toString(1000 / rate) + "MHz";
+		} else if(rate <= 1000_000) {
+			return Integer.toString(1000_000 / rate) + "KHz";
+		} else {
+			return Integer.toString(1000_000_000 / rate) + "Hz";
 		}
 	}
 

@@ -19,6 +19,7 @@ import javax.swing.JToolBar;
 import javax.swing.border.Border;
 
 import javr.core.AvrPeripheral;
+import javr.core.Wire;
 import javr.peripherals.DotMatrixDisplay;
 import javr.util.AbstractSerialPeripheral;
 import javrsim.peripherals.JPeripheral.Descriptor;
@@ -39,12 +40,12 @@ public class DisplayPeripheral extends JPeripheral {
 	// The underlying AVR peripheral
 	private final Display spi;
 
-	public DisplayPeripheral(int width, int height) {
+	public DisplayPeripheral(int width, int height, Wire[] wires) {
 		super("Display Peripheral");
 		if ((width % 8) != 0) {
 			throw new IllegalArgumentException("Width must be multiple of 8");
 		}
-		this.spi = new Display(width, height);
+		this.spi = new Display(width, height, wires);
 		// Configure panels
 		DisplayCanvas canvas = new DisplayCanvas(width,height);
 		add(createPanel(canvas));
@@ -130,8 +131,8 @@ public class DisplayPeripheral extends JPeripheral {
 
 	private class Display extends DotMatrixDisplay {
 
-		public Display(int width, int height) {
-			super(width,height);
+		public Display(int width, int height, Wire[] wires) {
+			super(width,height, wires);
 		}
 
 		@Override
@@ -159,8 +160,8 @@ public class DisplayPeripheral extends JPeripheral {
 		}
 
 		@Override
-		public JPeripheral construct() {
-			return new DisplayPeripheral(64,64);
+		public JPeripheral construct(Wire[] wires) {
+			return new DisplayPeripheral(64,64, wires);
 		}
 	}
 }

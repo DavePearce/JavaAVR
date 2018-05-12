@@ -1,5 +1,6 @@
 package javr.peripherals;
 
+import javr.core.Wire;
 import javr.util.AbstractSerialPeripheral;
 
 /**
@@ -17,8 +18,8 @@ public class DotMatrixDisplay extends AbstractSerialPeripheral {
 	protected final int width;
 	protected final int height;
 
-	public DotMatrixDisplay(int width, int height) {
-			super(height * (width/8)); // transmit one byte at a time
+	public DotMatrixDisplay(int width, int height, Wire[] wires) {
+			super(height * (width/8), wires); // transmit one byte at a time
 			this.width = width;
 			this.height = height;
 			this.pixels = new byte[height * (width/8)];

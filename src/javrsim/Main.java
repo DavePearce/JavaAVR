@@ -42,7 +42,7 @@ public class Main {
 				new IdealWire("PB3"), new IdealWire("PB4"), new IdealWire("PB5"), new IdealWire("GND")
 		};
 		// ATtiny has a single port
-		WireArrayPort port = new WireArrayPort(PORTB, DDRB, PINB, pins[1], pins[2], pins[3], pins[4], pins[5]);
+		WireArrayPort port = new WireArrayPort(PORTB, DDRB, PINB, pins[1], pins[2], pins[3], pins[4], pins[5], pins[6]);
 		// ATtiny has 32 general purpose registers.
 		AVR.Memory registers = new ByteMemory(32);
 		// ATtiny has 64 io registers

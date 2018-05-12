@@ -13,6 +13,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
 import javr.core.AvrPeripheral;
+import javr.core.Wire;
 import javr.util.AbstractSerialPeripheral;
 import javrsim.peripherals.JPeripheral.Descriptor;
 
@@ -24,10 +25,10 @@ public class ConsolePeripheral extends JPeripheral {
 	private Console spi;
 	private JTextArea textArea;
 
-	public ConsolePeripheral() {
+	public ConsolePeripheral(Wire[] wires) {
 		super("Console Peripheral");
 		this.textArea = new JTextArea(10,40);
-		this.spi = new Console();
+		this.spi = new Console(wires);
 		add(createPanel());
 		pack();
 		setVisible(true);
@@ -64,8 +65,8 @@ public class ConsolePeripheral extends JPeripheral {
 	private class Console extends AbstractSerialPeripheral {
 		private StringBuffer text = new StringBuffer();
 
-		public Console() {
-			super(1); // transmit one byte at a time
+		public Console(Wire[] wires) {
+			super(1, wires); // transmit one byte at a time
 		}
 
 		@Override
@@ -94,8 +95,8 @@ public class ConsolePeripheral extends JPeripheral {
 		}
 
 		@Override
-		public JPeripheral construct() {
-			return new ConsolePeripheral();
+		public JPeripheral construct(Wire[] connections) {
+			return new ConsolePeripheral(connections);
 		}
 
 	}
