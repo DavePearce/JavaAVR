@@ -13,6 +13,7 @@ import javrsim.peripherals.ConsolePeripheral;
 import javrsim.peripherals.DisplayPeripheral;
 import javrsim.peripherals.JPeripheral;
 import javrsim.views.CodeView;
+import javrsim.views.DataView;
 import javrsim.views.JAvrView;
 import javrsim.windows.SimulationWindow;
 
@@ -28,7 +29,8 @@ public class Main {
 	 * The default set of views.
 	 */
 	public static JAvrView.Descriptor[] VIEWS = {
-			CodeView.DESCRIPTOR
+			CodeView.DESCRIPTOR,
+			DataView.DESCRIPTOR
 	};
 
 	public static AVR.Instrumentable createAVR() {

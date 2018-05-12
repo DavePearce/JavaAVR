@@ -12,6 +12,14 @@ public class InstrumentableMemory implements Memory {
 		this.memory = memory;
 	}
 
+	public void register(Instrument instrument) {
+		instruments.add(instrument);
+	}
+
+	public void unregister(Instrument instrument) {
+		instruments.remove(instrument);
+	}
+
 	@Override
 	public byte read(int address) {
 		byte data = memory.read(address);

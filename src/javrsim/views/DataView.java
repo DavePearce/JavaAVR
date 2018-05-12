@@ -14,9 +14,32 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 
-import javrsim.windows.SimulationWindow.DataCellRenderer;
+import javr.core.AVR;
+import javr.memory.InstrumentableMemory;
+import javr.memory.instruments.ReadWriteInstrument;
 
-public class DataViewWindow {
+public class DataView extends JAvrView {
+	// Fonts
+	private final static Font FONT_PLAIN = new Font(Font.MONOSPACED,Font.PLAIN,14);
+	private final static Font FONT_BOLD = new Font(Font.MONOSPACED,Font.BOLD,14);
+	// Default Colors
+	private final static Color VERY_LIGHT_GRAY = new Color(230,230,230);
+	private final static Color LIGHT_YELLOW = new Color(255,253,211);
+	private final static Color LIGHT_RED = new Color(227,174,174);
+	private final static Color LIGHT_GREEN = new Color(174,227,174);
+
+	private final AVR.Instrumentable avr;
+	private final ReadWriteInstrument instrument;
+
+	public DataView(AVR.Instrumentable avr) {
+		super("Data Space View");
+		this.avr = avr;
+		this.instrument = new ReadWriteInstrument();
+		avr.getData().register(instrument);
+		add(constructDataPanel());
+		pack();
+		setVisible(true);
+	}
 
 	public JPanel constructDataPanel() {
 		TableModel dataModel = new AbstractTableModel() {
@@ -27,7 +50,7 @@ public class DataViewWindow {
 
 			@Override
 			public int getRowCount() {
-				return mcu.getData().size() / 16;
+				return avr.getData().size() / 16;
 			}
 
 			@Override
@@ -36,36 +59,32 @@ public class DataViewWindow {
 					return String.format("%04X",row*16);
 				} else {
 					int address = (row * 16) + (col-1);
-					return String.format("%02X",mcu.getData().peek(address));
+					return String.format("%02X",avr.getData().peek(address));
 				}
 			}
 		};
 		JTable table = new JTable(dataModel);
 		// Configure Table Headings
 		table.getColumnModel().getColumn(0).setHeaderValue("Address" );
-		table.getColumnModel().getColumn(0).setCellRenderer(new CodeCellRenderer(VERY_LIGHT_GRAY,Color.WHITE,LIGHT_RED,FONT_BOLD));
+		table.getColumnModel().getColumn(0).setCellRenderer(new CodeView.CellRenderer(VERY_LIGHT_GRAY,Color.WHITE,LIGHT_RED,FONT_BOLD));
 		for(int i=0;i!=16;++i) {
 			table.getColumnModel().getColumn(i+1).setHeaderValue(Integer.toHexString(i));
-			table.getColumnModel().getColumn(i + 1).setCellRenderer(new DataCellRenderer(Color.GRAY, Color.DARK_GRAY,
-					LIGHT_GREEN, LIGHT_RED, LIGHT_YELLOW, FONT_PLAIN));
+			table.getColumnModel().getColumn(i + 1)
+					.setCellRenderer(new CellRenderer(Color.GRAY, Color.DARK_GRAY, LIGHT_YELLOW, FONT_PLAIN));
 		}
 		//
 		return createTablePanel(table);
 	}
 
-	private class DataCellRenderer extends DefaultTableCellRenderer {
+	private class CellRenderer extends DefaultTableCellRenderer {
 		private final Color first;
 		private final Color second;
-		private final Color read;
-		private final Color write;
 		private final Color access;
 		private final Font font;
 
-		public DataCellRenderer(Color first, Color second, Color read, Color write, Color access, Font font) {
+		public CellRenderer(Color first, Color second, Color access, Font font) {
 			this.first = first;
 			this.second = second;
-			this.read = read;
-			this.write = write;
 			this.access = access;
 			this.font = font;
 		}
@@ -75,11 +94,7 @@ public class DataViewWindow {
 				int row, int column) {
 			Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			int address = (row * 16) + (column - 1);
-			if (mcu.wasRead(address)) {
-				c.setBackground(read);
-			} else if (mcu.wasWritten(address)) {
-				c.setBackground(write);
-			} else if (mcu.wasAccessedEver(address)) {
+			if (instrument.wasRead(address) || instrument.wasWritten(address)) {
 				c.setBackground(access);
 			} else if (row % 2 == 0) {
 				c.setBackground(first);
@@ -104,5 +119,20 @@ public class DataViewWindow {
 		centerPanel.add(scrollPane, BorderLayout.EAST);
 		return centerPanel;
 	}
+
+
+	public final static JAvrView.Descriptor DESCRIPTOR = new JAvrView.Descriptor() {
+
+		@Override
+		public String getName() {
+			return "Data View";
+		}
+
+		@Override
+		public JAvrView construct(AVR.Instrumentable avr) {
+			return new DataView(avr);
+		}
+
+	};
 
 }

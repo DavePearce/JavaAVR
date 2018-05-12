@@ -81,20 +81,20 @@ public class CodeView extends JAvrView {
 		table.getColumnModel().getColumn(1).setHeaderValue("Raw");
 		table.getColumnModel().getColumn(2).setHeaderValue("Assembly");
 		// Configure Cell Renderers
-		table.getColumnModel().getColumn(0).setCellRenderer(new CodeCellRenderer(VERY_LIGHT_GRAY,Color.WHITE,LIGHT_RED,FONT_BOLD));
-		table.getColumnModel().getColumn(1).setCellRenderer(new CodeCellRenderer(VERY_LIGHT_GRAY,Color.WHITE,LIGHT_RED,FONT_PLAIN));
-		table.getColumnModel().getColumn(2).setCellRenderer(new CodeCellRenderer(VERY_LIGHT_GRAY,Color.WHITE,LIGHT_RED,FONT_PLAIN));
+		table.getColumnModel().getColumn(0).setCellRenderer(new CellRenderer(VERY_LIGHT_GRAY,Color.WHITE,LIGHT_RED,FONT_BOLD));
+		table.getColumnModel().getColumn(1).setCellRenderer(new CellRenderer(VERY_LIGHT_GRAY,Color.WHITE,LIGHT_RED,FONT_PLAIN));
+		table.getColumnModel().getColumn(2).setCellRenderer(new CellRenderer(VERY_LIGHT_GRAY,Color.WHITE,LIGHT_RED,FONT_PLAIN));
 		return createTablePanel(table);
 	}
 
 
-	private static class CodeCellRenderer extends DefaultTableCellRenderer {
+	public static class CellRenderer extends DefaultTableCellRenderer {
 		private final Color first;
 		private final Color second;
 		private final Color selected;
 		private final Font font;
 
-		public CodeCellRenderer(Color first, Color second, Color selected, Font font) {
+		public CellRenderer(Color first, Color second, Color selected, Font font) {
 			this.first = first;
 			this.second = second;
 			this.selected = selected;
