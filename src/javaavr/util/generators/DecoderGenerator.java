@@ -169,8 +169,8 @@ public class DecoderGenerator {
 	 */
 	public static Set<Opcode> determineCoveredOpcodes(int mask, int value, Set<Opcode> opcodes) {
 		HashSet<Opcode> covered = new HashSet<>();
-		for(Opcode o : opcodes) {
-			if(covered(o,mask, value)) {
+		for (Opcode o : opcodes) {
+			if (covered(o, mask, value)) {
 				covered.add(o);
 			}
 		}
@@ -222,7 +222,10 @@ public class DecoderGenerator {
 				if((i & mask) == i) {
 					Set<Opcode> covered = determineCoveredOpcodes(mask,i,opcodes);
 					if(covered.size() == opcodes.size()) {
-						throw new RuntimeException("Unable to distinguish " + opcodes);
+						for(Opcode o : covered) {
+							System.out.println(o + "\t: " + o.getOpcodeFormat());
+						}
+						throw new RuntimeException("Unable to distinguish " + opcodes + " (mask: " + Integer.toBinaryString(mask) + ")");
 					} else if(covered.size() > 0) {
 						Group bucket = split(covered);
 						group.getBuckets().put(i,bucket);
@@ -368,7 +371,7 @@ public class DecoderGenerator {
 
 	public static void printDecoder(Group g, Map<Group,Integer> numbering) {
 		int id = numbering.get(g);
-		System.out.println("\tprivate static Instruction decode_" + id + "(int opcode, Memory mem, int pc) {");
+		System.out.println("\tprivate static AvrInstruction decode_" + id + "(int opcode, Memory mem, int pc) {");
 		if(g.isTerminal()) {
 			Opcode o = g.getTerminal();
 			AvrInstruction.Argument[] args = o.getArguments();
@@ -401,7 +404,7 @@ public class DecoderGenerator {
 				System.out.println("\t\t\treturn decode_" + n + "(opcode,mem,pc);");
 			}
 			System.out.println("\t\tdefault:");
-			System.out.println("\t\t\treturn null;");
+			System.out.println("\t\t\treturn new AvrInstruction.UNKNOWN();");
 			System.out.println("\t\t}");
 		}
 		System.out.println("\t}");
@@ -438,7 +441,6 @@ public class DecoderGenerator {
 	public static void printExtractors(Group g) {
 		HashSet<String> visited = new HashSet<>();
 		for(Opcode o : g.getAll()) {
-			String fmt = o.getOpcodeFormat();
 			Argument[] args = o.getArguments();
 			for(int i=0;i!=args.length;++i) {
 				Argument arg = args[i];

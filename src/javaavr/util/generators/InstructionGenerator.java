@@ -141,7 +141,7 @@ public class InstructionGenerator {
 	private String determineBaseClass(Opcode opcode) {
 		AvrInstruction.Argument[] args = opcode.getArguments();
 		if (args.length == 0) {
-			return "Instruction";
+			return "AvrInstruction";
 		} else {
 			String r = "";
 			for (int i = 0; i != args.length; ++i) {

@@ -164,8 +164,8 @@ public class SimulationWindow extends JFrame {
 				clock();
 			}
 		});
-		String[] hzLabels = new String[] { "1Hz", "10Hz", "100Hz", "1Khz", "1Mhz"};
-		final int[] hzDelays = new int[] { 1000_000_000, 100_000_000, 10_000_000, 1_000_000, 1_000, };
+		String[] hzLabels = new String[] { "1Hz", "10Hz", "100Hz", "1Khz", "1Mhz", "8Mhz", "20Mhz"};
+		final int[] hzDelays = new int[] { 1000_000_000, 100_000_000, 10_000_000, 1_000_000, 1_000, 125, 50};
 		final JComboBox timeSelect = new JComboBox(hzLabels) {
 
 		};

@@ -214,6 +214,9 @@ public class AvrExecutor implements AVR.Executor {
 		case LD_Y_DEC:
 			execute((LD_Y_DEC) insn, code, data, registers);
 			break;
+		case LDD_Y_Q:
+			execute((LDD_Y_Q) insn, code, data, registers);
+			break;
 		case LD_Z:
 			execute((LD_Z) insn, code, data, registers);
 			break;
@@ -223,12 +226,15 @@ public class AvrExecutor implements AVR.Executor {
 		case LD_Z_DEC:
 			execute((LD_Z_DEC) insn, code, data, registers);
 			break;
+		case LDD_Z_Q:
+			execute((LDD_Z_Q) insn, code, data, registers);
+			break;
 		case LDI:
 			execute((LDI) insn, code, data, registers);
 			break;
-		case LDS_WIDE:
-			execute((LDS_WIDE) insn, code, data, registers);
-			break;
+//		case LDS_WIDE:
+//			execute((LDS_WIDE) insn, code, data, registers);
+//			break;
 		case LDS:
 			execute((LDS) insn, code, data, registers);
 			break;
@@ -379,6 +385,9 @@ public class AvrExecutor implements AVR.Executor {
 		case ST_Y_DEC:
 			execute((ST_Y_DEC) insn, code, data, registers);
 			break;
+		case STD_Y_Q:
+			execute((STD_Y_Q) insn, code, data, registers);
+			break;
 		case ST_Z:
 			execute((ST_Z) insn, code, data, registers);
 			break;
@@ -388,9 +397,12 @@ public class AvrExecutor implements AVR.Executor {
 		case ST_Z_DEC:
 			execute((ST_Z_DEC) insn, code, data, registers);
 			break;
-		case STS_DATA:
-			execute((STS_DATA) insn, code, data, registers);
+		case STD_Z_Q:
+			execute((STD_Z_Q) insn, code, data, registers);
 			break;
+//		case STS_DATA:
+//			execute((STS_DATA) insn, code, data, registers);
+//			break;
 		case STS_DATA_WIDE:
 			execute((STS_DATA_WIDE) insn, code, data, registers);
 			break;
@@ -1835,6 +1847,15 @@ public class AvrExecutor implements AVR.Executor {
 		data.write(insn.Rd, Rd);
 	}
 
+	private void execute(LDD_Y_Q insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Y register
+		int Y = readWord(AVR.YL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(Y + insn.q);
+		data.write(insn.Rd, Rd);
+	}
+
 	/**
 	 * Loads one byte indirect with or without displacement from the data space to a
 	 * register. For parts with SRAM, the data space consists of the Register File,
@@ -1898,6 +1919,14 @@ public class AvrExecutor implements AVR.Executor {
 		data.write(insn.Rd, Rd);
 	}
 
+	private void execute(LDD_Z_Q insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(Z + insn.q);
+		data.write(insn.Rd, Rd);
+	}
 	/**
 	 * Loads an 8-bit constant directly to register 16 to 31.
 	 *
@@ -1923,9 +1952,9 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LDS_WIDE insn, Memory code, Memory data, Registers regs) {
-		throw new RuntimeException("implement me!");
-	}
+//	private void execute(LDS_WIDE insn, Memory code, Memory data, Registers regs) {
+//		throw new RuntimeException("implement me!");
+//	}
 
 	/**
 	 * Loads one byte from the data space to a register. For parts with SRAM, the
@@ -2892,6 +2921,15 @@ public class AvrExecutor implements AVR.Executor {
 		data.write(Y, Rd);
 	}
 
+	private void execute(STD_Y_Q insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Y register
+		int Y = readWord(AVR.YL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(Y + insn.q, Rd);
+	}
+
 	/**
 	 * Stores one byte indirect with or without displacement from a register to data
 	 * space. For parts with SRAM, the data space consists of the Register File, I/O
@@ -2953,6 +2991,15 @@ public class AvrExecutor implements AVR.Executor {
 		data.write(Z, Rd);
 	}
 
+	private void execute(STD_Z_Q insn, Memory code, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
+		// Load Z register
+		int Z = readWord(AVR.ZL_ADDRESS, data);
+		// Perform operation
+		byte Rd = data.read(insn.Rd);
+		data.write(Z + insn.q, Rd);
+	}
+
 	/**
 	 * Stores one byte from a Register to the data space. For parts with SRAM, the
 	 * data space consists of the Register File, I/O memory, and internal SRAM (and
@@ -2965,11 +3012,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(STS_DATA insn, Memory code, Memory data, Registers regs) {
-		regs.PC = regs.PC + 2;
-		byte Rd = data.read(insn.Rd);
-		data.write(insn.k, Rd);
-	}
+//	private void execute(STS_DATA insn, Memory code, Memory data, Registers regs) {
+//		regs.PC = regs.PC + 1;
+//		throw new RuntimeException("implement me!");
+//	}
 
 	/**
 	 * Stores one byte from a Register to the data space. For parts with SRAM, the
@@ -2985,8 +3031,9 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(STS_DATA_WIDE insn, Memory code, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		regs.PC = regs.PC + 2;
+		byte Rd = data.read(insn.Rd);
+		data.write(insn.k, Rd);
 	}
 
 	/**

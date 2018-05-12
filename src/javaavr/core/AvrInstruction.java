@@ -22,6 +22,7 @@ public class AvrInstruction {
 	//
 	private static final Argument u6_K = new Argument(false, 6, Argument.Kind.Immediate, 'K');
 	private static final Argument u8_K = new Argument(false, 8, Argument.Kind.Immediate, 'K');
+	private static final Argument u6_q = new Argument(false, 6, Argument.Kind.Displacement, 'q');
 	//
 	private static final Argument i7_k = new Argument(true, 7, Argument.Kind.RelativeAddress, 'k');
 	private static final Argument i12_k = new Argument(true, 12, Argument.Kind.RelativeAddress, 'k');
@@ -101,15 +102,13 @@ public class AvrInstruction {
 		LD_Y("Load Indirect from data space to Register using Index Y", "1000_000d_dddd_1000", u5_d),
 		LD_Y_INC("Load Indirect from data space to Register using Index Y", "1001_000d_dddd_1001", u5_d),
 		LD_Y_DEC("Load Indirect from data space to Register using Index Y", "1001_000d_dddd_1010", u5_d),
-		// LD_Y_Q("10q0_qq0d_dddd_1qqq", "Load Indirect from data space to Register"),
-		// using Index Y
+		LDD_Y_Q("Load Indirect from data space to Register", "10q0_qq0d_dddd_1qqq", u5_d, u6_q),
 		LD_Z("Load Indirect From data space to Register using Index Z", "1000_000d_dddd_0000", u5_d),
 		LD_Z_INC("Load Indirect From data space to Register using Index Z", "1001_000d_dddd_0001", u5_d),
 		LD_Z_DEC("Load Indirect From data space to Register using Index Z", "1001_000d_dddd_0010", u5_d),
-		// LD_Z_Q("10q0_qq0d_dddd_0qqq", "Load Indirect From data space to Register"),
-		// using Index Z
+		LDD_Z_Q("Load Indirect From data space to Register", "10q0_qq0d_dddd_0qqq", u5_d, u6_q),
 		LDI("Load Immediate", "1110_KKKK_dddd_KKKK", u4_d_16, u8_K),
-		LDS_WIDE("Load Direct from data space", "1010_0kkk_dddd_kkkk", u4_d_16,u7_k),
+		//LDS_WIDE("Load Direct from data space", "1010_0kkk_dddd_kkkk", u4_d_16,u7_k),
 		LDS("Load Direct from data space", "1001_000d_dddd_0000", "kkkk_kkkk_kkkk_kkkk", u5_d, u16_k),
 		LPM("Load Program Memory", "1001_0101_1100_1000"),
 		LPM_Z("Load Program Memory", "1001_000d_dddd_0100", u5_d),
@@ -160,15 +159,13 @@ public class AvrInstruction {
 		ST_Y("Store Indirect From Register to data space using Index Y", "1000_001d_dddd_1000", u5_d),
 		ST_Y_INC("Store Indirect From Register to data space using Index Y", "1001_001d_dddd_1001", u5_d),
 		ST_Y_DEC("Store Indirect From Register to data space using Index Y", "1001_001d_dddd_1010", u5_d),
-		// ST_Y_Q("10q0_qq1r_rrrr_1qqq", "Store Indirect From Register to data space"),
-		// using Index Y
+		STD_Y_Q("Store Indirect From Register to data space", "10q0_qq1r_rrrr_1qqq", u5_r, u6_q),
 		ST_Z("Store Indirect From Register to data space using Index Z", "1000_001d_dddd_0000", u5_d),
 		ST_Z_INC("Store Indirect From Register to data space using Index Z", "1001_001d_dddd_0001", u5_d),
 		ST_Z_DEC("Store Indirect From Register to data space using Index Z", "1001_001d_dddd_0010", u5_d),
-		// ST_Z_Q("10q0_qq1r_rrrr_0qqq", "Store Indirect From Register to data space"),
-		// using Index Z
-		STS_DATA("Store Direct to data space", "1010_1kkk_dddd_kkkk", u4_d_16, u7_k),
-		STS_DATA_WIDE("Store Direct to data space", "1001_001d_dddd_0000", "kkkk_kkkk_kkkk_kkkk", u4_d_16, u16_k),
+		STD_Z_Q("Store Indirect From Register to data space", "10q0_qq1r_rrrr_0qqq", u5_r, u6_q),
+		//STS_DATA("Store Direct to data space", "1010_1kkk_dddd_kkkk", u4_d_16, u7_k),
+		STS_DATA_WIDE("Store Direct to data space", "1001_001d_dddd_0000", "kkkk_kkkk_kkkk_kkkk", u5_d, u16_k),
 		SUB("Subtract without Carry", "0001_10rd_dddd_rrrr", u5_d, u5_r),
 		SUBI("Subtract Immediate", "0101_KKKK_dddd_KKKK", u4_d_16, u8_K),
 		SWAP("Swap Nibbles", "1001_010d_dddd_0010", u5_d),
@@ -207,10 +204,10 @@ public class AvrInstruction {
 			//subsumedBy.put(TST, AND);
 			subsumedBy.put(SBR, ORI);
 			//
-			// subsumedBy.put(LD_Y,LD_Y_Q);
-			// subsumedBy.put(LD_Z,LD_Z_Q);
-			// subsumedBy.put(ST_Y,ST_Y_Q);
-			// subsumedBy.put(ST_Z,ST_Z_Q);
+			subsumedBy.put(LD_Y,LDD_Y_Q);
+			subsumedBy.put(LD_Z, LDD_Z_Q);
+			subsumedBy.put(ST_Y,STD_Y_Q);
+			subsumedBy.put(ST_Z,STD_Z_Q);
 			//
 			subsumedBy.put(CLS, BCLR);
 			subsumedBy.put(CLV, BCLR);
@@ -343,7 +340,7 @@ public class AvrInstruction {
 
 	public static final class Argument {
 		public enum Kind {
-			Immediate, Register, Bit, Flag, Io, RelativeAddress, AbsoluteAddress
+			Immediate, Displacement, Register, Bit, Flag, Io, RelativeAddress, AbsoluteAddress
 		}
 
 		public final boolean signed;
@@ -403,7 +400,7 @@ public class AvrInstruction {
 			// Remove all underscores.
 			String format = opcode.getOpcodeFormat();
 			if(opcode.getOperandFormat() != null) {
-				format += opcode.getOperandFormat();
+				format = opcode.getOperandFormat() + format;
 			}
 			format = format.replaceAll("_", "");
 			//
@@ -704,6 +701,30 @@ public class AvrInstruction {
 		}
 	}
 
+
+	public static abstract class RegisterDisplacement extends AvrInstruction {
+		public final int Rd;
+		public final int q;
+
+		public RegisterDisplacement(Opcode opcode, int Rd, int q) {
+			super(opcode);
+			if (Rd < 0 || Rd >= 32) {
+				throw new IllegalArgumentException("invalid register: " + Rd);
+			}
+			if (q < 0 || q >= 64) {
+				throw new IllegalArgumentException("invalid displacement: " + q);
+			}
+			this.Rd = Rd;
+			this.q = q;
+		}
+
+		@Override
+		public String toString() {
+			return super.toString() + " r" + Rd + ", 0x" + Integer.toHexString(q);
+		}
+	}
+
+
 	public static abstract class RelativeAddress extends AvrInstruction {
 		public final int k;
 
@@ -720,6 +741,23 @@ public class AvrInstruction {
 			return super.toString() + " 0x" + Integer.toHexString(k);
 		}
 	}
+
+	public static final class UNKNOWN extends AvrInstruction {
+	    public UNKNOWN() {
+	        super(Opcode.NOP);
+	    }
+
+	    public String getDescription() { return "An undecodable (possibly data) byte."; }
+
+	    public byte[] getBytes() {
+	        throw new UnsupportedOperationException();
+	    }
+
+	    @Override
+		public String toString() { return "??"; }
+
+	}
+
 	/**
 	 * Add with Carry.
 	 *
@@ -1429,8 +1467,9 @@ public class AvrInstruction {
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000001110;
-	        opcode |= (this.k << 0) & 0b11111111111111111;
-	        opcode |= (this.k << 3) & 0b1111100000000000000000000;
+	        opcode |= (this.k << 0) & 0b1;
+	        opcode |= (this.k << 3) & 0b111110000;
+	        opcode |= (this.k << 10) & 0b11111111111111110000000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}
@@ -1995,8 +2034,9 @@ public class AvrInstruction {
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001010000001100;
-	        opcode |= (this.k << 0) & 0b11111111111111111;
-	        opcode |= (this.k << 3) & 0b1111100000000000000000000;
+	        opcode |= (this.k << 0) & 0b1;
+	        opcode |= (this.k << 3) & 0b111110000;
+	        opcode |= (this.k << 10) & 0b11111111111111110000000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}
@@ -2190,6 +2230,33 @@ public class AvrInstruction {
 	    }
 	}
 	/**
+	 * Load Indirect from data space to Register.
+	 *
+	 * 10q0_qq0d_dddd_1qqq
+	 */
+	public static final class LDD_Y_Q extends RegisterDisplacement {
+	    public LDD_Y_Q(int d, int q) {
+	        super(Opcode.LDD_Y_Q, d, q);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
+	        if(q < 0 || q > 63) {
+	            throw new IllegalArgumentException("invalid argument q");
+	        }
+	    }
+
+	    public String getDescription() { return "Load Indirect from data space to Register"; }
+
+	    public byte[] getBytes() {
+	        int opcode = 0b1000000000001000;
+	        opcode |= (this.Rd << 4) & 0b111110000;
+	        opcode |= (this.q << 0) & 0b111;
+	        opcode |= (this.q << 7) & 0b110000000000;
+	        opcode |= (this.q << 8) & 0b10000000000000;
+	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
+	    }
+	}
+	/**
 	 * Load Indirect From data space to Register using Index Z.
 	 *
 	 * 1000_000d_dddd_0000
@@ -2253,6 +2320,33 @@ public class AvrInstruction {
 	    }
 	}
 	/**
+	 * Load Indirect From data space to Register.
+	 *
+	 * 10q0_qq0d_dddd_0qqq
+	 */
+	public static final class LDD_Z_Q extends RegisterDisplacement {
+	    public LDD_Z_Q(int d, int q) {
+	        super(Opcode.LDD_Z_Q, d, q);
+	        if(d < 0 || d > 31) {
+	            throw new IllegalArgumentException("invalid argument d");
+	        }
+	        if(q < 0 || q > 63) {
+	            throw new IllegalArgumentException("invalid argument q");
+	        }
+	    }
+
+	    public String getDescription() { return "Load Indirect From data space to Register"; }
+
+	    public byte[] getBytes() {
+	        int opcode = 0b1000000000000000;
+	        opcode |= (this.Rd << 4) & 0b111110000;
+	        opcode |= (this.q << 0) & 0b111;
+	        opcode |= (this.q << 7) & 0b110000000000;
+	        opcode |= (this.q << 8) & 0b10000000000000;
+	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
+	    }
+	}
+	/**
 	 * Load Immediate.
 	 *
 	 * 1110_KKKK_dddd_KKKK
@@ -2281,32 +2375,6 @@ public class AvrInstruction {
 	/**
 	 * Load Direct from data space.
 	 *
-	 * 1010_0kkk_dddd_kkkk
-	 */
-	public static final class LDS_WIDE extends RegisterAbsoluteAddress {
-	    public LDS_WIDE(int d, int k) {
-	        super(Opcode.LDS_WIDE, d, k);
-	        if(d < 16 || d > 31) {
-	            throw new IllegalArgumentException("invalid argument d");
-	        }
-	        if(k < 0 || k > 127) {
-	            throw new IllegalArgumentException("invalid argument k");
-	        }
-	    }
-
-	    public String getDescription() { return "Load Direct from data space"; }
-
-	    public byte[] getBytes() {
-	        int opcode = 0b1010000000000000;
-	        opcode |= (this.Rd << 4) & 0b11110000;
-	        opcode |= (this.k << 0) & 0b1111;
-	        opcode |= (this.k << 4) & 0b11100000000;
-	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
-	    }
-	}
-	/**
-	 * Load Direct from data space.
-	 *
 	 * 1001_000d_dddd_0000
 	 * kkkk_kkkk_kkkk_kkkk
 	 */
@@ -2328,8 +2396,8 @@ public class AvrInstruction {
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001000000000000;
-	        opcode |= (this.Rd << 20) & 0b1111100000000000000000000;
-	        opcode |= (this.k << 0) & 0b1111111111111111;
+	        opcode |= (this.Rd << 4) & 0b111110000;
+	        opcode |= (this.k << 16) & 0b11111111111111110000000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}
@@ -3394,6 +3462,33 @@ public class AvrInstruction {
 	    }
 	}
 	/**
+	 * Store Indirect From Register to data space.
+	 *
+	 * 10q0_qq1r_rrrr_1qqq
+	 */
+	public static final class STD_Y_Q extends RegisterDisplacement {
+	    public STD_Y_Q(int r, int q) {
+	        super(Opcode.STD_Y_Q, r, q);
+	        if(r < 0 || r > 31) {
+	            throw new IllegalArgumentException("invalid argument r");
+	        }
+	        if(q < 0 || q > 63) {
+	            throw new IllegalArgumentException("invalid argument q");
+	        }
+	    }
+
+	    public String getDescription() { return "Store Indirect From Register to data space"; }
+
+	    public byte[] getBytes() {
+	        int opcode = 0b1000001000001000;
+	        opcode |= (this.Rd << 4) & 0b111110000;
+	        opcode |= (this.q << 0) & 0b111;
+	        opcode |= (this.q << 7) & 0b110000000000;
+	        opcode |= (this.q << 8) & 0b10000000000000;
+	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
+	    }
+	}
+	/**
 	 * Store Indirect From Register to data space using Index Z.
 	 *
 	 * 1000_001d_dddd_0000
@@ -3457,28 +3552,29 @@ public class AvrInstruction {
 	    }
 	}
 	/**
-	 * Store Direct to data space.
+	 * Store Indirect From Register to data space.
 	 *
-	 * 1010_1kkk_dddd_kkkk
+	 * 10q0_qq1r_rrrr_0qqq
 	 */
-	public static final class STS_DATA extends RegisterAbsoluteAddress {
-	    public STS_DATA(int d, int k) {
-	        super(Opcode.STS_DATA, d, k);
-	        if(d < 16 || d > 31) {
-	            throw new IllegalArgumentException("invalid argument d");
+	public static final class STD_Z_Q extends RegisterDisplacement {
+	    public STD_Z_Q(int r, int q) {
+	        super(Opcode.STD_Z_Q, r, q);
+	        if(r < 0 || r > 31) {
+	            throw new IllegalArgumentException("invalid argument r");
 	        }
-	        if(k < 0 || k > 127) {
-	            throw new IllegalArgumentException("invalid argument k");
+	        if(q < 0 || q > 63) {
+	            throw new IllegalArgumentException("invalid argument q");
 	        }
 	    }
 
-	    public String getDescription() { return "Store Direct to data space"; }
+	    public String getDescription() { return "Store Indirect From Register to data space"; }
 
 	    public byte[] getBytes() {
-	        int opcode = 0b1010100000000000;
-	        opcode |= (this.Rd << 4) & 0b11110000;
-	        opcode |= (this.k << 0) & 0b1111;
-	        opcode |= (this.k << 4) & 0b11100000000;
+	        int opcode = 0b1000001000000000;
+	        opcode |= (this.Rd << 4) & 0b111110000;
+	        opcode |= (this.q << 0) & 0b111;
+	        opcode |= (this.q << 7) & 0b110000000000;
+	        opcode |= (this.q << 8) & 0b10000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -3491,7 +3587,7 @@ public class AvrInstruction {
 	public static final class STS_DATA_WIDE extends RegisterAbsoluteAddress {
 	    public STS_DATA_WIDE(int d, int k) {
 	        super(Opcode.STS_DATA_WIDE, d, k);
-	        if(d < 16 || d > 31) {
+	        if(d < 0 || d > 31) {
 	            throw new IllegalArgumentException("invalid argument d");
 	        }
 	        if(k < 0 || k > 65535) {
@@ -3506,8 +3602,8 @@ public class AvrInstruction {
 
 	    public byte[] getBytes() {
 	        int opcode = 0b1001001000000000;
-	        opcode |= (this.Rd << 20) & 0b1111100000000000000000000;
-	        opcode |= (this.k << 0) & 0b1111111111111111;
+	        opcode |= (this.Rd << 4) & 0b111110000;
+	        opcode |= (this.k << 16) & 0b11111111111111110000000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}
@@ -3622,4 +3718,5 @@ public class AvrInstruction {
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
+
 }

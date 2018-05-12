@@ -24,21 +24,20 @@ void spiTransfer(char c) {
 // Redraw the Tiny Console Display.  This is designed for a display
 // which is 64x64 pixels.
 void refresh() {
-  PORTB = 0b00000000;  
+  //PORTB = 0b00000000;  
   //
-  _delay_ms(50);
+  //_delay_ms(50);
   for(int i=7;i>=0;--i) {
-    for(int k=0;k!=8;++k) {
+    for(int k=0;k<8;++k) {
       for(int j=0;j<8;++j) {     
 	spiTransfer(display[i][j]);   
-	_delay_ms(1); 
       }
     }
   }
-  _delay_ms(100);   
+  //_delay_ms(100);   
   // take the SS pin high to de-select the chip:
-  PORTB = 0b00000001;
-  _delay_ms(50); 
+  //PORTB = 0b00000001;
+  //_delay_ms(50); 
 }
 
 // read joystick axis as number between 0 and 7
