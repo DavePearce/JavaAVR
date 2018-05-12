@@ -19,6 +19,7 @@ import javax.swing.JToolBar;
 import javax.swing.border.Border;
 
 import javaavr.core.AvrPeripheral;
+import javaavr.peripherals.DotMatrixDisplay;
 import javaavr.util.AbstractSerialPeripheral;
 
 /**
@@ -102,52 +103,40 @@ public class DisplayPeripheral extends JPeripheral {
 	private class DisplayCanvas extends JPanel {
 		public DisplayCanvas(int width, int height) {
 			setBounds(0, 0, width * 4, height * 4);
-		    setPreferredSize(new Dimension(width * 4, height * 4));
+			setPreferredSize(new Dimension(width * 4, height * 4));
 			pack();
 			setVisible(true);
 		}
+
 		@Override
 		public void paint(Graphics g) {
-			int pw = getWidth() / spi.width;
-			int ph = getHeight() / spi.height;
+			int pw = getWidth() / spi.getWidth();
+			int ph = getHeight() / spi.getHeight();
 			g.setColor(Color.WHITE);
-			g.fillRect(0,0,getWidth(),getHeight());
+			g.fillRect(0, 0, getWidth(), getHeight());
 			//
 			g.setColor(Color.BLACK);
-			for(int y=0;y!=spi.height;++y) {
-				for(int x=0;x!=spi.width;++x) {
-					boolean pixel = spi.isSet(x,y);
-					if(pixel) {
-						g.fillRect(x*pw, y*ph, pw, ph);
+			for (int y = 0; y != spi.getHeight(); ++y) {
+				for (int x = 0; x != spi.getWidth(); ++x) {
+					boolean pixel = spi.isSet(x, y);
+					if (pixel) {
+						g.fillRect(x * pw, y * ph, pw, ph);
 					}
 				}
 			}
 		}
 	}
 
-	private class Display extends AbstractSerialPeripheral {
-		private final byte[] pixels;
-		private final int width;
-		private final int height;
+	private class Display extends DotMatrixDisplay {
 
 		public Display(int width, int height) {
-			super(height * (width/8)); // transmit one byte at a time
-			this.width = width;
-			this.height = height;
-			this.pixels = new byte[height * (width/8)];
+			super(width,height);
 		}
 
 		@Override
 		public void received(byte[] data) {
-			System.arraycopy(data, 0, pixels, 0, pixels.length);
+			super.received(data);
 			repaint();
-		}
-
-		public boolean isSet(int x, int y) {
-			int w = width / 8;
-			int offset = (y * w) + (x / 8);
-			int mask = 1 << (x % 8);
-			return (pixels[offset] & mask) != 0;
 		}
 	}
 

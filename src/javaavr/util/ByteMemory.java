@@ -5,8 +5,15 @@ import java.util.List;
 import javaavr.core.AVR;
 import javaavr.io.HexFile;
 
+/**
+ * Provides a simple form of memory which is backed by a fixed size array of
+ * bytes.
+ *
+ * @author David J. Pearce
+ *
+ */
 public class ByteMemory implements AVR.Memory {
-	private byte[] data;
+	protected byte[] data;
 
 	public ByteMemory(int size) {
 		this.data = new byte[size];
