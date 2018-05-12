@@ -6,7 +6,7 @@ PROGRAMMER = -c usbtiny
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 COMPILE = avr-gcc -Wall -Os -std=c99 -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
-TARGETS = console.hex display.hex display_blocks.hex tetris.hex
+TARGETS = console.hex display.hex tetris.hex
 
 all: $(TARGETS)
 

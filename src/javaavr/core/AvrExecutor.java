@@ -2170,7 +2170,22 @@ public class AvrExecutor implements AVR.Executor {
 	 */
 	private void execute(NEG insn, Memory code, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
-		throw new RuntimeException("implement me!");
+		byte Rd = data.read(insn.Rd);
+		byte R = (byte) -Rd;
+		data.write(insn.Rd, R);
+		// Set flags
+		boolean Rd3 = (Rd & 0b1000) != 0;
+		boolean R3 = (R & 0b1000) != 0;
+		boolean R7 = (R & 0b1000_0000) != 0;
+		//
+		boolean C = (R != 0);
+		boolean Z = (R == 0);
+		boolean N = R7;
+		boolean V = (R == 0b1000_0000);
+		boolean S = N ^ V;
+		boolean H = R3 || !Rd3;
+		// Update Status Register
+		setStatusRegister(C, Z, N, V, S, H, regs);
 	}
 
 	/**
