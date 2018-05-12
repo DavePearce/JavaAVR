@@ -22,9 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import javr.core.Wire;
-import javr.util.WireArrayPort;
 import javrsim.peripherals.JPeripheral;
-import javrsim.peripherals.JPeripheral.Descriptor;
 
 public class ConnectionWindow extends JDialog {
 	private ArrayList<JComboBox<String>> connections = new ArrayList<>();

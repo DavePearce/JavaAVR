@@ -45,4 +45,68 @@ public interface Wire {
 	 * @return
 	 */
 	public boolean clock();
+
+	/**
+	 * A simple wire which only ever reads digital zero.
+	 */
+	public static Wire LOW = new Wire() {
+
+		@Override
+		public String getLabel() {
+			return "LOW";
+		}
+
+		@Override
+		public boolean read() {
+			return false;
+		}
+
+		@Override
+		public boolean write(boolean value) {
+			return false;
+		}
+
+		@Override
+		public boolean isRising() {
+			return false;
+		}
+
+		@Override
+		public boolean clock() {
+			return false;
+		}
+
+	};
+
+	/**
+	 * A simple wire which only ever reads digital zero.
+	 */
+	public static Wire HIGH = new Wire() {
+
+		@Override
+		public String getLabel() {
+			return "HIGH";
+		}
+
+		@Override
+		public boolean read() {
+			return true;
+		}
+
+		@Override
+		public boolean write(boolean value) {
+			return false;
+		}
+
+		@Override
+		public boolean isRising() {
+			return false;
+		}
+
+		@Override
+		public boolean clock() {
+			return false;
+		}
+
+	};
 }

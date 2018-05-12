@@ -125,6 +125,10 @@ public class SimulationWindow extends JFrame {
 		clock.start();
 	}
 
+	public void addPeripheral(JPeripheral peripheral) {
+		peripherals.add(peripheral);
+	}
+
 	private JMenuBar constructMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
