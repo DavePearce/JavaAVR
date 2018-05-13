@@ -58,7 +58,7 @@ public class AvrInstruction {
 		BRNE("Branch if Not Equal","1111_01kk_kkkk_k001", i7_k),
 		BRPL("Branch if Plus","1111_01kk_kkkk_k010", i7_k),
 		BRSH("Branch if Same or Higher (Unsigned)","1111_00kk_kkkk_k000", i7_k),
-		BRTC("if the T Flag is Cleared","1111_01kk_kkkk_k110", i7_k),
+		BRTC("Branch if the T Flag is Cleared","1111_01kk_kkkk_k110", i7_k),
 		BRTS("Branch if the T Flag is Set","1111_00kk_kkkk_k110", i7_k),
 		BRVC("Branch if Overflow Cleared","1111_01kk_kkkk_k011", i7_k),
 		BRVS("Branch if Overflow Set","1111_00kk_kkkk_k011", i7_k),

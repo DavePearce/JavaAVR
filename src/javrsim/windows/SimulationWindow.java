@@ -73,17 +73,18 @@ public class SimulationWindow extends JFrame {
 	 * Provides the heartbeat necessary to drive the simulation
 	 */
 	private final ClockThread clock;
-	/**
-	 * The list of instantiated peripheral windows. This is important
-	 * because peripherals need to be clocked as the AVR is clocked.
-	 */
-	private final ArrayList<JPeripheral> peripherals = new ArrayList<>();
 
 	/**
 	 * The list of peripheral descriptors. This determines what peripherals can be
 	 * created by this simulation.
 	 */
 	private final JPeripheral.Descriptor[] peripheralDescriptors;
+
+	/**
+	 * The list of instantiated peripherals. This is important because they also need
+	 * to be clocked as the AVR is clocked.
+	 */
+	private final ArrayList<JPeripheral> peripherals = new ArrayList<>();
 
 	/**
 	 * The list of instantiated avr views. This is important because they also need
@@ -162,7 +163,7 @@ public class SimulationWindow extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JDialog dialog = new ConnectionWindow(d, peripherals, mcu.getPins());
+					JDialog dialog = new ConnectionWindow(d, mcu.getPins(),peripherals);
 					center(dialog);
 				}
 
@@ -302,9 +303,9 @@ public class SimulationWindow extends JFrame {
 	}
 
 	public void clock() {
-		// Clock all peripherals
-		for(int i=0;i!=peripherals.size();++i) {
-			peripherals.get(i).clock();
+		// Clock any peripherals
+		for(JPeripheral p : peripherals) {
+			p.clock();
 		}
 		// Clock the AVR
 		mcu.clock();

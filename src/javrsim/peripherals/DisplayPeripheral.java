@@ -140,6 +140,11 @@ public class DisplayPeripheral extends JPeripheral {
 			super.received(data);
 			repaint();
 		}
+
+		@Override
+		public void clock() {
+			super.clock();
+		}
 	}
 
 	private static final class Descriptor implements JPeripheral.Descriptor {

@@ -1,6 +1,7 @@
 package javr.core;
 
 import javr.memory.InstrumentableMemory;
+import java.util.*;
 
 public class AVR {
 	// Status Flags

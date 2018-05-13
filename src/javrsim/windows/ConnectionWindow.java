@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+import javr.core.AVR;
 import javr.core.Wire;
 import javrsim.peripherals.JPeripheral;
 
@@ -29,11 +30,10 @@ public class ConnectionWindow extends JDialog {
 	private List<JPeripheral> peripherals;
 	private Wire[] avrPins;
 
-	public ConnectionWindow(JPeripheral.Descriptor descriptor, List<JPeripheral> peripherals,
-			Wire[] avrPins) {
+	public ConnectionWindow(JPeripheral.Descriptor descriptor, Wire[] pins, List<JPeripheral> peripherals) {
 		super((JFrame) null, "Connect to " + descriptor.getName());
 		this.peripherals = peripherals;
-		this.avrPins = avrPins;
+		this.avrPins = pins;
 		add(createPanel(descriptor));
 		pack();
 		setVisible(true);
@@ -116,7 +116,6 @@ public class ConnectionWindow extends JDialog {
 			wires[i] = avrPins[index];
 		}
 		JPeripheral peripheral = descriptor.construct(wires);
-
 		// Connect up to the peripheral list so that it will be clocked.
 		peripherals.add(peripheral);
 		// Center the peripheral

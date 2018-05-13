@@ -75,6 +75,11 @@ public class ConsolePeripheral extends JPeripheral {
 			text.append((char) data[0]);
 			repaint();
 		}
+
+		@Override
+		public void clock() {
+			super.clock();
+		}
 	}
 
 	private static final class Descriptor implements JPeripheral.Descriptor {
