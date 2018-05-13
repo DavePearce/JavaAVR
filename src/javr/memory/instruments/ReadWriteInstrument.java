@@ -22,6 +22,14 @@ public class ReadWriteInstrument implements InstrumentableMemory.Instrument {
 		return writes.get(address);
 	}
 
+	public BitSet getReads() {
+		return reads;
+	}
+
+	public BitSet getWrites() {
+		return writes;
+	}
+
 	@Override
 	public void read(int address, byte data) {
 		reads.set(address);
