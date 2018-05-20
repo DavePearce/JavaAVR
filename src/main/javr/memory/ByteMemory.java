@@ -1,5 +1,6 @@
 package javr.memory;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javr.core.AVR;
@@ -53,5 +54,9 @@ public class ByteMemory implements AVR.Memory {
 	@Override
 	public int size() {
 		return data.length;
+	}
+
+	public byte[] toByteArray() {
+		return Arrays.copyOf(data, data.length);
 	}
 }

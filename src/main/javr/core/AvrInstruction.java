@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AvrInstruction {
+public abstract class AvrInstruction {
 	private static final Argument u5_A = new Argument(false, 5, Argument.Kind.Io, 'A');
 	private static final Argument u6_A = new Argument(false, 6, Argument.Kind.Io, 'A');
 	//
@@ -332,6 +332,12 @@ public class AvrInstruction {
 	public int getWidth() {
 		return 1;
 	}
+
+	/**
+	 * Convert this instruction into an array of bytes.
+	 * @return
+	 */
+	public abstract byte[] getBytes();
 
 	@Override
 	public String toString() {
@@ -749,7 +755,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "An undecodable (possibly data) byte."; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        throw new UnsupportedOperationException();
 	    }
 
@@ -776,7 +783,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Add with Carry"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1110000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -802,7 +810,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Add without Carry"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b110000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -828,7 +837,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Add Immediate to Word"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001011000000000;
 	        opcode |= (this.Rd << 4) & 0b110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -854,7 +864,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Logical AND"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b10000000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -880,7 +891,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Logical AND with Immediate"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b111000000000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -903,7 +915,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Arithmetic Shift Right"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000000101;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -924,7 +937,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Bit Clear in SREG"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010010001000;
 	        opcode |= (this.s << 4) & 0b1110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -948,7 +962,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Bit Load from the T Flag in SREG to a Bit in Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111100000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.b << 0) & 0b111;
@@ -973,7 +988,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Bit in SREG is Cleared"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000000;
 	        opcode |= (this.s << 0) & 0b111;
 	        opcode |= (this.k << 3) & 0b1111111000;
@@ -998,7 +1014,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Bit in SREG is Set"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000000;
 	        opcode |= (this.s << 0) & 0b111;
 	        opcode |= (this.k << 3) & 0b1111111000;
@@ -1020,7 +1037,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Carry Cleared"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000000;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1041,7 +1059,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Carry Set"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000000;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1059,7 +1078,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Break"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010110011000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1079,7 +1099,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Equal"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000001;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1100,7 +1121,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Greater or Equal Signed"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000100;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1121,7 +1143,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Half Carry Flag is Cleared"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000101;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1142,7 +1165,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Half Carry Flag is Set"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000101;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1163,7 +1187,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Global Interrupt is Disabled"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000111;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1184,7 +1209,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Global Interrupt is Enabled"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000111;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1205,7 +1231,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Lower (Unsigned)"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000000;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1226,7 +1253,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Less Than (Signed)"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000100;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1247,7 +1275,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Minus"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000010;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1268,7 +1297,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Not Equal"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000001;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1289,7 +1319,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Plus"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000010;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1310,7 +1341,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Same or Higher (Unsigned)"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000000;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1331,7 +1363,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "if the T Flag is Cleared"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000110;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1352,7 +1385,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if the T Flag is Set"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000110;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1373,7 +1407,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Overflow Cleared"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111010000000011;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1394,7 +1429,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Branch if Overflow Set"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111000000000011;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1415,7 +1451,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Bit Set in SREG"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000001000;
 	        opcode |= (this.s << 4) & 0b1110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1439,7 +1476,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Bit Store from Bit in Register to T Flag in SREG"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111101000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.b << 0) & 0b111;
@@ -1465,7 +1503,8 @@ public class AvrInstruction {
 	    @Override
 		public int getWidth() { return 2; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000001110;
 	        opcode |= (this.k << 0) & 0b1;
 	        opcode |= (this.k << 3) & 0b111110000;
@@ -1491,7 +1530,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear Bit in I/O Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001100000000000;
 	        opcode |= (this.A << 3) & 0b11111000;
 	        opcode |= (this.b << 0) & 0b111;
@@ -1510,7 +1550,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear Carry Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010010001000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1527,7 +1568,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear Half Carry Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010011001000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1544,7 +1586,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear Global Interrupt Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010011111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1561,7 +1604,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear Global Interrupt Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010010101000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1578,7 +1622,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear Signed Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010011001000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1595,7 +1640,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear T Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010011101000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1612,7 +1658,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear Overflow Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010010111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1629,7 +1676,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Clear Zero Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010010011000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1649,7 +1697,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "One's Complement"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1673,7 +1722,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Compare"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1010000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -1699,7 +1749,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Compare with Carry"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b10000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -1725,7 +1776,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Compare with Immediate"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b11000000000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -1751,7 +1803,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Compare Skip if Equal"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -1774,7 +1827,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Decrement"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000001010;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -1792,7 +1846,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Extended Indirect Call to Subroutine"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010100011001;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1809,7 +1864,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Extended Indirect Jump"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000011001;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1826,7 +1882,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Extended Load Program Memory"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010111011000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1849,7 +1906,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Exclusive OR"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b10010000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -1875,7 +1933,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Fractional Multiply Unsigned"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1100001000;
 	        opcode |= (this.Rd << 4) & 0b1110000;
 	        opcode |= (this.Rr << 0) & 0b111;
@@ -1900,7 +1959,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Fractional Multiply Signed"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1110000000;
 	        opcode |= (this.Rd << 4) & 0b1110000;
 	        opcode |= (this.Rr << 0) & 0b111;
@@ -1925,7 +1985,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Fractional Multiply Signed with Unsigned"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1110001000;
 	        opcode |= (this.Rd << 4) & 0b1110000;
 	        opcode |= (this.Rr << 0) & 0b111;
@@ -1944,7 +2005,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Indirect Call to Subroutine"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010100001001;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1961,7 +2023,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Indirect Jump"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000001001;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1984,7 +2047,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load an I/O Location to Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1011000000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.A << 0) & 0b1111;
@@ -2007,7 +2071,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Increment"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000000011;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2032,7 +2097,8 @@ public class AvrInstruction {
 	    @Override
 		public int getWidth() { return 2; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000001100;
 	        opcode |= (this.k << 0) & 0b1;
 	        opcode |= (this.k << 3) & 0b111110000;
@@ -2055,7 +2121,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load and Clear"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000000110;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2076,7 +2143,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load and Set"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000000101;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2097,7 +2165,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load and Toggle"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000000111;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2118,7 +2187,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect from data space to Register using Index X"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000001100;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2139,7 +2209,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect from data space to Register using Index X"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000001101;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2160,7 +2231,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect from data space to Register using Index X"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000001110;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2181,7 +2253,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect from data space to Register using Index Y"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000000000001000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2202,7 +2275,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect from data space to Register using Index Y"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000001001;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2223,7 +2297,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect from data space to Register using Index Y"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000001010;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2247,7 +2322,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect from data space to Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000000000001000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.q << 0) & 0b111;
@@ -2271,7 +2347,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect From data space to Register using Index Z"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000000000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2292,7 +2369,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect From data space to Register using Index Z"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000000001;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2313,7 +2391,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect From data space to Register using Index Z"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000000010;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2337,7 +2416,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Indirect From data space to Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000000000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.q << 0) & 0b111;
@@ -2364,7 +2444,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Immediate"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1110000000000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -2394,7 +2475,8 @@ public class AvrInstruction {
 	    @Override
 		public int getWidth() { return 2; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.k << 16) & 0b11111111111111110000000000000000;
@@ -2413,7 +2495,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Program Memory"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010111001000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -2433,7 +2516,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Program Memory"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000000100;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2454,7 +2538,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Load Program Memory"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000000101;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2478,7 +2563,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Logical Shift Left"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b110000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -2501,7 +2587,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Logical Shift Right"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000000110;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2525,7 +2612,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Copy Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b10110000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -2551,7 +2639,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Copy Register Word"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b100000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -2576,7 +2665,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Multiply Unsigned"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001110000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -2602,7 +2692,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Multiply Signed"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -2627,7 +2718,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Multiply Signed with Unsigned"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1100000000;
 	        opcode |= (this.Rd << 4) & 0b1110000;
 	        opcode |= (this.Rr << 0) & 0b111;
@@ -2649,7 +2741,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Two's Complement"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000000001;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2667,7 +2760,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "No Operation"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b0;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -2690,7 +2784,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Logical OR"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b10100000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -2716,7 +2811,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Logical OR with Immediate"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b110000000000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -2742,7 +2838,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Register to I/O Location"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1011100000000000;
 	        opcode |= (this.A << 0) & 0b1111;
 	        opcode |= (this.A << 5) & 0b11000000000;
@@ -2765,7 +2862,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Pop Register from Stack"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001000000001111;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2786,7 +2884,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Push Register on Stack"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000001111;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2807,7 +2906,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Relative Call to Subroutine"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1101000000000000;
 	        opcode |= (this.k << 0) & 0b111111111111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2825,7 +2925,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Return from Subroutine"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010100001000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -2842,7 +2943,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Return from Interrupt"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010100011000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -2862,7 +2964,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Relative Jump"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1100000000000000;
 	        opcode |= (this.k << 0) & 0b111111111111;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2886,7 +2989,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Rotate Left through Carry"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1110000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -2909,7 +3013,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Rotate Right through Carry"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000000111;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -2933,7 +3038,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Subtract with Carry"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b100000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -2959,7 +3065,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Subtract Immediate with Carry"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b100000000000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -2985,7 +3092,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set Bit in I/O Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001101000000000;
 	        opcode |= (this.A << 3) & 0b11111000;
 	        opcode |= (this.b << 0) & 0b111;
@@ -3010,7 +3118,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Skip if Bit in I/O Register is Cleared"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001100100000000;
 	        opcode |= (this.A << 3) & 0b11111000;
 	        opcode |= (this.b << 0) & 0b111;
@@ -3035,7 +3144,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Skip if Bit in I/O Register is Set"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001101100000000;
 	        opcode |= (this.A << 3) & 0b11111000;
 	        opcode |= (this.b << 0) & 0b111;
@@ -3060,7 +3170,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Subtract Immediate from Word"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001011100000000;
 	        opcode |= (this.Rd << 4) & 0b110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -3086,7 +3197,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set Bits in Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b110000000000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -3112,7 +3224,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Skip if Bit in Register is Cleared"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111110000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.b << 0) & 0b111;
@@ -3137,7 +3250,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Skip if Bit in Register is Set"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1111111000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.b << 0) & 0b111;
@@ -3156,7 +3270,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set Carry Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000001000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3173,7 +3288,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set Half Carry Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010001011000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3190,7 +3306,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set Global Interrupt Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010001111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3207,7 +3324,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set Negative Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000101000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3227,7 +3345,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set all bits in Register"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1110111100001111;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3245,7 +3364,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set Signed Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010001001000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3262,7 +3382,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set T Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010001101000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3279,7 +3400,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Overflow Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3296,7 +3418,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Set Zero Flag"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000011000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3313,7 +3436,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Sleep mode"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010110001000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3330,7 +3454,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Program Memory"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010111101000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3350,7 +3475,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index X"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000001100;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3371,7 +3497,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index X"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000001101;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3392,7 +3519,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index X"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000001110;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3413,7 +3541,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index Y"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000001000001000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3434,7 +3563,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index Y"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000001001;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3455,7 +3585,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index Y"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000001010;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3479,7 +3610,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000001000001000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.q << 0) & 0b111;
@@ -3503,7 +3635,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index Z"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000001000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3524,7 +3657,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index Z"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000000001;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3545,7 +3679,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space using Index Z"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000000010;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3569,7 +3704,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Store Indirect From Register to data space"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1000001000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.q << 0) & 0b111;
@@ -3600,7 +3736,8 @@ public class AvrInstruction {
 	    @Override
 		public int getWidth() { return 2; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.k << 16) & 0b11111111111111110000000000000000;
@@ -3625,7 +3762,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Subtract without Carry"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1100000000000;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        opcode |= (this.Rr << 0) & 0b1111;
@@ -3651,7 +3789,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Subtract Immediate"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b101000000000000;
 	        opcode |= (this.Rd << 4) & 0b11110000;
 	        opcode |= (this.K << 0) & 0b1111;
@@ -3674,7 +3813,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Swap Nibbles"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010000000010;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
@@ -3692,7 +3832,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Watchdog Reset"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001010110101000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -3712,7 +3853,8 @@ public class AvrInstruction {
 
 	    public String getDescription() { return "Exchange"; }
 
-	    public byte[] getBytes() {
+	    @Override
+		public byte[] getBytes() {
 	        int opcode = 0b1001001000000100;
 	        opcode |= (this.Rd << 4) & 0b111110000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
