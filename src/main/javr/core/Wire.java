@@ -47,6 +47,11 @@ public interface Wire {
 	public boolean clock();
 
 	/**
+	 * Reset the wire after a system-wide reset event;
+	 */
+	public void reset();
+
+	/**
 	 * A simple wire which only ever reads digital zero.
 	 */
 	public static Wire LOW = new Wire() {
@@ -74,6 +79,11 @@ public interface Wire {
 		@Override
 		public boolean clock() {
 			return false;
+		}
+
+		@Override
+		public void reset() {
+			// do nothing
 		}
 
 	};
@@ -106,6 +116,11 @@ public interface Wire {
 		@Override
 		public boolean clock() {
 			return false;
+		}
+
+		@Override
+		public void reset() {
+			// do nothing
 		}
 
 	};

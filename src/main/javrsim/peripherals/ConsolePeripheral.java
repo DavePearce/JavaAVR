@@ -45,6 +45,12 @@ public class ConsolePeripheral extends JPeripheral {
 	}
 
 	@Override
+	public void reset() {
+		spi.reset();
+		repaint();
+	}
+
+	@Override
 	public void paint(Graphics g) {
 		textArea.setText(spi.text.toString());
 		super.paint(g);

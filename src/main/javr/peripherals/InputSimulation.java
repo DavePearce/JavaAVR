@@ -43,4 +43,9 @@ public class InputSimulation implements AvrPeripheral {
 			wires[i].clock();
 		}
 	}
+
+	@Override
+	public void reset() {
+
+	}
 }

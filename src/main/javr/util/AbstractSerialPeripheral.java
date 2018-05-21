@@ -77,6 +77,15 @@ public abstract class AbstractSerialPeripheral implements AvrPeripheral {
 		SCLK.clock();
 	}
 
+	@Override
+	public void reset() {
+		position = 0;
+		MOSI.reset();
+		MISO.reset();
+		SS.reset();
+		SCLK.reset();
+	}
+
 	/**
 	 * Reset the transmission buffer. This is normally performed upon receipt of a
 	 * given block.

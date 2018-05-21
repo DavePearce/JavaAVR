@@ -16,8 +16,6 @@ void spi_write_byte(char c) {
 int main (void){
   // set SCLK, MOSI, MISO, SS to be output
   DDRB = 0b00001111;
-  PORTB = 0b00000000;
-  //
   char chars[] = "hello world";
   //
   for(int j=0;j!=11;++j) {

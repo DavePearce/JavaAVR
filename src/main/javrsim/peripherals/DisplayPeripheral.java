@@ -66,6 +66,12 @@ public class DisplayPeripheral extends JPeripheral {
 		spi.clock();
 	}
 
+	@Override
+	public void reset() {
+		spi.reset();
+		repaint();
+	}
+
 	private JToolBar createToolBar(int width, int height, DisplayCanvas canvas) {
 	    final JToolBar toolBar = new JToolBar();
 	    toolBar.add(createMultiplerButton(width,height,1, canvas));

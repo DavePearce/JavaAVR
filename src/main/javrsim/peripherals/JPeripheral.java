@@ -18,7 +18,16 @@ public abstract class JPeripheral extends JFrame {
 	 */
 	public abstract AvrPeripheral getPeripheral();
 
+	/**
+	 * Clock the peripheral. This allows it to update its internal state and, for
+	 * example, deal with SPI communication, etc.
+	 */
 	public abstract void clock();
+
+	/**
+	 * Reset any internal state are a system-wide reset.
+	 */
+	public abstract void reset();
 
 	public interface Descriptor {
 		/**

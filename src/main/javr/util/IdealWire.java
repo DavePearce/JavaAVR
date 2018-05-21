@@ -65,6 +65,11 @@ public class IdealWire implements Wire {
 	}
 
 	@Override
+	public void reset() {
+		this.state = State.LOW;
+	}
+
+	@Override
 	public String toString() {
 		return state.toString();
 	}

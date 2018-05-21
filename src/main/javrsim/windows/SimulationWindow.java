@@ -147,7 +147,12 @@ public class SimulationWindow extends JFrame {
 				final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
 				int returnVal = fc.showOpenDialog(SimulationWindow.this);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					// Pause simulation (otherwise wierd things happen)
+					clock.pause();
+					// Upload hex file
 		            loadHexFile(fc.getSelectedFile());
+					// Redraw window
+					repaint();
 				} else {
 					System.out.println("CANCELLED");
 				}
@@ -195,6 +200,7 @@ public class SimulationWindow extends JFrame {
 		JButton newButton = new JButton(new AbstractAction("RESET") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				clock.pause();
 				resetMicroController();
 			}
 		});
@@ -209,6 +215,7 @@ public class SimulationWindow extends JFrame {
 		final JButton stepButton = new JButton(new AbstractAction("STEP") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				clock.pause();
 				clock();
 			}
 		});
@@ -246,6 +253,7 @@ public class SimulationWindow extends JFrame {
 	}
 
 	public void resetMicroController() {
+		// Reset the microcontroller
 		mcu.reset();
 		Random rand = new Random();
 		AVR.Memory data = mcu.getData();
@@ -253,6 +261,10 @@ public class SimulationWindow extends JFrame {
 		for(int i=0;i!=data.size();++i) {
 			byte item = (byte) rand.nextInt(255);
 			data.poke(i,item);
+		}
+		// Reset the peripherals
+		for(JPeripheral p : peripherals) {
+			p.reset();
 		}
 	}
 
@@ -264,9 +276,7 @@ public class SimulationWindow extends JFrame {
 			// Upload it to memory
 			hf.uploadTo(mcu.getCode());
 			// Reset the microcontroller
-			mcu.reset();
-			// Finally redraw window
-			repaint();
+			resetMicroController();
 		} catch (Exception e) {
 			error("Problem loading file", e);
 		}

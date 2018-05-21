@@ -1,5 +1,7 @@
 package javr.peripherals;
 
+import java.util.Arrays;
+
 import javr.core.Wire;
 import javr.util.AbstractSerialPeripheral;
 
@@ -60,6 +62,11 @@ public class DotMatrixDisplay extends AbstractSerialPeripheral {
 		int offset = (y * w) + (x / 8);
 		int mask = 1 << (x % 8);
 		return (pixels[offset] & mask) != 0;
+	}
+
+	@Override
+	public void reset() {
+		Arrays.fill(pixels, (byte) 0);
 	}
 
 	@Override

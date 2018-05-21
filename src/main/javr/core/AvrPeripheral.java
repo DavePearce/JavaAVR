@@ -14,4 +14,9 @@ public interface AvrPeripheral {
 	 * example, deal with SPI communication, etc.
 	 */
 	public void clock();
+
+	/**
+	 * Reset any internal state are a system-wide reset.
+	 */
+	public void reset();
 }
