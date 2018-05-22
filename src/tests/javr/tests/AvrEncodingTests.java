@@ -191,19 +191,24 @@ public class AvrEncodingTests {
 		final String suffix = ".hex";
 
 		ArrayList<Object[]> testcases = new ArrayList<>();
-		for (File f : new File(srcDir).listFiles()) {
-			// Check it's a file
-			if (!f.isFile()) {
-				continue;
+		File[] files = new File(srcDir).listFiles();
+		if(files == null) {
+			throw new IllegalArgumentException("invalid directory: " + srcDir);
+		} else {
+			for (File f : files) {
+				// Check it's a file
+				if (!f.isFile()) {
+					continue;
+				}
+				String name = f.getName();
+				// Check it's a whiley source file
+				if (!name.endsWith(suffix)) {
+					continue;
+				}
+				// Get rid of extension
+				String testName = name.substring(0, name.length() - suffix.length());
+				testcases.add(new Object[] { testName });
 			}
-			String name = f.getName();
-			// Check it's a whiley source file
-			if (!name.endsWith(suffix)) {
-				continue;
-			}
-			// Get rid of extension
-			String testName = name.substring(0, name.length() - suffix.length());
-			testcases.add(new Object[] { testName });
 		}
 		// Sort the result by filename
 		Collections.sort(testcases, new Comparator<Object[]>() {
