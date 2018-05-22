@@ -1,10 +1,13 @@
 package javr.io;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -155,6 +158,64 @@ public class HexFile {
 		}
 	}
 
+	public static class Writer {
+		private final PrintWriter writer;
+
+		public Writer(java.io.Writer writer) {
+			this.writer = new PrintWriter(writer);
+		}
+
+		public void flush() throws IOException {
+			writer.flush();
+		}
+
+		public void write(HexFile hf) throws IOException {
+			Record[] records = hf.records;
+			for(int i=0;i!=hf.size();++i) {
+				write(records[i]);
+			}
+		}
+
+		private void write(Record r) throws IOException {
+			writer.write(":");
+			// Write byte count
+			write_u1(r.size());
+			// Write address
+			write_u2(r.getAddress());
+			// Write data bytes
+			for(int i=0;i!=r.size();++i) {
+				write_u1(r.get(i) & 0xFF);
+			}
+			// Write checksum
+			// End line
+			writer.println();
+		}
+
+		private void write_u1(int value) throws IOException {
+			if(value < 0 || value > 255) {
+				throw new IllegalArgumentException("invalid unsigned byte value: " + value);
+			}
+//			char d1 = (char) ('0' + (value & 0xF));
+//			writer.print(d1);
+//			value = value >> 4;
+//			char d2 = (char) ('0' + (value & 0xF));
+//			writer.print(d2);
+			String d = String.format("%02x", value);
+			if(d.length() != 2) {
+				throw new IllegalArgumentException("internal failure");
+			}
+			writer.print(d);
+		}
+
+		private void write_u2(int value) throws IOException {
+			if(value < 0 || value > 65535) {
+				throw new IllegalArgumentException("invalid unsigned word value: " + value);
+			}
+			write_u1((value >> 8) & 0xFF);
+			write_u1(value & 0xFF);
+		}
+	}
+
 	public static class InvalidHexLine extends IOException {
 		public InvalidHexLine(String message) {
 			super(message);
@@ -183,6 +244,22 @@ public class HexFile {
 		public int getAddress() {
 			return address;
 		}
+
+		/**
+		 * Get the number of bytes in the data field. This is an 8 bit field, hence can
+		 * return at most 256 bytes.
+		 *
+		 * @return
+		 */
+		public abstract int size() ;
+
+		/**
+		 * Get a given byte in the data field.
+		 *
+		 * @param i
+		 * @return
+		 */
+		public abstract byte get(int i);
 	}
 
 	/**
@@ -199,10 +276,12 @@ public class HexFile {
 			this.data = data;
 		}
 
+		@Override
 		public int size() {
 			return data.length;
 		}
 
+		@Override
 		public byte get(int i) {
 			return data[i];
 		}
@@ -227,30 +306,48 @@ public class HexFile {
 		}
 
 		@Override
+		public int size() {
+			return 0;
+		}
+
+		@Override
+		public byte get(int i) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public String toString() {
 			return "eof";
 		}
 	}
 
 	public static void main(String[] args) throws IOException {
-		String input = ":10010000214601360121470136007EFE09D2190140\n" + ":100110002146017E17C20001FF5F16002148011928\n"
-				+ ":10012000194E79234623965778239EDA3F01B2CAA7\n" + ":100130003F0156702B5E712B722B732146013421C7\n"
+		String input = ":10010000214601360121470136007EFE09D2190140\n"
+				+ ":100110002146017E17C20001FF5F16002148011928\n"
+				+ ":10012000194E79234623965778239EDA3F01B2CAA7\n"
+				+ ":100130003F0156702B5E712B722B732146013421C7\n"
 				+ ":00000001FF\n";
 		// HexFile.Reader reader = new HexFile.Reader(new StringReader(input));
 
-		HexFile.Reader reader = new HexFile.Reader(new FileReader("main.hex"));
+		HexFile.Reader reader = new HexFile.Reader(new StringReader(input));
 		HexFile hf = reader.readAll();
 		for (int i = 0; i != hf.size(); ++i) {
 			System.out.println("READ: " + hf.get(i));
 		}
 		// Now, upload and try to decode
-		ByteMemory mem = new ByteMemory(100);
+		ByteMemory mem = new ByteMemory(512);
 		hf.uploadTo(mem);
-		AvrDecoder decoder = new AvrDecoder();
-		for(int i=0;i!=mem.size();) {
-			AvrInstruction insn = decoder.decode(mem,i);
-			System.out.println(String.format("%04X", i/2) + ": " + insn);
-			i = i + insn.getWidth();
-		}
+//		AvrDecoder decoder = new AvrDecoder();
+//		for(int i=0;i!=mem.size();) {
+//			AvrInstruction insn = decoder.decode(mem,i);
+//			System.out.println(String.format("%04X", i/2) + ": " + insn);
+//			i = i + insn.getWidth();
+//		}
+		// Generate output file
+		StringWriter strbuf = new StringWriter();
+		HexFile.Writer writer = new HexFile.Writer(strbuf);
+		writer.write(hf);
+		writer.flush();
+		System.out.println(strbuf);
 	}
 }
