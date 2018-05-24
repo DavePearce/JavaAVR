@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.function.Function;
 
 import javr.core.AVR.Memory;
+import javr.core.AvrInstruction.AbsoluteAddress;
 import javr.core.AvrInstruction.FlagRelativeAddress;
 import javr.core.AvrInstruction.RelativeAddress;
 import javr.io.HexFile;
@@ -128,7 +129,7 @@ public class Disassembler implements Function<Memory,AvrInstruction[]>{
 			break;
 		}
 		case JMP: {
-			RelativeAddress branch = (RelativeAddress) instruction;
+			AbsoluteAddress branch = (AbsoluteAddress) instruction;
 			// Explore the branch target
 			disassemble(branch.k, instructions, decoder, memory);
 			//
@@ -198,14 +199,14 @@ public class Disassembler implements Function<Memory,AvrInstruction[]>{
 		for (int i = 0; i != instructions.length;) {
 			AvrInstruction insn = instructions[i];
 			if (insn != null) {
-				System.out.print(String.format("%04X", i));
-				System.out.print("\t");
-				System.out.print(insn.toString());
+				out.print(String.format("%04X", i));
+				out.print("\t");
+				out.println(insn.toString());
 				i = i + insn.getWidth();
 				ignoring = false;
 			} else {
 				if (!ignoring) {
-					System.out.println(" ... ");
+					out.println(" ... ");
 					ignoring = true;
 				}
 				i = i + 1;

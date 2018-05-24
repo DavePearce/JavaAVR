@@ -469,7 +469,7 @@ public class DecoderGenerator {
 			} else {
 				System.out.print(arg.name + " |= ");
 			}
-			System.out.println("(opcode & " + toBinaryString(r.toMask()) + ") >> " + offset + ";");
+			System.out.println("(opcode & " + toBinaryString(r.toMask()) + ") >>> " + offset + ";");
 			width += r.getWidth();
 		}
 		if(arg.signed) {

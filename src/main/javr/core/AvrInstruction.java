@@ -26,7 +26,7 @@ public abstract class AvrInstruction {
 	//
 	private static final Argument i7_k = new Argument(true, 7, Argument.Kind.RelativeAddress, 'k');
 	private static final Argument i12_k = new Argument(true, 12, Argument.Kind.RelativeAddress, 'k');
-	private static final Argument i21_k = new Argument(true, 21, Argument.Kind.RelativeAddress, 'k');
+	private static final Argument u22_k = new Argument(false, 22, Argument.Kind.AbsoluteAddress, 'k');
 	private static final Argument u7_k = new Argument(false, 7, Argument.Kind.AbsoluteAddress, 'k');
 	private static final Argument u16_k = new Argument(false, 16, Argument.Kind.AbsoluteAddress, 'k');
 	//
@@ -64,7 +64,7 @@ public abstract class AvrInstruction {
 		BRVS("Branch if Overflow Set","1111_00kk_kkkk_k011", i7_k),
 		BSET("Bit Set in SREG", "1001_0100_0sss_1000", u3_s),
 		BST("Bit Store from Bit in Register to T Flag in SREG", "1111_101d_dddd_0bbb", u5_d, u3_b),
-		CALL("Long Call to a Subroutine", "1001_010k_kkkk_111k", "kkkk_kkkk_kkkk_kkkk", i21_k),
+		CALL("Long Call to a Subroutine", "1001_010k_kkkk_111k", "kkkk_kkkk_kkkk_kkkk", u22_k),
 		CBI("Clear Bit in I/O Register", "1001_1000_AAAA_Abbb", u5_A, u3_b),
 		CLC("Clear Carry Flag", "1001_0100_1000_1000"),
 		CLH("Clear Half Carry Flag", "1001_0100_1100_1000"),
@@ -92,7 +92,7 @@ public abstract class AvrInstruction {
 		IJMP("Indirect Jump", "1001_0100_0000_1001"),
 		IN("Load an I/O Location to Register", "1011_0AAd_dddd_AAAA", u5_d, u6_A),
 		INC("Increment", "1001_010d_dddd_0011", u5_d),
-		JMP("Jump", "1001_010k_kkkk_110k", "kkkk_kkkk_kkkk_kkkk", i21_k),
+		JMP("Jump", "1001_010k_kkkk_110k", "kkkk_kkkk_kkkk_kkkk", u22_k),
 		LAC("Load and Clear", "1001_001d_dddd_0110", u5_d),
 		LAS("Load and Set", "1001_001d_dddd_0101", u5_d),
 		LAT("Load and Toggle", "1001_001d_dddd_0111", u5_d),
@@ -730,6 +730,22 @@ public abstract class AvrInstruction {
 		}
 	}
 
+	public static abstract class AbsoluteAddress extends AvrInstruction {
+		public final int k;
+
+		public AbsoluteAddress(Opcode opcode, int k) {
+			super(opcode);
+			if (k < 0) {
+				throw new IllegalArgumentException("invalid absolute address: " + k);
+			}
+			this.k = k;
+		}
+
+		@Override
+		public String toString() {
+			return super.toString() + " 0x" + Integer.toHexString(k);
+		}
+	}
 
 	public static abstract class RelativeAddress extends AvrInstruction {
 		public final int k;
@@ -764,7 +780,6 @@ public abstract class AvrInstruction {
 		public String toString() { return "??"; }
 
 	}
-
 	/**
 	 * Add with Carry.
 	 *
@@ -1349,7 +1364,7 @@ public abstract class AvrInstruction {
 	    }
 	}
 	/**
-	 * if the T Flag is Cleared.
+	 * Branch if the T Flag is Cleared.
 	 *
 	 * 1111_01kk_kkkk_k110
 	 */
@@ -1361,7 +1376,7 @@ public abstract class AvrInstruction {
 	        }
 	    }
 
-	    public String getDescription() { return "if the T Flag is Cleared"; }
+	    public String getDescription() { return "Branch if the T Flag is Cleared"; }
 
 	    @Override
 		public byte[] getBytes() {
@@ -1490,10 +1505,10 @@ public abstract class AvrInstruction {
 	 * 1001_010k_kkkk_111k
 	 * kkkk_kkkk_kkkk_kkkk
 	 */
-	public static final class CALL extends RelativeAddress {
+	public static final class CALL extends AbsoluteAddress {
 	    public CALL(int k) {
 	        super(Opcode.CALL, k);
-	        if(k < -1048576 || k > 1048575) {
+	        if(k < 0 || k > 4194303) {
 	            throw new IllegalArgumentException("invalid argument k");
 	        }
 	    }
@@ -2084,10 +2099,10 @@ public abstract class AvrInstruction {
 	 * 1001_010k_kkkk_110k
 	 * kkkk_kkkk_kkkk_kkkk
 	 */
-	public static final class JMP extends RelativeAddress {
+	public static final class JMP extends AbsoluteAddress {
 	    public JMP(int k) {
 	        super(Opcode.JMP, k);
-	        if(k < -1048576 || k > 1048575) {
+	        if(k < 0 || k > 4194303) {
 	            throw new IllegalArgumentException("invalid argument k");
 	        }
 	    }
@@ -3860,5 +3875,4 @@ public abstract class AvrInstruction {
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
-
 }
