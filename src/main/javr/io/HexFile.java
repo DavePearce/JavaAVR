@@ -54,6 +54,34 @@ public class HexFile {
 		}
 	}
 
+	/**
+	 * Convert an array of bytes into a HexFile.
+	 *
+	 * @param bytes
+	 *            The array of bytes to be converted.
+	 * @param width
+	 *            The preferred width of each data record in bytes (must be less
+	 *            than 256).
+	 * @return
+	 */
+	public static HexFile toHexFile(byte[] bytes, int width) {
+		if(width < 0 || width > 256) {
+			throw new IllegalArgumentException("invalid record width");
+		} else if(bytes == null) {
+			throw new IllegalArgumentException("bytes cannot be null");
+		}
+		ArrayList<Record> records = new ArrayList<>();
+		for (int i = 0; i < bytes.length; i = i + width) {
+			// Construct a chunk of the given size
+			byte[] chunk = Arrays.copyOfRange(bytes, i, Math.min(i + width, bytes.length));
+			records.add(new Data(i, chunk));
+		}
+		// Terminate record list
+		records.add(new EndOfFile(0));
+		// Done
+		return new HexFile(records);
+	}
+
 	public static class Reader {
 		private final BufferedReader reader;
 
