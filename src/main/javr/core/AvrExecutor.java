@@ -2181,7 +2181,7 @@ public class AvrExecutor implements AVR.Executor {
 		boolean C = (R != 0);
 		boolean Z = (R == 0);
 		boolean N = R7;
-		boolean V = (R&0xFF) == 0b1000_0000;
+		boolean V = ((R & 0xFF) == 0b1000_0000);
 		boolean S = N ^ V;
 		boolean H = R3 || !Rd3;
 		// Update Status Register
