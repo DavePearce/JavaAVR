@@ -266,6 +266,14 @@ public class AvrDecoder implements AVR.Decoder {
 	}
 
 	private static AvrInstruction decode_27(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111000000000000) {
+		case 0b0110000000000000: {
+			int Rd = extract_u11110000(opcode);
+			Rd = Rd + 16;
+			int K = extract_u111100001111(opcode);
+			return new SBR(Rd, K);
+		}
+		}
 		int Rd = extract_u11110000(opcode);
 		Rd = Rd + 16;
 		int K = extract_u111100001111(opcode);
@@ -313,24 +321,48 @@ public class AvrDecoder implements AVR.Decoder {
 	}
 
 	private static AvrInstruction decode_32(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111111000001111) {
+		case 0b1000000000000000: {
+			int Rd = extract_u111110000(opcode);
+			return new LD_Z(Rd);
+		}
+		}
 		int Rd = extract_u111110000(opcode);
 		int q = extract_u10110000000111(opcode);
 		return new LDD_Z_Q(Rd, q);
 	}
 
 	private static AvrInstruction decode_33(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111111000001111) {
+		case 0b1000001000000000: {
+			int Rd = extract_u111110000(opcode);
+			return new ST_Z(Rd);
+		}
+		}
 		int Rr = extract_u111110000(opcode);
 		int q = extract_u10110000000111(opcode);
 		return new STD_Z_Q(Rr, q);
 	}
 
 	private static AvrInstruction decode_34(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111111000001111) {
+		case 0b1000000000001000: {
+			int Rd = extract_u111110000(opcode);
+			return new LD_Y(Rd);
+		}
+		}
 		int Rd = extract_u111110000(opcode);
 		int q = extract_u10110000000111(opcode);
 		return new LDD_Y_Q(Rd, q);
 	}
 
 	private static AvrInstruction decode_35(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111111000001111) {
+		case 0b1000001000001000: {
+			int Rd = extract_u111110000(opcode);
+			return new ST_Y(Rd);
+		}
+		}
 		int Rr = extract_u111110000(opcode);
 		int q = extract_u10110000000111(opcode);
 		return new STD_Y_Q(Rr, q);
@@ -667,11 +699,63 @@ public class AvrDecoder implements AVR.Decoder {
 	}
 
 	private static AvrInstruction decode_76(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111111111111111) {
+		case 0b1001010001101000: {
+			return new SET();
+		}
+		case 0b1001010000011000: {
+			return new SEZ();
+		}
+		case 0b1001010001001000: {
+			return new SES();
+		}
+		case 0b1001010000101000: {
+			return new SEN();
+		}
+		case 0b1001010000001000: {
+			return new SEC();
+		}
+		case 0b1001010001011000: {
+			return new SEH();
+		}
+		case 0b1001010001111000: {
+			return new SEI();
+		}
+		case 0b1001010000111000: {
+			return new SEV();
+		}
+		}
 		int s = extract_u1110000(opcode);
 		return new BSET(s);
 	}
 
 	private static AvrInstruction decode_77(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111111111111111) {
+		case 0b1001010010001000: {
+			return new CLC();
+		}
+		case 0b1001010011111000: {
+			return new CLI();
+		}
+		case 0b1001010011011000: {
+			return new CLH();
+		}
+		case 0b1001010011001000: {
+			return new CLS();
+		}
+		case 0b1001010011101000: {
+			return new CLT();
+		}
+		case 0b1001010010101000: {
+			return new CLN();
+		}
+		case 0b1001010010111000: {
+			return new CLV();
+		}
+		case 0b1001010010011000: {
+			return new CLZ();
+		}
+		}
 		int s = extract_u1110000(opcode);
 		return new BCLR(s);
 	}
@@ -909,6 +993,13 @@ public class AvrDecoder implements AVR.Decoder {
 	}
 
 	private static AvrInstruction decode_111(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111111100001111) {
+		case 0b1110111100001111: {
+			int Rd = extract_u11110000(opcode);
+			Rd = Rd + 16;
+			return new SER(Rd);
+		}
+		}
 		int Rd = extract_u11110000(opcode);
 		Rd = Rd + 16;
 		int K = extract_u111100001111(opcode);
@@ -947,12 +1038,80 @@ public class AvrDecoder implements AVR.Decoder {
 	}
 
 	private static AvrInstruction decode_115(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111110000000111) {
+		case 0b1111000000000001: {
+			int k = extract_s1111111000(opcode);
+			return new BREQ(k);
+		}
+		case 0b1111000000000000: {
+			int k = extract_s1111111000(opcode);
+			return new BRLO(k);
+		}
+		case 0b1111000000000100: {
+			int k = extract_s1111111000(opcode);
+			return new BRLT(k);
+		}
+		case 0b1111000000000111: {
+			int k = extract_s1111111000(opcode);
+			return new BRIE(k);
+		}
+		case 0b1111000000000011: {
+			int k = extract_s1111111000(opcode);
+			return new BRVS(k);
+		}
+		case 0b1111000000000110: {
+			int k = extract_s1111111000(opcode);
+			return new BRTS(k);
+		}
+		case 0b1111000000000101: {
+			int k = extract_s1111111000(opcode);
+			return new BRHS(k);
+		}
+		case 0b1111000000000010: {
+			int k = extract_s1111111000(opcode);
+			return new BRMI(k);
+		}
+		}
 		int s = extract_u111(opcode);
 		int k = extract_s1111111000(opcode);
 		return new BRBS(s, k);
 	}
 
 	private static AvrInstruction decode_116(int opcode, Memory mem, int pc) {
+		switch (opcode & 0b1111110000000111) {
+		case 0b1111010000000111: {
+			int k = extract_s1111111000(opcode);
+			return new BRID(k);
+		}
+		case 0b1111010000000101: {
+			int k = extract_s1111111000(opcode);
+			return new BRHC(k);
+		}
+		case 0b1111010000000010: {
+			int k = extract_s1111111000(opcode);
+			return new BRPL(k);
+		}
+		case 0b1111010000000001: {
+			int k = extract_s1111111000(opcode);
+			return new BRNE(k);
+		}
+		case 0b1111010000000011: {
+			int k = extract_s1111111000(opcode);
+			return new BRVC(k);
+		}
+		case 0b1111010000000000: {
+			int k = extract_s1111111000(opcode);
+			return new BRSH(k);
+		}
+		case 0b1111010000000100: {
+			int k = extract_s1111111000(opcode);
+			return new BRGE(k);
+		}
+		case 0b1111010000000110: {
+			int k = extract_s1111111000(opcode);
+			return new BRTC(k);
+		}
+		}
 		int s = extract_u111(opcode);
 		int k = extract_s1111111000(opcode);
 		return new BRBC(s, k);
@@ -1004,8 +1163,40 @@ public class AvrDecoder implements AVR.Decoder {
 		return new SBRS(Rd, b);
 	}
 
+	private static int extract_u110000(int opcode) {
+		int Rd = (opcode & 0b0000000000110000) >>> 4;
+		return Rd;
+	}
+
+	private static int extract_u11001111(int opcode) {
+		int K = (opcode & 0b0000000000001111) >>> 0;
+		K |= (opcode & 0b0000000011000000) >>> 2;
+		return K;
+	}
+
+	private static int extract_u11111000(int opcode) {
+		int A = (opcode & 0b0000000011111000) >>> 3;
+		return A;
+	}
+
 	private static int extract_u111(int opcode) {
-		int s = (opcode & 0b0000000000000111) >>> 0;
+		int b = (opcode & 0b0000000000000111) >>> 0;
+		return b;
+	}
+
+	private static int extract_u111110000(int opcode) {
+		int Rd = (opcode & 0b0000000111110000) >>> 4;
+		return Rd;
+	}
+
+	private static int extract_u1000001111(int opcode) {
+		int Rr = (opcode & 0b0000000000001111) >>> 0;
+		Rr |= (opcode & 0b0000001000000000) >>> 5;
+		return Rr;
+	}
+
+	private static int extract_u1110000(int opcode) {
+		int s = (opcode & 0b0000000001110000) >>> 4;
 		return s;
 	}
 
@@ -1020,41 +1211,6 @@ public class AvrDecoder implements AVR.Decoder {
 		k |= (opcode & 0b0000000111110000) >>> 3;
 		k |= (opcode & 0b11111111111111110000000000000000) >>> 10;
 		return k;
-	}
-
-	private static int extract_u111110000(int opcode) {
-		int Rd = (opcode & 0b0000000111110000) >>> 4;
-		return Rd;
-	}
-
-	private static int extract_u1110000(int opcode) {
-		int s = (opcode & 0b0000000001110000) >>> 4;
-		return s;
-	}
-
-	private static int extract_u1000001111(int opcode) {
-		int Rr = (opcode & 0b0000000000001111) >>> 0;
-		Rr |= (opcode & 0b0000001000000000) >>> 5;
-		return Rr;
-	}
-
-	private static int extract_u10110000000111(int opcode) {
-		int q = (opcode & 0b0000000000000111) >>> 0;
-		q |= (opcode & 0b0000110000000000) >>> 7;
-		q |= (opcode & 0b0010000000000000) >>> 8;
-		return q;
-	}
-
-	private static int extract_s111111111111(int opcode) {
-		int k = (opcode & 0b0000111111111111) >>> 0;
-		k = (k << 20) >> 20;
-		return k;
-	}
-
-	private static int extract_u11000001111(int opcode) {
-		int A = (opcode & 0b0000000000001111) >>> 0;
-		A |= (opcode & 0b0000011000000000) >>> 5;
-		return A;
 	}
 
 	private static int extract_u11110000(int opcode) {
@@ -1073,24 +1229,27 @@ public class AvrDecoder implements AVR.Decoder {
 		return Rr;
 	}
 
-	private static int extract_u11111000(int opcode) {
-		int A = (opcode & 0b0000000011111000) >>> 3;
-		return A;
-	}
-
 	private static int extract_u11111111111111110000000000000000(int opcode) {
 		int k = (opcode & 0b11111111111111110000000000000000) >>> 16;
 		return k;
 	}
 
-	private static int extract_u110000(int opcode) {
-		int Rd = (opcode & 0b0000000000110000) >>> 4;
-		return Rd;
+	private static int extract_u11000001111(int opcode) {
+		int A = (opcode & 0b0000000000001111) >>> 0;
+		A |= (opcode & 0b0000011000000000) >>> 5;
+		return A;
 	}
 
-	private static int extract_u11001111(int opcode) {
-		int K = (opcode & 0b0000000000001111) >>> 0;
-		K |= (opcode & 0b0000000011000000) >>> 2;
-		return K;
+	private static int extract_u10110000000111(int opcode) {
+		int q = (opcode & 0b0000000000000111) >>> 0;
+		q |= (opcode & 0b0000110000000000) >>> 7;
+		q |= (opcode & 0b0010000000000000) >>> 8;
+		return q;
+	}
+
+	private static int extract_s111111111111(int opcode) {
+		int k = (opcode & 0b0000111111111111) >>> 0;
+		k = (k << 20) >> 20;
+		return k;
 	}
 }

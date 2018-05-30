@@ -40,12 +40,6 @@ public class AvrExecutor implements AVR.Executor {
 		case BRBS:
 			execute((BRBS) insn, code, data, registers);
 			break;
-		case BRCC:
-			execute((BRCC) insn, code, data, registers);
-			break;
-		case BRCS:
-			execute((BRCS) insn, code, data, registers);
-			break;
 		case BREAK:
 			execute((BREAK) insn, code, data, registers);
 			break;
@@ -247,9 +241,9 @@ public class AvrExecutor implements AVR.Executor {
 		case LPM_Z_INC:
 			execute((LPM_Z_INC) insn, code, data, registers);
 			break;
-		case LSL:
-			execute((LSL) insn, code, data, registers);
-			break;
+//		case LSL:
+//			execute((LSL) insn, code, data, registers);
+//			break;
 		case LSR:
 			execute((LSR) insn, code, data, registers);
 			break;
@@ -301,9 +295,9 @@ public class AvrExecutor implements AVR.Executor {
 		case RJMP:
 			execute((RJMP) insn, code, data, registers);
 			break;
-		case ROL:
-			execute((ROL) insn, code, data, registers);
-			break;
+//		case ROL:
+//			execute((ROL) insn, code, data, registers);
+//			break;
 		case ROR:
 			execute((ROR) insn, code, data, registers);
 			break;
@@ -677,46 +671,6 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(BRBS insn, Memory code, Memory data, Registers regs) {
 		int mask = (1 << insn.s);
 		if ((regs.SREG & mask) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
-		} else {
-			regs.PC = regs.PC + 1;
-		}
-	}
-
-	/**
-	 * Conditional relative branch. Tests the Carry Flag (C) and branches relatively
-	 * to PC if C is cleared. This instruction branches relatively to PC in either
-	 * direction (PC - 63 ≤ destination ≤ PC + 64). Parameter k is the offset from
-	 * PC and is represented in two’s complement form. (Equivalent to instruction
-	 * BRBC 0,k.)
-	 *
-	 * @param insn
-	 * @param code
-	 * @param data
-	 * @param regs
-	 */
-	private void execute(BRCC insn, Memory code, Memory data, Registers regs) {
-		if ((regs.SREG & CARRY_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
-		} else {
-			regs.PC = regs.PC + 1;
-		}
-	}
-
-	/**
-	 * Conditional relative branch. Tests the Carry Flag (C) and branches relatively
-	 * to PC if C is set. This instruction branches relatively to PC in either
-	 * direction (PC - 63 ≤ destination ≤ PC + 64). Parameter k is the offset from
-	 * PC and is represented in two’s complement form. (Equivalent to instruction
-	 * BRBS 0,k.)
-	 *
-	 * @param insn
-	 * @param code
-	 * @param data
-	 * @param regs
-	 */
-	private void execute(BRCS insn, Memory code, Memory data, Registers regs) {
-		if ((regs.SREG & CARRY_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
 			regs.PC = regs.PC + 1;
@@ -2032,27 +1986,27 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LSL insn, Memory code, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		byte Rd = data.read(insn.Rd);
-		// Perform operation
-		byte R = (byte) (Rd + Rd);
-		// Update Register file
-		data.write(insn.Rd, R);
-		// Set Flags
-		boolean Rd3 = (Rd & 0b1000) != 0;
-		boolean Rd7 = (Rd & 0b1000_0000) != 0;
-		boolean R7 = (R & 0b1000_0000) != 0;
-		//
-		boolean C = Rd7;
-		boolean Z = (R == 0);
-		boolean N = R7;
-		boolean V = N ^ C;
-		boolean S = N ^ V;
-		boolean H = Rd3;
-		// Update Status Register
-		setStatusRegister(C, Z, N, V, S, H, regs);
-	}
+//	private void execute(LSL insn, Memory code, Memory data, Registers regs) {
+//		regs.PC = regs.PC + 1;
+//		byte Rd = data.read(insn.Rd);
+//		// Perform operation
+//		byte R = (byte) (Rd + Rd);
+//		// Update Register file
+//		data.write(insn.Rd, R);
+//		// Set Flags
+//		boolean Rd3 = (Rd & 0b1000) != 0;
+//		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+//		boolean R7 = (R & 0b1000_0000) != 0;
+//		//
+//		boolean C = Rd7;
+//		boolean Z = (R == 0);
+//		boolean N = R7;
+//		boolean V = N ^ C;
+//		boolean S = N ^ V;
+//		boolean H = Rd3;
+//		// Update Status Register
+//		setStatusRegister(C, Z, N, V, S, H, regs);
+//	}
 
 	/**
 	 * Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit 0 is
@@ -2377,32 +2331,30 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ROL insn, Memory code, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		// Read carry flag
-		int CF = (regs.SREG & CARRY_FLAG);
-		// Read register
-		byte Rd = data.read(insn.Rd);
-		// Perform operation
-		regs.SREG &= 0b0111_1111;
-		regs.SREG |= (Rd & 0b1000_0000);
-		byte R = (byte) ((Rd << 1) | CF);
-		// Update Register file
-		data.write(insn.Rd, R);
-		// Update status register
-		boolean Rd7 = (Rd & 0b1000_0001) != 0;
-		boolean Rd3 = (Rd & 0b0000_1000) != 0;
-		boolean R7 = (R & 0b1000_0000) != 0;
-		//
-		boolean H = Rd3;
-		boolean C = Rd7;
-		boolean Z = (R == 0);
-		boolean N = R7;
-		boolean V = N ^ C;
-		boolean S = N ^ V;
-		// Update Status Register
-		setStatusRegister(C, Z, N, V, S, H, regs);
-	}
+//	private void execute(ROL insn, Memory code, Memory data, Registers regs) {
+//		regs.PC = regs.PC + 1;
+//		// Read carry flag
+//		int CF = (regs.SREG & CARRY_FLAG);
+//		// Read register
+//		byte Rd = data.read(insn.Rd);
+//		// Perform operation
+//		byte R = (byte) ((Rd << 1) | CF);
+//		// Update Register file
+//		data.write(insn.Rd, R);
+//		// Update status register
+//		boolean Rd7 = (Rd & 0b1000_0000) != 0;
+//		boolean Rd3 = (Rd & 0b0000_1000) != 0;
+//		boolean R7 = (R & 0b1000_0000) != 0;
+//		//
+//		boolean H = Rd3;
+//		boolean C = Rd7;
+//		boolean Z = (R == 0);
+//		boolean N = R7;
+//		boolean V = N ^ C;
+//		boolean S = N ^ V;
+//		// Update Status Register
+//		setStatusRegister(C, Z, N, V, S, H, regs);
+//	}
 
 	/**
 	 * Shifts all bits in Rd one place to the right. The C Flag is shifted into bit

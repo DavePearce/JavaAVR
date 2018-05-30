@@ -70,8 +70,6 @@ public class Disassembler implements Function<Memory,AvrInstruction[]>{
 			//
 			break;
 		}
-		case BRCC:
-		case BRCS:
 		case BREQ:
 		case BRGE:
 		case BRHC:
@@ -165,8 +163,6 @@ public class Disassembler implements Function<Memory,AvrInstruction[]>{
 		switch(instruction.getOpcode()) {
 		case BRBC:
 		case BRBS:
-		case BRCC:
-		case BRCS:
 		case BREQ:
 		case BRGE:
 		case BRHC:

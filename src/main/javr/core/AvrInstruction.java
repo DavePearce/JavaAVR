@@ -43,8 +43,8 @@ public abstract class AvrInstruction {
 		BLD("Bit Load from the T Flag in SREG to a Bit in Register","1111_100d_dddd_0bbb", u5_d, u3_b),
 		BRBC("Branch if Bit in SREG is Cleared","1111_01kk_kkkk_ksss", u3_s, i7_k),
 		BRBS("Branch if Bit in SREG is Set","1111_00kk_kkkk_ksss", u3_s, i7_k),
-		BRCC("Branch if Carry Cleared","1111_01kk_kkkk_k000", i7_k),
-		BRCS("Branch if Carry Set","1111_00kk_kkkk_k000", i7_k),
+		//BRCC("Branch if Carry Cleared","1111_01kk_kkkk_k000", i7_k),
+		//BRCS("Branch if Carry Set","1111_00kk_kkkk_k000", i7_k),
 		BREAK("Break","1001_0101_1001_1000"),
 		BREQ("Branch if Equal","1111_00kk_kkkk_k001", i7_k),
 		BRGE("Branch if Greater or Equal Signed","1111_01kk_kkkk_k100", i7_k),
@@ -57,7 +57,7 @@ public abstract class AvrInstruction {
 		BRMI("Branch if Minus","1111_00kk_kkkk_k010", i7_k),
 		BRNE("Branch if Not Equal","1111_01kk_kkkk_k001", i7_k),
 		BRPL("Branch if Plus","1111_01kk_kkkk_k010", i7_k),
-		BRSH("Branch if Same or Higher (Unsigned)","1111_00kk_kkkk_k000", i7_k),
+		BRSH("Branch if Same or Higher (Unsigned)","1111_01kk_kkkk_k000", i7_k),
 		BRTC("Branch if the T Flag is Cleared","1111_01kk_kkkk_k110", i7_k),
 		BRTS("Branch if the T Flag is Set","1111_00kk_kkkk_k110", i7_k),
 		BRVC("Branch if Overflow Cleared","1111_01kk_kkkk_k011", i7_k),
@@ -67,7 +67,7 @@ public abstract class AvrInstruction {
 		CALL("Long Call to a Subroutine", "1001_010k_kkkk_111k", "kkkk_kkkk_kkkk_kkkk", u22_k),
 		CBI("Clear Bit in I/O Register", "1001_1000_AAAA_Abbb", u5_A, u3_b),
 		CLC("Clear Carry Flag", "1001_0100_1000_1000"),
-		CLH("Clear Half Carry Flag", "1001_0100_1100_1000"),
+		CLH("Clear Half Carry Flag", "1001_0100_1101_1000"),
 		CLI("Clear Global Interrupt Flag","1001_0100_1111_1000"),
 		CLN("Clear Global Interrupt Flag", "1001_0100_1010_1000"),
 		// CLR("0010_01rd_dddd_rrrr", u5_d, u5_r, "Clear Register"),
@@ -113,7 +113,7 @@ public abstract class AvrInstruction {
 		LPM("Load Program Memory", "1001_0101_1100_1000"),
 		LPM_Z("Load Program Memory", "1001_000d_dddd_0100", u5_d),
 		LPM_Z_INC("Load Program Memory", "1001_000d_dddd_0101", u5_d),
-		LSL("Logical Shift Left", "0000_11rd_dddd_rrrr", u5_d, u5_r), // TODO: DROP r
+		//LSL("Logical Shift Left", "0000_11rd_dddd_rrrr", u5_d, u5_r), // TODO: DROP r
 		LSR("Logical Shift Right", "1001_010d_dddd_0110", u5_d),
 		MOV("Copy Register", "0010_11rd_dddd_rrrr", u5_d, u5_r),
 		MOVW("Copy Register Word", "0000_0001_dddd_rrrr", u4_d_m2, u4_r_m2),
@@ -131,7 +131,7 @@ public abstract class AvrInstruction {
 		RET("Return from Subroutine", "1001_0101_0000_1000"),
 		RETI("Return from Interrupt", "1001_0101_0001_1000"),
 		RJMP("Relative Jump", "1100_kkkk_kkkk_kkkk", i12_k),
-		ROL("Rotate Left through Carry", "0001_11rd_dddd_rrrr", u5_d, u5_r), // TODO: drop r
+		//ROL("Rotate Left through Carry", "0001_11rd_dddd_rrrr", u5_d, u5_r), // TODO: drop r
 		ROR("Rotate Right through Carry", "1001_010d_dddd_0111", u5_d),
 		SBC("Subtract with Carry", "0000_10rd_dddd_rrrr", u5_d, u5_r),
 		SBCI("Subtract Immediate with Carry", "0100_KKKK_dddd_KKKK", u4_d_16, u8_K),
@@ -179,28 +179,30 @@ public abstract class AvrInstruction {
 		private static Map<Opcode, Opcode> subsumedBy = new HashMap<>();
 
 		static {
+
+
+			//subsumedBy.put(BRCS, BRBS);
 			subsumedBy.put(BREQ, BRBS);
-			subsumedBy.put(BRVS, BRBS);
-			subsumedBy.put(BRIE, BRBS);
-			subsumedBy.put(BRLT, BRBS);
-			subsumedBy.put(BRSH, BRBS);
-			subsumedBy.put(BRCS, BRBS);
-			subsumedBy.put(BRMI, BRBS);
 			subsumedBy.put(BRHS, BRBS);
-			subsumedBy.put(BRTS, BRBS);
+			subsumedBy.put(BRIE, BRBS);
 			subsumedBy.put(BRLO, BRBS);
+			subsumedBy.put(BRLT, BRBS);
+			subsumedBy.put(BRMI, BRBS);
+			subsumedBy.put(BRTS, BRBS);
+			subsumedBy.put(BRVS, BRBS);
 			//
-			subsumedBy.put(BRVC, BRBC);
-			subsumedBy.put(BRHC, BRBC);
+			//subsumedBy.put(BRCC, BRBC);
 			subsumedBy.put(BRGE, BRBC);
-			subsumedBy.put(BRCC, BRBC);
+			subsumedBy.put(BRHC, BRBC);
 			subsumedBy.put(BRID, BRBC);
-			subsumedBy.put(BRTC, BRBC);
 			subsumedBy.put(BRNE, BRBC);
 			subsumedBy.put(BRPL, BRBC);
+			subsumedBy.put(BRSH, BRBC);
+			subsumedBy.put(BRTC, BRBC);
+			subsumedBy.put(BRVC, BRBC);
 			//
-			subsumedBy.put(LSL, ADD);
-			subsumedBy.put(ROL, ADC);
+//			subsumedBy.put(LSL, ADD);
+//			subsumedBy.put(ROL, ADC);
 			//subsumedBy.put(TST, AND);
 			subsumedBy.put(SBR, ORI);
 			//
@@ -298,6 +300,30 @@ public abstract class AvrInstruction {
 				}
 			}
 			//
+			return mask;
+		}
+
+		public int getMask() {
+			// Remove all underscores.
+			String format = opcodeFormat.replaceAll("_", "");
+			//
+			int mask = 0;
+			for (int i = 0; i != format.length(); ++i) {
+				mask = mask << 1;
+				char c = format.charAt(i);
+				if (c == '1' || c == '0') {
+					mask = mask | 1;
+				}
+			}
+			//
+			return mask;
+		}
+
+		public int getArgumentMask() {
+			int mask = 0;
+			for(Argument a : getArguments()) {
+				mask |= a.toMask(this);
+			}
 			return mask;
 		}
 
@@ -780,6 +806,7 @@ public abstract class AvrInstruction {
 		public String toString() { return "??"; }
 
 	}
+
 	/**
 	 * Add with Carry.
 	 *
@@ -1033,50 +1060,6 @@ public abstract class AvrInstruction {
 		public byte[] getBytes() {
 	        int opcode = 0b1111000000000000;
 	        opcode |= (this.s << 0) & 0b111;
-	        opcode |= (this.k << 3) & 0b1111111000;
-	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
-	    }
-	}
-	/**
-	 * Branch if Carry Cleared.
-	 *
-	 * 1111_01kk_kkkk_k000
-	 */
-	public static final class BRCC extends RelativeAddress {
-	    public BRCC(int k) {
-	        super(Opcode.BRCC, k);
-	        if(k < -64 || k > 63) {
-	            throw new IllegalArgumentException("invalid argument k");
-	        }
-	    }
-
-	    public String getDescription() { return "Branch if Carry Cleared"; }
-
-	    @Override
-		public byte[] getBytes() {
-	        int opcode = 0b1111010000000000;
-	        opcode |= (this.k << 3) & 0b1111111000;
-	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
-	    }
-	}
-	/**
-	 * Branch if Carry Set.
-	 *
-	 * 1111_00kk_kkkk_k000
-	 */
-	public static final class BRCS extends RelativeAddress {
-	    public BRCS(int k) {
-	        super(Opcode.BRCS, k);
-	        if(k < -64 || k > 63) {
-	            throw new IllegalArgumentException("invalid argument k");
-	        }
-	    }
-
-	    public String getDescription() { return "Branch if Carry Set"; }
-
-	    @Override
-		public byte[] getBytes() {
-	        int opcode = 0b1111000000000000;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1344,7 +1327,7 @@ public abstract class AvrInstruction {
 	/**
 	 * Branch if Same or Higher (Unsigned).
 	 *
-	 * 1111_00kk_kkkk_k000
+	 * 1111_01kk_kkkk_k000
 	 */
 	public static final class BRSH extends RelativeAddress {
 	    public BRSH(int k) {
@@ -1358,7 +1341,7 @@ public abstract class AvrInstruction {
 
 	    @Override
 		public byte[] getBytes() {
-	        int opcode = 0b1111000000000000;
+	        int opcode = 0b1111010000000000;
 	        opcode |= (this.k << 3) & 0b1111111000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
@@ -1574,7 +1557,7 @@ public abstract class AvrInstruction {
 	/**
 	 * Clear Half Carry Flag.
 	 *
-	 * 1001_0100_1100_1000
+	 * 1001_0100_1101_1000
 	 */
 	public static final class CLH extends AvrInstruction {
 	    public CLH() {
@@ -1585,7 +1568,7 @@ public abstract class AvrInstruction {
 
 	    @Override
 		public byte[] getBytes() {
-	        int opcode = 0b1001010011001000;
+	        int opcode = 0b1001010011011000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
 	    }
 	}
@@ -2565,28 +2548,28 @@ public abstract class AvrInstruction {
 	 *
 	 * 0000_11rd_dddd_rrrr
 	 */
-	public static final class LSL extends RegisterRegister {
-	    public LSL(int d, int r) {
-	        super(Opcode.LSL, d, r);
-	        if(d < 0 || d > 31) {
-	            throw new IllegalArgumentException("invalid argument d");
-	        }
-	        if(r < 0 || r > 31) {
-	            throw new IllegalArgumentException("invalid argument r");
-	        }
-	    }
-
-	    public String getDescription() { return "Logical Shift Left"; }
-
-	    @Override
-		public byte[] getBytes() {
-	        int opcode = 0b110000000000;
-	        opcode |= (this.Rd << 4) & 0b111110000;
-	        opcode |= (this.Rr << 0) & 0b1111;
-	        opcode |= (this.Rr << 5) & 0b1000000000;
-	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
-	    }
-	}
+//	public static final class LSL extends RegisterRegister {
+//	    public LSL(int d, int r) {
+//	        super(Opcode.LSL, d, r);
+//	        if(d < 0 || d > 31) {
+//	            throw new IllegalArgumentException("invalid argument d");
+//	        }
+//	        if(r < 0 || r > 31) {
+//	            throw new IllegalArgumentException("invalid argument r");
+//	        }
+//	    }
+//
+//	    public String getDescription() { return "Logical Shift Left"; }
+//
+//	    @Override
+//		public byte[] getBytes() {
+//	        int opcode = 0b110000000000;
+//	        opcode |= (this.Rd << 4) & 0b111110000;
+//	        opcode |= (this.Rr << 0) & 0b1111;
+//	        opcode |= (this.Rr << 5) & 0b1000000000;
+//	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
+//	    }
+//	}
 	/**
 	 * Logical Shift Right.
 	 *
@@ -2991,28 +2974,28 @@ public abstract class AvrInstruction {
 	 *
 	 * 0001_11rd_dddd_rrrr
 	 */
-	public static final class ROL extends RegisterRegister {
-	    public ROL(int d, int r) {
-	        super(Opcode.ROL, d, r);
-	        if(d < 0 || d > 31) {
-	            throw new IllegalArgumentException("invalid argument d");
-	        }
-	        if(r < 0 || r > 31) {
-	            throw new IllegalArgumentException("invalid argument r");
-	        }
-	    }
-
-	    public String getDescription() { return "Rotate Left through Carry"; }
-
-	    @Override
-		public byte[] getBytes() {
-	        int opcode = 0b1110000000000;
-	        opcode |= (this.Rd << 4) & 0b111110000;
-	        opcode |= (this.Rr << 0) & 0b1111;
-	        opcode |= (this.Rr << 5) & 0b1000000000;
-	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
-	    }
-	}
+//	public static final class ROL extends RegisterRegister {
+//	    public ROL(int d, int r) {
+//	        super(Opcode.ROL, d, r);
+//	        if(d < 0 || d > 31) {
+//	            throw new IllegalArgumentException("invalid argument d");
+//	        }
+//	        if(r < 0 || r > 31) {
+//	            throw new IllegalArgumentException("invalid argument r");
+//	        }
+//	    }
+//
+//	    public String getDescription() { return "Rotate Left through Carry"; }
+//
+//	    @Override
+//		public byte[] getBytes() {
+//	        int opcode = 0b1110000000000;
+//	        opcode |= (this.Rd << 4) & 0b111110000;
+//	        opcode |= (this.Rr << 0) & 0b1111;
+//	        opcode |= (this.Rr << 5) & 0b1000000000;
+//	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8) };
+//	    }
+//	}
 	/**
 	 * Rotate Right through Carry.
 	 *

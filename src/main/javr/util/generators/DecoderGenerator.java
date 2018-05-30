@@ -37,6 +37,9 @@ public class DecoderGenerator {
 			return buckets;
 		}
 
+		public boolean isSingleton() {
+			return items.size() == 1;
+		}
 		public boolean isTerminal() {
 			return DecoderGenerator.isTerminal(items);
 		}
@@ -214,7 +217,11 @@ public class DecoderGenerator {
 	 */
 	public static Group split(Set<Opcode> opcodes) {
 		if(isTerminal(opcodes)) {
-			return new Group(0,opcodes);
+			int mask = 0;
+			for(Opcode o : opcodes) {
+				mask |= o.getMask();
+			}
+			return new Group(mask,opcodes);
 		} else {
 			int mask = determineMaximumMask(opcodes);
 			Group group = new Group(mask,opcodes);
@@ -370,43 +377,71 @@ public class DecoderGenerator {
 	}
 
 	public static void printDecoder(Group g, Map<Group,Integer> numbering) {
-		int id = numbering.get(g);
-		System.out.println("\tprivate static AvrInstruction decode_" + id + "(int opcode, Memory mem, int pc) {");
 		if(g.isTerminal()) {
-			Opcode o = g.getTerminal();
-			AvrInstruction.Argument[] args = o.getArguments();
-			if(o.getOperandFormat() != null) {
-				System.out.println("\t\t\tint lsb = mem.read(pc+2) & 0xFF;");
-				System.out.println("\t\t\tint msb = mem.read(pc+3) & 0xFF;");
-				System.out.println("\t\t\topcode = (msb << 24) | (lsb << 16) | opcode;");
-			}
-			String argstr = "";
-			for(int i=0;i!=args.length;++i) {
-				AvrInstruction.Argument arg = args[i];
-				if(arg.signed) {
-					System.out.println("\t\t\tint " + arg.name + " = extract_s" + Integer.toBinaryString(arg.toMask(o)) + "(opcode);");
-				} else {
-					System.out.println("\t\t\tint " + arg.name + " = extract_u" + Integer.toBinaryString(arg.toMask(o)) + "(opcode);");
-				}
-				if(i != 0) {
-					argstr += ", ";
-				}
-				printTransforms(arg);
-				argstr = argstr + arg.name;
-			}
-			System.out.println("\t\t\treturn new " + o + "(" + argstr + ");");
+			printTerminalDecoder(g,numbering);
 		} else {
+			printNonTerminalDecoder(g,numbering);
+		}
+	}
+
+	public static void printTerminalDecoder(Group g, Map<Group,Integer> numbering) {
+		int id = numbering.get(g);
+		Opcode terminal = g.getTerminal();
+		System.out.println("\tprivate static AvrInstruction decode_" + id + "(int opcode, Memory mem, int pc) {");
+		if(!g.isSingleton()) {
+			// Have a bunch of special cases here.
 			String mask = toBinaryString(g.getMask());
 			System.out.println("\t\tswitch(opcode & " + mask + ") {");
-			for(Map.Entry<Integer, Group> e : g.getBuckets().entrySet()) {
-				System.out.println("\t\tcase " + toBinaryString(e.getKey()) + ":");
-				int n = numbering.get(e.getValue());
-				System.out.println("\t\t\treturn decode_" + n + "(opcode,mem,pc);");
+			for(Opcode o : g.items) {
+				if(o != terminal) {
+					System.out.println("\t\tcase " + toBinaryString(o.getBinaryBase()) + ": {");
+					printTerminalCase(o);
+					System.out.println("\t\t}");
+				}
 			}
-			System.out.println("\t\tdefault:");
-			System.out.println("\t\t\treturn new AvrInstruction.UNKNOWN();");
-			System.out.println("\t\t}");
+			System.out.println("}");
 		}
+		printTerminalCase(terminal);
+		System.out.println("\t}");
+	}
+
+	public static void printTerminalCase(Opcode o) {
+		AvrInstruction.Argument[] args = o.getArguments();
+		if(o.getOperandFormat() != null) {
+			System.out.println("\t\t\tint lsb = mem.read(pc+2) & 0xFF;");
+			System.out.println("\t\t\tint msb = mem.read(pc+3) & 0xFF;");
+			System.out.println("\t\t\topcode = (msb << 24) | (lsb << 16) | opcode;");
+		}
+		String argstr = "";
+		for(int i=0;i!=args.length;++i) {
+			AvrInstruction.Argument arg = args[i];
+			if(arg.signed) {
+				System.out.println("\t\t\tint " + arg.name + " = extract_s" + Integer.toBinaryString(arg.toMask(o)) + "(opcode);");
+			} else {
+				System.out.println("\t\t\tint " + arg.name + " = extract_u" + Integer.toBinaryString(arg.toMask(o)) + "(opcode);");
+			}
+			if(i != 0) {
+				argstr += ", ";
+			}
+			printTransforms(arg);
+			argstr = argstr + arg.name;
+		}
+		System.out.println("\t\t\treturn new " + o + "(" + argstr + ");");
+	}
+
+	public static void printNonTerminalDecoder(Group g, Map<Group,Integer> numbering) {
+		int id = numbering.get(g);
+		System.out.println("\tprivate static AvrInstruction decode_" + id + "(int opcode, Memory mem, int pc) {");
+		String mask = toBinaryString(g.getMask());
+		System.out.println("\t\tswitch(opcode & " + mask + ") {");
+		for(Map.Entry<Integer, Group> e : g.getBuckets().entrySet()) {
+			System.out.println("\t\tcase " + toBinaryString(e.getKey()) + ":");
+			int n = numbering.get(e.getValue());
+			System.out.println("\t\t\treturn decode_" + n + "(opcode,mem,pc);");
+		}
+		System.out.println("\t\tdefault:");
+		System.out.println("\t\t\treturn new AvrInstruction.UNKNOWN();");
+		System.out.println("\t\t}");
 		System.out.println("\t}");
 	}
 
