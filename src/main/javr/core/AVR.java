@@ -126,7 +126,6 @@ public class AVR {
 		 * Poke a data byte into the contents of a given address.
 		 *
 		 * @param address
-		 * @return
 		 */
 		public void poke(int address, byte data);
 

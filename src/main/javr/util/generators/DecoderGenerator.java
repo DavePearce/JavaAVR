@@ -212,7 +212,6 @@ public class DecoderGenerator {
 	 * Recursively split a given set of opcodes into a tree of groups.
 	 *
 	 * @param opcodes
-	 * @param mask
 	 * @return
 	 */
 	public static Group split(Set<Opcode> opcodes) {

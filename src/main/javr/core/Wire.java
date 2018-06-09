@@ -19,7 +19,6 @@ public interface Wire {
 	/**
 	 * Read current state of pin.
 	 *
-	 * @param i
 	 * @return
 	 */
 	public boolean read();
@@ -27,7 +26,6 @@ public interface Wire {
 	/**
 	 * Write current state of pin.
 	 *
-	 * @param i
 	 * @return
 	 */
 	public boolean write(boolean value);

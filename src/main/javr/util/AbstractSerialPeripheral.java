@@ -131,7 +131,6 @@ public abstract class AbstractSerialPeripheral implements AvrPeripheral {
 	/**
 	 * Write next boolean from the internal buffer
 	 *
-	 * @return
 	 */
 	private void write(boolean b) {
 		int offset = (position / 8);
