@@ -10,11 +10,19 @@ package javr.core;
  */
 public interface Wire {
 	/**
-	 * The label associated with this wire (if any).
+	 * The label(s) associated with this wire (if any).
 	 *
 	 * @return
 	 */
-	public String getLabel();
+	public String[] getLabels();
+
+	/**
+	 * Check whether wire has a given label or not (e.g. SCLK).
+	 *
+	 * @param label
+	 * @return
+	 */
+	public boolean hasLabel(String label);
 
 	/**
 	 * Read current state of pin.
@@ -57,8 +65,13 @@ public interface Wire {
 	public static Wire LOW = new Wire() {
 
 		@Override
-		public String getLabel() {
-			return "LOW";
+		public String[] getLabels() {
+			return new String[] {"LOW"};
+		}
+
+		@Override
+		public boolean hasLabel(String label) {
+			return label.equals("LOW");
 		}
 
 		@Override
@@ -94,8 +107,13 @@ public interface Wire {
 	public static Wire HIGH = new Wire() {
 
 		@Override
-		public String getLabel() {
-			return "HIGH";
+		public String[] getLabels() {
+			return new String[] {"HIGH"};
+		}
+
+		@Override
+		public boolean hasLabel(String label) {
+			return label.equals("HIGH");
 		}
 
 		@Override

@@ -45,6 +45,21 @@ public class AVR {
 		return pins;
 	}
 
+	/**
+	 * Get a specific pin based on its label.
+	 *
+	 * @param label
+	 * @return
+	 */
+	public Wire getPin(String label) {
+		for (int i = 0; i != pins.length; ++i) {
+			if (pins[i].hasLabel(label)) {
+				return pins[i];
+			}
+		}
+		throw new IllegalArgumentException("unknown pin (" + label + ")");
+	}
+
 	public Memory getCode() {
 		return flash;
 	}

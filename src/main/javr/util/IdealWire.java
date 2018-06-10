@@ -13,17 +13,26 @@ public class IdealWire implements Wire {
 		FALLING
 	}
 
-	private final String label;
+	private final String[] labels;
 	private State state;
 
-	public IdealWire(String name) {
-		this.label = name;
+	public IdealWire(String... labels) {
+		this.labels = labels;
 		this.state = State.LOW;
 	}
 
 	@Override
-	public String getLabel() {
-		return label;
+	public String[] getLabels() {
+		return labels;
+	}
+
+	public boolean hasLabel(String label) {
+		for(int i=0;i!=labels.length;++i) {
+			if(labels[i].equals(label)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

@@ -128,8 +128,20 @@ public class ConnectionWindow extends JDialog {
 	private String[] toPinLabels(Wire[] pins) {
 		String[] labels = new String[pins.length];
 		for(int i=0;i!=labels.length;++i) {
-			labels[i] = pins[i].getLabel();
+			labels[i] = toPinLabel(pins[i]);
 		}
 		return labels;
+	}
+
+	private String toPinLabel(Wire pin) {
+		String[] labels = pin.getLabels();
+		String label = "";
+		for(int i=0;i!=labels.length;++i) {
+			if(i != 0) {
+				label += "/";
+			}
+			label += labels[i];
+		}
+		return label;
 	}
 }
