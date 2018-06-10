@@ -425,7 +425,7 @@ public abstract class AvrInstruction {
 		 * Turn a given format string into a 16-bit mask which identifies all fixed
 		 * bits.
 		 *
-		 * @param format
+		 * @param opcode
 		 * @return
 		 */
 		public int toMask(Opcode opcode) {

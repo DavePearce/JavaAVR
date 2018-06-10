@@ -69,7 +69,7 @@ public class AvrEncodingTests {
 	 * expectation is that compilation should fail with an error and, hence, the
 	 * test fails if compilation does not.
 	 *
-	 * @param name
+	 * @param testName
 	 *            Name of the test to run. This must correspond to a whiley
 	 *            source file in the <code>WHILEY_SRC_DIR</code> directory.
 	 */
@@ -127,7 +127,7 @@ public class AvrEncodingTests {
 	 * Read a given hex file as a sequence of instructions. We can then encode these
 	 * back into binary data in order to check that the encoder works.
 	 *
-	 * @param filename
+	 * @param hf
 	 * @return
 	 * @throws IOException
 	 */
