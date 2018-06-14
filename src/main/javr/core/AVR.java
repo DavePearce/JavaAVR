@@ -24,7 +24,6 @@ public class AVR {
 	public final static int ZL_ADDRESS = 0x1e;
 	public final static int ZH_ADDRESS = 0x1f;
 	//
-	private final Decoder decoder;
 	private final Executor executor;
 	private final Wire[] pins;
 	private final Memory data;
@@ -32,9 +31,8 @@ public class AVR {
 	// Internal registers
 	private Registers registers;
 
-	public AVR(Decoder decoder, Executor executor, Wire[] pins, Memory flash, Memory data) {
+	public AVR(Executor executor, Wire[] pins, Memory flash, Memory data) {
 		this.executor = executor;
-		this.decoder = decoder;
 		this.pins = pins;
 		this.flash = flash;
 		this.data = data;
@@ -77,8 +75,7 @@ public class AVR {
 	}
 
 	public void clock() {
-		AvrInstruction instruction = decoder.decode(flash, registers.PC);
-		executor.execute(instruction, flash, data, registers);
+		executor.execute(flash, data, registers);
 	}
 
 	public static final class Registers {
@@ -109,7 +106,7 @@ public class AVR {
 	 *
 	 */
 	public interface Executor {
-		void execute(AvrInstruction insn, Memory code, Memory data, AVR.Registers registers);
+		void execute(Memory code, Memory data, AVR.Registers registers);
 	}
 
 	public interface Memory {
@@ -168,8 +165,8 @@ public class AVR {
 	 *
 	 */
 	public static class Instrumentable extends AVR {
-		public Instrumentable(Decoder decoder, Executor executor, Wire[] pins, Memory flash, Memory data) {
-			super(decoder, executor, pins, new InstrumentableMemory(flash), new InstrumentableMemory(data));
+		public Instrumentable(Executor executor, Wire[] pins, Memory flash, Memory data) {
+			super(executor, pins, new InstrumentableMemory(flash), new InstrumentableMemory(data));
 		}
 
 		@Override

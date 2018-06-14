@@ -3,421 +3,450 @@ package javr.core;
 import static javr.core.AVR.*;
 import static javr.core.AvrInstruction.*;
 
+import javr.core.AVR.Decoder;
 import javr.memory.ByteMemory;
 
 public class AvrExecutor implements AVR.Executor {
+	/**
+	 * Responsible for decoding instructions. This has to be done lazily as we
+	 * cannot otherwise tell what is code, versus what is data in the flash memory.
+	 */
+	private final Decoder decoder;
+
+	/**
+	 * Cache of decoded instructions. This just means we don't have to decode
+	 * everything.
+	 */
+	private final AvrInstruction[] decoded;
+
+	public AvrExecutor(int size, Decoder decoder) {
+		this.decoder = decoder;
+		this.decoded = new AvrInstruction[size];
+	}
 
 	@Override
-	public void execute(AvrInstruction insn, Memory code, Memory data, Registers registers) {
+	public void execute(Memory flash, Memory data, Registers registers) {
+		AvrInstruction insn = decode(registers.PC, flash);
+		// Dispatch on instruction
 		switch (insn.getOpcode()) {
 		case ADC:
-			execute((ADC) insn, code, data, registers);
+			execute((ADC) insn, flash, data, registers);
 			break;
 		case ADD:
-			execute((ADD) insn, code, data, registers);
+			execute((ADD) insn, flash, data, registers);
 			break;
 		case ADIW:
-			execute((ADIW) insn, code, data, registers);
+			execute((ADIW) insn, flash, data, registers);
 			break;
 		case AND:
-			execute((AND) insn, code, data, registers);
+			execute((AND) insn, flash, data, registers);
 			break;
 		case ANDI:
-			execute((ANDI) insn, code, data, registers);
+			execute((ANDI) insn, flash, data, registers);
 			break;
 		case ASR:
-			execute((ASR) insn, code, data, registers);
+			execute((ASR) insn, flash, data, registers);
 			break;
 		case BCLR:
-			execute((BCLR) insn, code, data, registers);
+			execute((BCLR) insn, flash, data, registers);
 			break;
 		case BLD:
-			execute((BLD) insn, code, data, registers);
+			execute((BLD) insn, flash, data, registers);
 			break;
 		case BRBC:
-			execute((BRBC) insn, code, data, registers);
+			execute((BRBC) insn, flash, data, registers);
 			break;
 		case BRBS:
-			execute((BRBS) insn, code, data, registers);
+			execute((BRBS) insn, flash, data, registers);
 			break;
 		case BREAK:
-			execute((BREAK) insn, code, data, registers);
+			execute((BREAK) insn, flash, data, registers);
 			break;
 		case BREQ:
-			execute((BREQ) insn, code, data, registers);
+			execute((BREQ) insn, flash, data, registers);
 			break;
 		case BRGE:
-			execute((BRGE) insn, code, data, registers);
+			execute((BRGE) insn, flash, data, registers);
 			break;
 		case BRHC:
-			execute((BRHC) insn, code, data, registers);
+			execute((BRHC) insn, flash, data, registers);
 			break;
 		case BRHS:
-			execute((BRHS) insn, code, data, registers);
+			execute((BRHS) insn, flash, data, registers);
 			break;
 		case BRID:
-			execute((BRID) insn, code, data, registers);
+			execute((BRID) insn, flash, data, registers);
 			break;
 		case BRIE:
-			execute((BRIE) insn, code, data, registers);
+			execute((BRIE) insn, flash, data, registers);
 			break;
 		case BRLO:
-			execute((BRLO) insn, code, data, registers);
+			execute((BRLO) insn, flash, data, registers);
 			break;
 		case BRLT:
-			execute((BRLT) insn, code, data, registers);
+			execute((BRLT) insn, flash, data, registers);
 			break;
 		case BRMI:
-			execute((BRMI) insn, code, data, registers);
+			execute((BRMI) insn, flash, data, registers);
 			break;
 		case BRNE:
-			execute((BRNE) insn, code, data, registers);
+			execute((BRNE) insn, flash, data, registers);
 			break;
 		case BRPL:
-			execute((BRPL) insn, code, data, registers);
+			execute((BRPL) insn, flash, data, registers);
 			break;
 		case BRSH:
-			execute((BRSH) insn, code, data, registers);
+			execute((BRSH) insn, flash, data, registers);
 			break;
 		case BRTC:
-			execute((BRTC) insn, code, data, registers);
+			execute((BRTC) insn, flash, data, registers);
 			break;
 		case BRTS:
-			execute((BRTS) insn, code, data, registers);
+			execute((BRTS) insn, flash, data, registers);
 			break;
 		case BRVC:
-			execute((BRVC) insn, code, data, registers);
+			execute((BRVC) insn, flash, data, registers);
 			break;
 		case BRVS:
-			execute((BRVS) insn, code, data, registers);
+			execute((BRVS) insn, flash, data, registers);
 			break;
 		case BSET:
-			execute((BSET) insn, code, data, registers);
+			execute((BSET) insn, flash, data, registers);
 			break;
 		case BST:
-			execute((BST) insn, code, data, registers);
+			execute((BST) insn, flash, data, registers);
 			break;
 		case CALL:
-			execute((CALL) insn, code, data, registers);
+			execute((CALL) insn, flash, data, registers);
 			break;
 		case CBI:
-			execute((CBI) insn, code, data, registers);
+			execute((CBI) insn, flash, data, registers);
 			break;
 		case CLC:
-			execute((CLC) insn, code, data, registers);
+			execute((CLC) insn, flash, data, registers);
 			break;
 		case CLH:
-			execute((CLH) insn, code, data, registers);
+			execute((CLH) insn, flash, data, registers);
 			break;
 		case CLI:
-			execute((CLI) insn, code, data, registers);
+			execute((CLI) insn, flash, data, registers);
 			break;
 		case CLN:
-			execute((CLN) insn, code, data, registers);
+			execute((CLN) insn, flash, data, registers);
 			break;
 		case CLS:
-			execute((CLS) insn, code, data, registers);
+			execute((CLS) insn, flash, data, registers);
 			break;
 		case CLT:
-			execute((CLT) insn, code, data, registers);
+			execute((CLT) insn, flash, data, registers);
 			break;
 		case CLV:
-			execute((CLV) insn, code, data, registers);
+			execute((CLV) insn, flash, data, registers);
 			break;
 		case CLZ:
-			execute((CLZ) insn, code, data, registers);
+			execute((CLZ) insn, flash, data, registers);
 			break;
 		case COM:
-			execute((COM) insn, code, data, registers);
+			execute((COM) insn, flash, data, registers);
 			break;
 		case CP:
-			execute((CP) insn, code, data, registers);
+			execute((CP) insn, flash, data, registers);
 			break;
 		case CPC:
-			execute((CPC) insn, code, data, registers);
+			execute((CPC) insn, flash, data, registers);
 			break;
 		case CPI:
-			execute((CPI) insn, code, data, registers);
+			execute((CPI) insn, flash, data, registers);
 			break;
 		case CPSE:
-			execute((CPSE) insn, code, data, registers);
+			execute((CPSE) insn, flash, data, registers);
 			break;
 		case DEC:
-			execute((DEC) insn, code, data, registers);
+			execute((DEC) insn, flash, data, registers);
 			break;
 		case EICALL:
-			execute((EICALL) insn, code, data, registers);
+			execute((EICALL) insn, flash, data, registers);
 			break;
 		case EIJMP:
-			execute((EIJMP) insn, code, data, registers);
+			execute((EIJMP) insn, flash, data, registers);
 			break;
 		case ELPM:
-			execute((ELPM) insn, code, data, registers);
+			execute((ELPM) insn, flash, data, registers);
 			break;
 		case EOR:
-			execute((EOR) insn, code, data, registers);
+			execute((EOR) insn, flash, data, registers);
 			break;
 		case FMUL:
-			execute((FMUL) insn, code, data, registers);
+			execute((FMUL) insn, flash, data, registers);
 			break;
 		case FMULS:
-			execute((FMULS) insn, code, data, registers);
+			execute((FMULS) insn, flash, data, registers);
 			break;
 		case FMULSU:
-			execute((FMULSU) insn, code, data, registers);
+			execute((FMULSU) insn, flash, data, registers);
 			break;
 		case ICALL:
-			execute((ICALL) insn, code, data, registers);
+			execute((ICALL) insn, flash, data, registers);
 			break;
 		case IJMP:
-			execute((IJMP) insn, code, data, registers);
+			execute((IJMP) insn, flash, data, registers);
 			break;
 		case IN:
-			execute((IN) insn, code, data, registers);
+			execute((IN) insn, flash, data, registers);
 			break;
 		case INC:
-			execute((INC) insn, code, data, registers);
+			execute((INC) insn, flash, data, registers);
 			break;
 		case JMP:
-			execute((JMP) insn, code, data, registers);
+			execute((JMP) insn, flash, data, registers);
 			break;
 		case LAC:
-			execute((LAC) insn, code, data, registers);
+			execute((LAC) insn, flash, data, registers);
 			break;
 		case LAS:
-			execute((LAS) insn, code, data, registers);
+			execute((LAS) insn, flash, data, registers);
 			break;
 		case LAT:
-			execute((LAT) insn, code, data, registers);
+			execute((LAT) insn, flash, data, registers);
 			break;
 		case LD_X:
-			execute((LD_X) insn, code, data, registers);
+			execute((LD_X) insn, flash, data, registers);
 			break;
 		case LD_X_INC:
-			execute((LD_X_INC) insn, code, data, registers);
+			execute((LD_X_INC) insn, flash, data, registers);
 			break;
 		case LD_X_DEC:
-			execute((LD_X_DEC) insn, code, data, registers);
+			execute((LD_X_DEC) insn, flash, data, registers);
 			break;
 		case LD_Y:
-			execute((LD_Y) insn, code, data, registers);
+			execute((LD_Y) insn, flash, data, registers);
 			break;
 		case LD_Y_INC:
-			execute((LD_Y_INC) insn, code, data, registers);
+			execute((LD_Y_INC) insn, flash, data, registers);
 			break;
 		case LD_Y_DEC:
-			execute((LD_Y_DEC) insn, code, data, registers);
+			execute((LD_Y_DEC) insn, flash, data, registers);
 			break;
 		case LDD_Y_Q:
-			execute((LDD_Y_Q) insn, code, data, registers);
+			execute((LDD_Y_Q) insn, flash, data, registers);
 			break;
 		case LD_Z:
-			execute((LD_Z) insn, code, data, registers);
+			execute((LD_Z) insn, flash, data, registers);
 			break;
 		case LD_Z_INC:
-			execute((LD_Z_INC) insn, code, data, registers);
+			execute((LD_Z_INC) insn, flash, data, registers);
 			break;
 		case LD_Z_DEC:
-			execute((LD_Z_DEC) insn, code, data, registers);
+			execute((LD_Z_DEC) insn, flash, data, registers);
 			break;
 		case LDD_Z_Q:
-			execute((LDD_Z_Q) insn, code, data, registers);
+			execute((LDD_Z_Q) insn, flash, data, registers);
 			break;
 		case LDI:
-			execute((LDI) insn, code, data, registers);
+			execute((LDI) insn, flash, data, registers);
 			break;
 //		case LDS_WIDE:
 //			execute((LDS_WIDE) insn, code, data, registers);
 //			break;
 		case LDS:
-			execute((LDS) insn, code, data, registers);
+			execute((LDS) insn, flash, data, registers);
 			break;
 		case LPM:
-			execute((LPM) insn, code, data, registers);
+			execute((LPM) insn, flash, data, registers);
 			break;
 		case LPM_Z:
-			execute((LPM_Z) insn, code, data, registers);
+			execute((LPM_Z) insn, flash, data, registers);
 			break;
 		case LPM_Z_INC:
-			execute((LPM_Z_INC) insn, code, data, registers);
+			execute((LPM_Z_INC) insn, flash, data, registers);
 			break;
 //		case LSL:
 //			execute((LSL) insn, code, data, registers);
 //			break;
 		case LSR:
-			execute((LSR) insn, code, data, registers);
+			execute((LSR) insn, flash, data, registers);
 			break;
 		case MOV:
-			execute((MOV) insn, code, data, registers);
+			execute((MOV) insn, flash, data, registers);
 			break;
 		case MOVW:
-			execute((MOVW) insn, code, data, registers);
+			execute((MOVW) insn, flash, data, registers);
 			break;
 		case MUL:
-			execute((MUL) insn, code, data, registers);
+			execute((MUL) insn, flash, data, registers);
 			break;
 		case MULS:
-			execute((MULS) insn, code, data, registers);
+			execute((MULS) insn, flash, data, registers);
 			break;
 		case MULSU:
-			execute((MULSU) insn, code, data, registers);
+			execute((MULSU) insn, flash, data, registers);
 			break;
 		case NEG:
-			execute((NEG) insn, code, data, registers);
+			execute((NEG) insn, flash, data, registers);
 			break;
 		case NOP:
-			execute((NOP) insn, code, data, registers);
+			execute((NOP) insn, flash, data, registers);
 			break;
 		case OR:
-			execute((OR) insn, code, data, registers);
+			execute((OR) insn, flash, data, registers);
 			break;
 		case ORI:
-			execute((ORI) insn, code, data, registers);
+			execute((ORI) insn, flash, data, registers);
 			break;
 		case OUT:
-			execute((OUT) insn, code, data, registers);
+			execute((OUT) insn, flash, data, registers);
 			break;
 		case POP:
-			execute((POP) insn, code, data, registers);
+			execute((POP) insn, flash, data, registers);
 			break;
 		case PUSH:
-			execute((PUSH) insn, code, data, registers);
+			execute((PUSH) insn, flash, data, registers);
 			break;
 		case RCALL:
-			execute((RCALL) insn, code, data, registers);
+			execute((RCALL) insn, flash, data, registers);
 			break;
 		case RET:
-			execute((RET) insn, code, data, registers);
+			execute((RET) insn, flash, data, registers);
 			break;
 		case RETI:
-			execute((RETI) insn, code, data, registers);
+			execute((RETI) insn, flash, data, registers);
 			break;
 		case RJMP:
-			execute((RJMP) insn, code, data, registers);
+			execute((RJMP) insn, flash, data, registers);
 			break;
 //		case ROL:
 //			execute((ROL) insn, code, data, registers);
 //			break;
 		case ROR:
-			execute((ROR) insn, code, data, registers);
+			execute((ROR) insn, flash, data, registers);
 			break;
 		case SBC:
-			execute((SBC) insn, code, data, registers);
+			execute((SBC) insn, flash, data, registers);
 			break;
 		case SBCI:
-			execute((SBCI) insn, code, data, registers);
+			execute((SBCI) insn, flash, data, registers);
 			break;
 		case SBI:
-			execute((SBI) insn, code, data, registers);
+			execute((SBI) insn, flash, data, registers);
 			break;
 		case SBIC:
-			execute((SBIC) insn, code, data, registers);
+			execute((SBIC) insn, flash, data, registers);
 			break;
 		case SBIS:
-			execute((SBIS) insn, code, data, registers);
+			execute((SBIS) insn, flash, data, registers);
 			break;
 		case SBIW:
-			execute((SBIW) insn, code, data, registers);
+			execute((SBIW) insn, flash, data, registers);
 			break;
 		case SBR:
-			execute((SBR) insn, code, data, registers);
+			execute((SBR) insn, flash, data, registers);
 			break;
 		case SBRC:
-			execute((SBRC) insn, code, data, registers);
+			execute((SBRC) insn, flash, data, registers);
 			break;
 		case SBRS:
-			execute((SBRS) insn, code, data, registers);
+			execute((SBRS) insn, flash, data, registers);
 			break;
 		case SEC:
-			execute((SEC) insn, code, data, registers);
+			execute((SEC) insn, flash, data, registers);
 			break;
 		case SEH:
-			execute((SEH) insn, code, data, registers);
+			execute((SEH) insn, flash, data, registers);
 			break;
 		case SEI:
-			execute((SEI) insn, code, data, registers);
+			execute((SEI) insn, flash, data, registers);
 			break;
 		case SEN:
-			execute((SEN) insn, code, data, registers);
+			execute((SEN) insn, flash, data, registers);
 			break;
 		case SER:
-			execute((SER) insn, code, data, registers);
+			execute((SER) insn, flash, data, registers);
 			break;
 		case SES:
-			execute((SES) insn, code, data, registers);
+			execute((SES) insn, flash, data, registers);
 			break;
 		case SET:
-			execute((SET) insn, code, data, registers);
+			execute((SET) insn, flash, data, registers);
 			break;
 		case SEV:
-			execute((SEV) insn, code, data, registers);
+			execute((SEV) insn, flash, data, registers);
 			break;
 		case SEZ:
-			execute((SEZ) insn, code, data, registers);
+			execute((SEZ) insn, flash, data, registers);
 			break;
 		case SLEEP:
-			execute((SLEEP) insn, code, data, registers);
+			execute((SLEEP) insn, flash, data, registers);
 			break;
 		case SPM:
-			execute((SPM) insn, code, data, registers);
+			execute((SPM) insn, flash, data, registers);
 			break;
 		case ST_X:
-			execute((ST_X) insn, code, data, registers);
+			execute((ST_X) insn, flash, data, registers);
 			break;
 		case ST_X_INC:
-			execute((ST_X_INC) insn, code, data, registers);
+			execute((ST_X_INC) insn, flash, data, registers);
 			break;
 		case ST_X_DEC:
-			execute((ST_X_DEC) insn, code, data, registers);
+			execute((ST_X_DEC) insn, flash, data, registers);
 			break;
 		case ST_Y:
-			execute((ST_Y) insn, code, data, registers);
+			execute((ST_Y) insn, flash, data, registers);
 			break;
 		case ST_Y_INC:
-			execute((ST_Y_INC) insn, code, data, registers);
+			execute((ST_Y_INC) insn, flash, data, registers);
 			break;
 		case ST_Y_DEC:
-			execute((ST_Y_DEC) insn, code, data, registers);
+			execute((ST_Y_DEC) insn, flash, data, registers);
 			break;
 		case STD_Y_Q:
-			execute((STD_Y_Q) insn, code, data, registers);
+			execute((STD_Y_Q) insn, flash, data, registers);
 			break;
 		case ST_Z:
-			execute((ST_Z) insn, code, data, registers);
+			execute((ST_Z) insn, flash, data, registers);
 			break;
 		case ST_Z_INC:
-			execute((ST_Z_INC) insn, code, data, registers);
+			execute((ST_Z_INC) insn, flash, data, registers);
 			break;
 		case ST_Z_DEC:
-			execute((ST_Z_DEC) insn, code, data, registers);
+			execute((ST_Z_DEC) insn, flash, data, registers);
 			break;
 		case STD_Z_Q:
-			execute((STD_Z_Q) insn, code, data, registers);
+			execute((STD_Z_Q) insn, flash, data, registers);
 			break;
 //		case STS_DATA:
 //			execute((STS_DATA) insn, code, data, registers);
 //			break;
 		case STS_DATA_WIDE:
-			execute((STS_DATA_WIDE) insn, code, data, registers);
+			execute((STS_DATA_WIDE) insn, flash, data, registers);
 			break;
 		case SUB:
-			execute((SUB) insn, code, data, registers);
+			execute((SUB) insn, flash, data, registers);
 			break;
 		case SUBI:
-			execute((SUBI) insn, code, data, registers);
+			execute((SUBI) insn, flash, data, registers);
 			break;
 		case SWAP:
-			execute((SWAP) insn, code, data, registers);
+			execute((SWAP) insn, flash, data, registers);
 			break;
 		case WDR:
-			execute((WDR) insn, code, data, registers);
+			execute((WDR) insn, flash, data, registers);
 			break;
 		case XCH:
-			execute((XCH) insn, code, data, registers);
+			execute((XCH) insn, flash, data, registers);
 			break;
 		default:
 			throw new IllegalArgumentException("invalid opcode encountered: " + insn.getOpcode());
 		}
+	}
+
+	private AvrInstruction decode(int PC, Memory flash) {
+		AvrInstruction insn = decoded[PC];
+		if(insn == null) {
+			// Instruction not previously decoded. Therefore, decode and cache for later.
+			insn = decoder.decode(flash, PC);
+			decoded[PC] = insn;
+		}
+		return insn;
 	}
 
 	/**
@@ -429,7 +458,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ADC insn, Memory code, Memory data, Registers regs) {
+	private void execute(ADC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -465,7 +494,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ADD insn, Memory code, Memory data, Registers regs) {
+	private void execute(ADD insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -501,7 +530,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ADIW insn, Memory code, Memory data, Registers regs) {
+	private void execute(ADIW insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		int Rd = readWord(insn.Rd, data);
 		byte Rr = (byte) insn.K;
@@ -531,7 +560,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(AND insn, Memory code, Memory data, Registers regs) {
+	private void execute(AND insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -560,7 +589,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ANDI insn, Memory code, Memory data, Registers regs) {
+	private void execute(ANDI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = (byte) insn.K;
@@ -591,7 +620,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ASR insn, Memory code, Memory data, Registers regs) {
+	private void execute(ASR insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		// Perform operation
@@ -615,7 +644,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BCLR insn, Memory code, Memory data, Registers regs) {
+	private void execute(BCLR insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~(1 << insn.s);
 	}
@@ -628,7 +657,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BLD insn, Memory code, Memory data, Registers regs) {
+	private void execute(BLD insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		int Rd = data.read(insn.Rd);
 		int mask = (1 << insn.b);
@@ -648,7 +677,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRBC insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRBC insn, Memory flash, Memory data, Registers regs) {
 		int mask = (1 << insn.s);
 		if ((regs.SREG & mask) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
@@ -668,7 +697,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRBS insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRBS insn, Memory flash, Memory data, Registers regs) {
 		int mask = (1 << insn.s);
 		if ((regs.SREG & mask) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
@@ -690,7 +719,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BREAK insn, Memory code, Memory data, Registers regs) {
+	private void execute(BREAK insn, Memory flash, Memory data, Registers regs) {
 		throw new RuntimeException("implement me!");
 	}
 
@@ -709,7 +738,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BREQ insn, Memory code, Memory data, Registers regs) {
+	private void execute(BREQ insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & ZERO_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -732,7 +761,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRGE insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRGE insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & SIGN_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -752,7 +781,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRHC insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRHC insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & HALFCARRY_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -772,7 +801,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRHS insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRHS insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & HALFCARRY_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -792,7 +821,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRID insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRID insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & INTERRUPT_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -812,7 +841,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRIE insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRIE insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & INTERRUPT_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -835,7 +864,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRLO insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRLO insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & CARRY_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -858,7 +887,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRLT insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRLT insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & SIGN_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -878,7 +907,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRMI insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRMI insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & NEGATIVE_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -901,7 +930,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRNE insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRNE insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & ZERO_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -921,7 +950,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRPL insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRPL insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & NEGATIVE_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -944,7 +973,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRSH insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRSH insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & CARRY_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -964,7 +993,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRTC insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRTC insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & BITCOPY_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -983,7 +1012,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRTS insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRTS insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & BITCOPY_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -1003,7 +1032,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRVC insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRVC insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & OVERFLOW_FLAG) == 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -1023,7 +1052,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BRVS insn, Memory code, Memory data, Registers regs) {
+	private void execute(BRVS insn, Memory flash, Memory data, Registers regs) {
 		if ((regs.SREG & OVERFLOW_FLAG) != 0) {
 			regs.PC = regs.PC + insn.k + 1;
 		} else {
@@ -1039,7 +1068,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BSET insn, Memory code, Memory data, Registers regs) {
+	private void execute(BSET insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= (1 << insn.s);
 	}
@@ -1052,7 +1081,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(BST insn, Memory code, Memory data, Registers regs) {
+	private void execute(BST insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		int Rd = data.read(insn.Rd);
 		int mask = (1 << insn.b);
@@ -1070,7 +1099,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CALL insn, Memory code, Memory data, Registers regs) {
+	private void execute(CALL insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 2;
 		pushWord(regs.PC, data);
 		regs.PC = insn.k;
@@ -1085,7 +1114,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CBI insn, Memory code, Memory data, Registers regs) {
+	private void execute(CBI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		int A = data.read(insn.A + 32);
 		int mask = (1 << insn.b);
@@ -1101,7 +1130,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CLC insn, Memory code, Memory data, Registers regs) {
+	private void execute(CLC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~CARRY_FLAG;
 	}
@@ -1114,7 +1143,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CLH insn, Memory code, Memory data, Registers regs) {
+	private void execute(CLH insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~HALFCARRY_FLAG;
 	}
@@ -1130,7 +1159,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CLI insn, Memory code, Memory data, Registers regs) {
+	private void execute(CLI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~INTERRUPT_FLAG;
 	}
@@ -1143,7 +1172,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CLN insn, Memory code, Memory data, Registers regs) {
+	private void execute(CLN insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~NEGATIVE_FLAG;
 	}
@@ -1156,7 +1185,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CLS insn, Memory code, Memory data, Registers regs) {
+	private void execute(CLS insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~SIGN_FLAG;
 	}
@@ -1169,7 +1198,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CLT insn, Memory code, Memory data, Registers regs) {
+	private void execute(CLT insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~BITCOPY_FLAG;
 	}
@@ -1182,7 +1211,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CLV insn, Memory code, Memory data, Registers regs) {
+	private void execute(CLV insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~OVERFLOW_FLAG;
 	}
@@ -1195,7 +1224,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CLZ insn, Memory code, Memory data, Registers regs) {
+	private void execute(CLZ insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG &= ~ZERO_FLAG;
 	}
@@ -1208,7 +1237,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(COM insn, Memory code, Memory data, Registers regs) {
+	private void execute(COM insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		// Perform operation
@@ -1237,7 +1266,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CP insn, Memory code, Memory data, Registers regs) {
+	private void execute(CP insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -1272,7 +1301,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CPC insn, Memory code, Memory data, Registers regs) {
+	private void execute(CPC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -1307,7 +1336,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CPI insn, Memory code, Memory data, Registers regs) {
+	private void execute(CPI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte K = (byte) insn.K;
@@ -1340,14 +1369,13 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(CPSE insn, Memory code, Memory data, Registers regs) {
+	private void execute(CPSE insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
 		if (Rd == Rr) {
-			// FIXME: this needs to lookahead and see if there's a one or two byte
-			// instruction following.
-			regs.PC = regs.PC + 1;
+			AvrInstruction following = decode(regs.PC, flash);
+			regs.PC = regs.PC + following.getWidth();
 		}
 	}
 
@@ -1364,7 +1392,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(DEC insn, Memory code, Memory data, Registers regs) {
+	private void execute(DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		// Perform operation
@@ -1402,7 +1430,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(EICALL insn, Memory code, Memory data, Registers regs) {
+	private void execute(EICALL insn, Memory flash, Memory data, Registers regs) {
 		throw new IllegalArgumentException("implement me!");
 	}
 
@@ -1417,7 +1445,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(EIJMP insn, Memory code, Memory data, Registers regs) {
+	private void execute(EIJMP insn, Memory flash, Memory data, Registers regs) {
 		throw new IllegalArgumentException("implement me");
 	}
 
@@ -1440,7 +1468,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ELPM insn, Memory code, Memory data, Registers regs) {
+	private void execute(ELPM insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1454,7 +1482,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(EOR insn, Memory code, Memory data, Registers regs) {
+	private void execute(EOR insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -1483,7 +1511,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(FMUL insn, Memory code, Memory data, Registers regs) {
+	private void execute(FMUL insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1497,7 +1525,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(FMULS insn, Memory code, Memory data, Registers regs) {
+	private void execute(FMULS insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1511,7 +1539,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(FMULSU insn, Memory code, Memory data, Registers regs) {
+	private void execute(FMULSU insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1526,7 +1554,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ICALL insn, Memory code, Memory data, Registers regs) {
+	private void execute(ICALL insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		pushWord(regs.PC, data);
 		// Read the Z register
@@ -1544,7 +1572,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(IJMP insn, Memory code, Memory data, Registers regs) {
+	private void execute(IJMP insn, Memory flash, Memory data, Registers regs) {
 		// Read the Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		regs.PC = Z;
@@ -1559,7 +1587,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(IN insn, Memory code, Memory data, Registers regs) {
+	private void execute(IN insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.A + 32);
 		data.write(insn.Rd, Rd);
@@ -1578,7 +1606,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(INC insn, Memory code, Memory data, Registers regs) {
+	private void execute(INC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = +1;
@@ -1615,7 +1643,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(JMP insn, Memory code, Memory data, Registers regs) {
+	private void execute(JMP insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = insn.k;
 	}
 
@@ -1634,7 +1662,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LAC insn, Memory code, Memory data, Registers regs) {
+	private void execute(LAC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1654,7 +1682,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LAS insn, Memory code, Memory data, Registers regs) {
+	private void execute(LAS insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1674,7 +1702,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LAT insn, Memory code, Memory data, Registers regs) {
+	private void execute(LAT insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1692,7 +1720,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_X insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_X insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
@@ -1709,7 +1737,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_X_INC insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_X_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
@@ -1728,7 +1756,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_X_DEC insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_X_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
@@ -1753,7 +1781,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_Y insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_Y insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
@@ -1770,7 +1798,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_Y_INC insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_Y_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
@@ -1789,7 +1817,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_Y_DEC insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_Y_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
@@ -1801,7 +1829,7 @@ public class AvrExecutor implements AVR.Executor {
 		data.write(insn.Rd, Rd);
 	}
 
-	private void execute(LDD_Y_Q insn, Memory code, Memory data, Registers regs) {
+	private void execute(LDD_Y_Q insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
@@ -1825,7 +1853,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_Z insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_Z insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
@@ -1842,7 +1870,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_Z_INC insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_Z_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
@@ -1861,7 +1889,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LD_Z_DEC insn, Memory code, Memory data, Registers regs) {
+	private void execute(LD_Z_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
@@ -1873,7 +1901,7 @@ public class AvrExecutor implements AVR.Executor {
 		data.write(insn.Rd, Rd);
 	}
 
-	private void execute(LDD_Z_Q insn, Memory code, Memory data, Registers regs) {
+	private void execute(LDD_Z_Q insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
@@ -1889,7 +1917,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LDI insn, Memory code, Memory data, Registers regs) {
+	private void execute(LDI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		data.write(insn.Rd, (byte) insn.K);
 	}
@@ -1906,7 +1934,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-//	private void execute(LDS_WIDE insn, Memory code, Memory data, Registers regs) {
+//	private void execute(LDS_WIDE insn, Memory flash, Memory data, Registers regs) {
 //		throw new RuntimeException("implement me!");
 //	}
 
@@ -1923,7 +1951,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LDS insn, Memory code, Memory data, Registers regs) {
+	private void execute(LDS insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 2;
 		byte Rd = data.read(insn.k);
 		data.write(insn.Rd, Rd);
@@ -1944,7 +1972,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LPM insn, Memory code, Memory data, Registers regs) {
+	private void execute(LPM insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -1956,21 +1984,21 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LPM_Z insn, Memory code, Memory data, Registers regs) {
+	private void execute(LPM_Z insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
-		byte Rd = code.read(Z);
+		byte Rd = flash.read(Z);
 		data.write(insn.Rd, Rd);
 	}
 
-	private void execute(LPM_Z_INC insn, Memory code, Memory data, Registers regs) {
+	private void execute(LPM_Z_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
-		byte Rd = code.read(Z);
+		byte Rd = flash.read(Z);
 		data.write(insn.Rd, Rd);
 		// Post increment
 		writeWord(AVR.ZL_ADDRESS, Z + 1, data);
@@ -1986,7 +2014,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-//	private void execute(LSL insn, Memory code, Memory data, Registers regs) {
+//	private void execute(LSL insn, Memory flash, Memory data, Registers regs) {
 //		regs.PC = regs.PC + 1;
 //		byte Rd = data.read(insn.Rd);
 //		// Perform operation
@@ -2018,7 +2046,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(LSR insn, Memory code, Memory data, Registers regs) {
+	private void execute(LSR insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Read register
 		byte Rd = data.read(insn.Rd);
@@ -2051,7 +2079,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(MOV insn, Memory code, Memory data, Registers regs) {
+	private void execute(MOV insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rr);
 		data.write(insn.Rd, Rd);
@@ -2067,7 +2095,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(MOVW insn, Memory code, Memory data, Registers regs) {
+	private void execute(MOVW insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		int word = readWord(insn.Rr, data);
 		writeWord(insn.Rd, word, data);
@@ -2081,7 +2109,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(MUL insn, Memory code, Memory data, Registers regs) {
+	private void execute(MUL insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -2094,7 +2122,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(MULS insn, Memory code, Memory data, Registers regs) {
+	private void execute(MULS insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -2108,7 +2136,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(MULSU insn, Memory code, Memory data, Registers regs) {
+	private void execute(MULSU insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -2122,7 +2150,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(NEG insn, Memory code, Memory data, Registers regs) {
+	private void execute(NEG insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte R = (byte) -Rd;
@@ -2150,7 +2178,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(NOP insn, Memory code, Memory data, Registers regs) {
+	private void execute(NOP insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 	}
 
@@ -2163,7 +2191,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(OR insn, Memory code, Memory data, Registers regs) {
+	private void execute(OR insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -2192,7 +2220,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ORI insn, Memory code, Memory data, Registers regs) {
+	private void execute(ORI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = (byte) insn.K;
@@ -2221,7 +2249,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(OUT insn, Memory code, Memory data, Registers regs) {
+	private void execute(OUT insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rr);
 		data.write(insn.A + 32, Rd);
@@ -2236,7 +2264,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(POP insn, Memory code, Memory data, Registers regs) {
+	private void execute(POP insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = popByte(data);
 		data.write(insn.Rd, Rd);
@@ -2251,7 +2279,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(PUSH insn, Memory code, Memory data, Registers regs) {
+	private void execute(PUSH insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		pushByte(Rd, data);
@@ -2269,7 +2297,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(RCALL insn, Memory code, Memory data, Registers regs) {
+	private void execute(RCALL insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		pushWord(regs.PC, data);
 		regs.PC = regs.PC + insn.k;
@@ -2283,7 +2311,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(RET insn, Memory code, Memory data, Registers regs) {
+	private void execute(RET insn, Memory flash, Memory data, Registers regs) {
 		int address = popWord(data);
 		regs.PC = address;
 	}
@@ -2301,7 +2329,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(RETI insn, Memory code, Memory data, Registers regs) {
+	private void execute(RETI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -2317,7 +2345,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(RJMP insn, Memory code, Memory data, Registers regs) {
+	private void execute(RJMP insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + insn.k + 1;
 	}
 
@@ -2331,7 +2359,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-//	private void execute(ROL insn, Memory code, Memory data, Registers regs) {
+//	private void execute(ROL insn, Memory flash, Memory data, Registers regs) {
 //		regs.PC = regs.PC + 1;
 //		// Read carry flag
 //		int CF = (regs.SREG & CARRY_FLAG);
@@ -2367,7 +2395,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ROR insn, Memory code, Memory data, Registers regs) {
+	private void execute(ROR insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Read carry flag
 		int CF = (regs.SREG & CARRY_FLAG) << 7;
@@ -2401,7 +2429,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBC insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -2437,7 +2465,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBCI insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBCI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte K = (byte) insn.K;
@@ -2474,7 +2502,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBI insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBI insn, Memory flash, Memory data, Registers regs) {
 		int mask = 1 << insn.b;
 		regs.PC = regs.PC + 1;
 		byte A = data.read(insn.A + 32);
@@ -2491,12 +2519,13 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBIC insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBIC insn, Memory flash, Memory data, Registers regs) {
 		int mask = 1 << insn.b;
 		regs.PC = regs.PC + 1;
 		byte io = data.read(insn.A + 32);
 		if((io & mask) == 0) {
-			regs.PC = regs.PC + 1;
+			AvrInstruction following = decode(regs.PC, flash);
+			regs.PC = regs.PC + following.getWidth();
 		}
 	}
 
@@ -2510,12 +2539,13 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBIS insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBIS insn, Memory flash, Memory data, Registers regs) {
 		int mask = 1 << insn.b;
 		regs.PC = regs.PC + 1;
 		byte io = data.read(insn.A + 32);
 		if((io & (mask)) != 0) {
-			regs.PC = regs.PC + 1;
+			AvrInstruction following = decode(regs.PC, flash);
+			regs.PC = regs.PC + following.getWidth();
 		}
 	}
 
@@ -2529,7 +2559,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBIW insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBIW insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		int Rd = readWord(insn.Rd, data);
 		byte Rr = (byte) insn.K;
@@ -2560,7 +2590,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBR insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBR insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		int Rd = data.read(insn.Rd);
 		//
@@ -2588,13 +2618,13 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBRC insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBRC insn, Memory flash, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
 		int mask = 1 << insn.b;
 		byte Rd = data.read(insn.Rd);
 		if ((Rd & mask) == 0) {
-			regs.PC = regs.PC + 2;
-		} else {
-			regs.PC = regs.PC + 1;
+			AvrInstruction following = decode(regs.PC, flash);
+			regs.PC = regs.PC + following.getWidth();
 		}
 	}
 
@@ -2607,13 +2637,13 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SBRS insn, Memory code, Memory data, Registers regs) {
+	private void execute(SBRS insn, Memory flash, Memory data, Registers regs) {
+		regs.PC = regs.PC + 1;
 		int mask = 1 << insn.b;
 		byte Rd = data.read(insn.Rd);
 		if ((Rd & mask) != 0) {
-			regs.PC = regs.PC + 2;
-		} else {
-			regs.PC = regs.PC + 1;
+			AvrInstruction following = decode(regs.PC, flash);
+			regs.PC = regs.PC + following.getWidth();
 		}
 	}
 
@@ -2625,7 +2655,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SEC insn, Memory code, Memory data, Registers regs) {
+	private void execute(SEC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= CARRY_FLAG;
 	}
@@ -2638,7 +2668,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SEH insn, Memory code, Memory data, Registers regs) {
+	private void execute(SEH insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= HALFCARRY_FLAG;
 	}
@@ -2652,7 +2682,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SEI insn, Memory code, Memory data, Registers regs) {
+	private void execute(SEI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= INTERRUPT_FLAG;
 	}
@@ -2665,7 +2695,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SEN insn, Memory code, Memory data, Registers regs) {
+	private void execute(SEN insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= NEGATIVE_FLAG;
 	}
@@ -2678,7 +2708,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SER insn, Memory code, Memory data, Registers regs) {
+	private void execute(SER insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		data.write(insn.Rd, (byte) 0xFF);
 	}
@@ -2691,7 +2721,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SES insn, Memory code, Memory data, Registers regs) {
+	private void execute(SES insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= SIGN_FLAG;
 	}
@@ -2704,7 +2734,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SET insn, Memory code, Memory data, Registers regs) {
+	private void execute(SET insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= BITCOPY_FLAG;
 	}
@@ -2717,7 +2747,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SEV insn, Memory code, Memory data, Registers regs) {
+	private void execute(SEV insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= OVERFLOW_FLAG;
 	}
@@ -2730,7 +2760,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SEZ insn, Memory code, Memory data, Registers regs) {
+	private void execute(SEZ insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		regs.SREG |= ZERO_FLAG;
 	}
@@ -2744,7 +2774,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SLEEP insn, Memory code, Memory data, Registers regs) {
+	private void execute(SLEEP insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -2761,7 +2791,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SPM insn, Memory code, Memory data, Registers regs) {
+	private void execute(SPM insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -2779,7 +2809,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_X insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_X insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
@@ -2796,7 +2826,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_X_INC insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_X_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
@@ -2815,7 +2845,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_X_DEC insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_X_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
@@ -2840,7 +2870,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_Y insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_Y insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
@@ -2857,7 +2887,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_Y_INC insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_Y_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
@@ -2876,7 +2906,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_Y_DEC insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_Y_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
@@ -2888,7 +2918,7 @@ public class AvrExecutor implements AVR.Executor {
 		data.write(Y, Rd);
 	}
 
-	private void execute(STD_Y_Q insn, Memory code, Memory data, Registers regs) {
+	private void execute(STD_Y_Q insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
@@ -2910,7 +2940,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_Z insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_Z insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
@@ -2927,7 +2957,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_Z_INC insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_Z_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
@@ -2946,7 +2976,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(ST_Z_DEC insn, Memory code, Memory data, Registers regs) {
+	private void execute(ST_Z_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
@@ -2958,7 +2988,7 @@ public class AvrExecutor implements AVR.Executor {
 		data.write(Z, Rd);
 	}
 
-	private void execute(STD_Z_Q insn, Memory code, Memory data, Registers regs) {
+	private void execute(STD_Z_Q insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
@@ -2979,7 +3009,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-//	private void execute(STS_DATA insn, Memory code, Memory data, Registers regs) {
+//	private void execute(STS_DATA insn, Memory flash, Memory data, Registers regs) {
 //		regs.PC = regs.PC + 1;
 //		throw new RuntimeException("implement me!");
 //	}
@@ -2997,7 +3027,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(STS_DATA_WIDE insn, Memory code, Memory data, Registers regs) {
+	private void execute(STS_DATA_WIDE insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 2;
 		byte Rd = data.read(insn.Rd);
 		data.write(insn.k, Rd);
@@ -3011,7 +3041,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SUB insn, Memory code, Memory data, Registers regs) {
+	private void execute(SUB insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
@@ -3047,7 +3077,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SUBI insn, Memory code, Memory data, Registers regs) {
+	private void execute(SUBI insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		byte K = (byte) insn.K;
@@ -3081,7 +3111,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(SWAP insn, Memory code, Memory data, Registers regs) {
+	private void execute(SWAP insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		int Rd = data.read(insn.Rd);
 		int lsn = Rd & 0b0000_1111;
@@ -3102,7 +3132,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(WDR insn, Memory code, Memory data, Registers regs) {
+	private void execute(WDR insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		throw new RuntimeException("implement me!");
 	}
@@ -3120,7 +3150,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param data
 	 * @param regs
 	 */
-	private void execute(XCH insn, Memory code, Memory data, Registers regs) {
+	private void execute(XCH insn, Memory flash, Memory data, Registers regs) {
 		regs.PC = regs.PC + 1;
 		byte Rd = data.read(insn.Rd);
 		int Z = readWord(AVR.ZL_ADDRESS, data);
