@@ -71,7 +71,7 @@ public class CodeView extends JAvrView {
 		JTable table = new JTable(dataModel) {
 			@Override
 			public void paint(Graphics g) {
-				int pc = mcu.getRegisters().PC;
+				int pc = mcu.getRegisters().getPC();
 				setRowSelectionInterval(pc, pc);
 				super.paint(g);
 			}

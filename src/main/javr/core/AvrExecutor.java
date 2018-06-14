@@ -26,7 +26,7 @@ public class AvrExecutor implements AVR.Executor {
 
 	@Override
 	public void execute(Memory flash, Memory data, Registers registers) {
-		AvrInstruction insn = decode(registers.PC, flash);
+		AvrInstruction insn = decode(registers.getPC(), flash);
 		// Dispatch on instruction
 		switch (insn.getOpcode()) {
 		case ADC:
@@ -459,10 +459,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ADC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
-		int CF = (regs.SREG & CARRY_FLAG) >> 0;
+		int CF = regs.getStatusBit(CARRY_FLAG) ? 1 : 0;
 		// Perform operation
 		byte R = (byte) (Rd + Rr + CF);
 		// Update Register file
@@ -495,7 +495,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ADD insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
 		// Perform operation
@@ -531,7 +531,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ADIW insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int Rd = readWord(insn.Rd, data);
 		byte Rr = (byte) insn.K;
 		// Perform operation
@@ -561,7 +561,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(AND insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
 		// Perform operation
@@ -571,7 +571,7 @@ public class AvrExecutor implements AVR.Executor {
 		// Set Flags
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
-		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean C = regs.getStatusBit(CARRY_FLAG);
 		boolean Z = (R == 0);
 		boolean N = R7;
 		boolean V = false;
@@ -590,7 +590,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ANDI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = (byte) insn.K;
 		// Perform operation
@@ -600,7 +600,7 @@ public class AvrExecutor implements AVR.Executor {
 		// Set Flags
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
-		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean C = regs.getStatusBit(CARRY_FLAG);
 		boolean Z = (R == 0);
 		boolean N = R7;
 		boolean V = false;
@@ -621,7 +621,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ASR insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		// Perform operation
 		byte R = (byte) (Rd >> 1);
@@ -645,8 +645,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BCLR insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~(1 << insn.s);
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(1 << insn.s);
 	}
 
 	/**
@@ -658,11 +658,11 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BLD insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int Rd = data.read(insn.Rd);
 		int mask = (1 << insn.b);
 		Rd = Rd & mask;
-		Rd |= (regs.SREG & BITCOPY_FLAG) != 0 ? mask : 0;
+		Rd |= regs.getStatusBit(BITCOPY_FLAG) ? mask : 0;
 		data.write(insn.Rd, (byte) Rd);
 	}
 
@@ -679,10 +679,10 @@ public class AvrExecutor implements AVR.Executor {
 	 */
 	private void execute(BRBC insn, Memory flash, Memory data, Registers regs) {
 		int mask = (1 << insn.s);
-		if ((regs.SREG & mask) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(mask)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -699,10 +699,10 @@ public class AvrExecutor implements AVR.Executor {
 	 */
 	private void execute(BRBS insn, Memory flash, Memory data, Registers regs) {
 		int mask = (1 << insn.s);
-		if ((regs.SREG & mask) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if(regs.getStatusBit(mask)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -739,10 +739,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BREQ insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & ZERO_FLAG) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(ZERO_FLAG)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -762,10 +762,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRGE insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & SIGN_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(SIGN_FLAG)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -782,10 +782,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRHC insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & HALFCARRY_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(HALFCARRY_FLAG)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -802,10 +802,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRHS insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & HALFCARRY_FLAG) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(HALFCARRY_FLAG)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -822,10 +822,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRID insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & INTERRUPT_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(INTERRUPT_FLAG)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -842,10 +842,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRIE insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & INTERRUPT_FLAG) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(INTERRUPT_FLAG)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -865,10 +865,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRLO insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & CARRY_FLAG) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(CARRY_FLAG)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -888,10 +888,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRLT insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & SIGN_FLAG) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(SIGN_FLAG)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -908,10 +908,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRMI insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & NEGATIVE_FLAG) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(NEGATIVE_FLAG)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -931,10 +931,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRNE insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & ZERO_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(ZERO_FLAG)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -951,10 +951,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRPL insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & NEGATIVE_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(NEGATIVE_FLAG)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -974,10 +974,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRSH insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & CARRY_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(CARRY_FLAG)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -994,10 +994,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRTC insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & BITCOPY_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(BITCOPY_FLAG)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -1013,10 +1013,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRTS insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & BITCOPY_FLAG) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(BITCOPY_FLAG)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -1033,10 +1033,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRVC insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & OVERFLOW_FLAG) == 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(OVERFLOW_FLAG)) {
+			regs.setPC(regs.getPC()+1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC() + insn.k + 1);
 		}
 	}
 
@@ -1053,10 +1053,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BRVS insn, Memory flash, Memory data, Registers regs) {
-		if ((regs.SREG & OVERFLOW_FLAG) != 0) {
-			regs.PC = regs.PC + insn.k + 1;
+		if (regs.getStatusBit(OVERFLOW_FLAG)) {
+			regs.setPC(regs.getPC() + insn.k + 1);
 		} else {
-			regs.PC = regs.PC + 1;
+			regs.setPC(regs.getPC()+1);
 		}
 	}
 
@@ -1069,8 +1069,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BSET insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= (1 << insn.s);
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(1 << insn.s);
 	}
 
 	/**
@@ -1082,11 +1082,11 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(BST insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int Rd = data.read(insn.Rd);
 		int mask = (1 << insn.b);
 		boolean T = (Rd & mask) != 0;
-		regs.SREG |= T ? (1 << 6) : 0;
+		regs.setStatusBit(T ? (1 << 6) : 0);
 	}
 
 	/**
@@ -1100,9 +1100,9 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CALL insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 2;
-		pushWord(regs.PC, data);
-		regs.PC = insn.k;
+		regs.setPC(regs.getPC() + 2);
+		pushWord(regs.getPC(), data);
+		regs.setPC(insn.k);
 	}
 
 	/**
@@ -1115,7 +1115,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CBI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int A = data.read(insn.A + 32);
 		int mask = (1 << insn.b);
 		A &= ~mask;
@@ -1131,8 +1131,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CLC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~CARRY_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(CARRY_FLAG);
 	}
 
 	/**
@@ -1144,8 +1144,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CLH insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~HALFCARRY_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(HALFCARRY_FLAG);
 	}
 
 	/**
@@ -1160,8 +1160,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CLI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~INTERRUPT_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(INTERRUPT_FLAG);
 	}
 
 	/**
@@ -1173,8 +1173,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CLN insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~NEGATIVE_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(NEGATIVE_FLAG);
 	}
 
 	/**
@@ -1186,8 +1186,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CLS insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~SIGN_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(SIGN_FLAG);
 	}
 
 	/**
@@ -1199,8 +1199,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CLT insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~BITCOPY_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(BITCOPY_FLAG);
 	}
 
 	/**
@@ -1212,8 +1212,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CLV insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~OVERFLOW_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(OVERFLOW_FLAG);
 	}
 
 	/**
@@ -1225,8 +1225,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CLZ insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG &= ~ZERO_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.clearStatusBit(ZERO_FLAG);
 	}
 
 	/**
@@ -1238,7 +1238,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(COM insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		// Perform operation
 		byte R = (byte) (0xFF - Rd);
@@ -1267,7 +1267,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CP insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
 		// Perform operation
@@ -1302,10 +1302,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CPC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
-		int CF = (regs.SREG & CARRY_FLAG) >> 0;
+		int CF = regs.getStatusBit(CARRY_FLAG) ? 1 : 0;
 		// Perform operation
 		byte R = (byte) (Rd - Rr - CF);
 		// Set Flags
@@ -1317,7 +1317,7 @@ public class AvrExecutor implements AVR.Executor {
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
 		boolean C = (!Rd7 & Rr7) | (Rr7 & R7) | (R7 & !Rd7);
-		boolean Z = (R == 0) && ((regs.SREG & ZERO_FLAG) != 0);
+		boolean Z = (R == 0) && regs.getStatusBit(ZERO_FLAG);
 		boolean N = R7;
 		boolean V = (Rd7 & !Rr7 & !R7) | (!Rd7 & Rr7 & R7);
 		boolean S = N ^ V;
@@ -1337,7 +1337,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CPI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte K = (byte) insn.K;
 		// Perform operation
@@ -1370,12 +1370,12 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(CPSE insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC() + 1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
 		if (Rd == Rr) {
-			AvrInstruction following = decode(regs.PC, flash);
-			regs.PC = regs.PC + following.getWidth();
+			AvrInstruction following = decode(regs.getPC(), flash);
+			regs.setPC(regs.getPC() + following.getWidth());
 		}
 	}
 
@@ -1393,7 +1393,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(DEC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		// Perform operation
 		byte R = (byte) (Rd - 1);
@@ -1410,7 +1410,7 @@ public class AvrExecutor implements AVR.Executor {
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
 		//
-		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean C = regs.getStatusBit(CARRY_FLAG);
 		boolean Z = (R == 0);
 		boolean N = R7;
 		boolean V = !R7 & R6 & R5 & R4 & R3 & R2 & R1 & R0;;
@@ -1469,7 +1469,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ELPM insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1483,7 +1483,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(EOR insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
 		// Perform operation
@@ -1493,7 +1493,7 @@ public class AvrExecutor implements AVR.Executor {
 		// Set Flags
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
-		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean C = regs.getStatusBit(CARRY_FLAG);
 		boolean Z = (R == 0);
 		boolean N = R7;
 		boolean V = false;
@@ -1512,7 +1512,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(FMUL insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1526,7 +1526,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(FMULS insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1540,7 +1540,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(FMULSU insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1555,11 +1555,11 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ICALL insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		pushWord(regs.PC, data);
+		regs.setPC(regs.getPC()+1);
+		pushWord(regs.getPC(), data);
 		// Read the Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
-		regs.PC = Z;
+		regs.setPC(Z);
 	}
 
 	/**
@@ -1575,7 +1575,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(IJMP insn, Memory flash, Memory data, Registers regs) {
 		// Read the Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
-		regs.PC = Z;
+		regs.setPC(Z);
 	}
 
 	/**
@@ -1588,7 +1588,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(IN insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.A + 32);
 		data.write(insn.Rd, Rd);
 	}
@@ -1607,7 +1607,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(INC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = +1;
 		// Perform operation
@@ -1624,7 +1624,7 @@ public class AvrExecutor implements AVR.Executor {
 		boolean R6 = (R & 0b0100_0000) != 0;
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
-		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean C = regs.getStatusBit(CARRY_FLAG);
 		boolean Z = (R == 0);
 		boolean N = R7;
 		boolean V = R7 & !R6 & !R5 & !R4 & !R3 & !R2 & !R1 & !R0;
@@ -1644,7 +1644,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(JMP insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = insn.k;
+		regs.setPC(insn.k);
 	}
 
 	/**
@@ -1663,7 +1663,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LAC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1683,7 +1683,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LAS insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1703,7 +1703,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LAT insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1721,7 +1721,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_X insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
 		// Perform operation
@@ -1738,7 +1738,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_X_INC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
 		// Perform operation
@@ -1757,7 +1757,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_X_DEC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
 		// Pre decrement
@@ -1782,7 +1782,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_Y insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
 		// Perform operation
@@ -1799,7 +1799,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_Y_INC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
 		// Perform operation
@@ -1818,7 +1818,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_Y_DEC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
 		// Pre decrement
@@ -1830,7 +1830,7 @@ public class AvrExecutor implements AVR.Executor {
 	}
 
 	private void execute(LDD_Y_Q insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
 		// Perform operation
@@ -1854,7 +1854,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_Z insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
@@ -1871,7 +1871,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_Z_INC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
@@ -1890,7 +1890,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LD_Z_DEC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Pre decrement
@@ -1902,7 +1902,7 @@ public class AvrExecutor implements AVR.Executor {
 	}
 
 	private void execute(LDD_Z_Q insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
@@ -1918,7 +1918,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LDI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		data.write(insn.Rd, (byte) insn.K);
 	}
 
@@ -1952,7 +1952,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LDS insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 2;
+		regs.setPC(regs.getPC() + 2);
 		byte Rd = data.read(insn.k);
 		data.write(insn.Rd, Rd);
 	}
@@ -1973,7 +1973,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LPM insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -1985,7 +1985,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LPM_Z insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
@@ -1994,7 +1994,7 @@ public class AvrExecutor implements AVR.Executor {
 	}
 
 	private void execute(LPM_Z_INC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
@@ -2015,7 +2015,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 //	private void execute(LSL insn, Memory flash, Memory data, Registers regs) {
-//		regs.PC = regs.PC + 1;
+//		regs.setPC(regs.getPC()+1);
 //		byte Rd = data.read(insn.Rd);
 //		// Perform operation
 //		byte R = (byte) (Rd + Rd);
@@ -2047,12 +2047,12 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(LSR insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Read register
 		byte Rd = data.read(insn.Rd);
 		// Perform operation
-		regs.SREG &= ~CARRY_FLAG;
-		regs.SREG |= (Rd & CARRY_FLAG);
+		regs.clearStatusBit(CARRY_FLAG);
+		regs.setStatusBit(Rd & CARRY_FLAG);
 		byte R = (byte) (Rd >>> 1);
 		// Update Register file
 		data.write(insn.Rd, R);
@@ -2080,7 +2080,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(MOV insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rr);
 		data.write(insn.Rd, Rd);
 	}
@@ -2096,7 +2096,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(MOVW insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int word = readWord(insn.Rr, data);
 		writeWord(insn.Rd, word, data);
 	}
@@ -2110,7 +2110,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(MUL insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -2123,7 +2123,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(MULS insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -2137,7 +2137,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(MULSU insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -2151,7 +2151,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(NEG insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte R = (byte) -Rd;
 		data.write(insn.Rd, R);
@@ -2179,7 +2179,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(NOP insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 	}
 
 	/**
@@ -2192,7 +2192,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(OR insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
 		// Perform operation
@@ -2202,7 +2202,7 @@ public class AvrExecutor implements AVR.Executor {
 		// Set Flags
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
-		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean C = regs.getStatusBit(CARRY_FLAG);
 		boolean Z = (R == 0);
 		boolean N = R7;
 		boolean V = false;
@@ -2221,7 +2221,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ORI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = (byte) insn.K;
 		// Perform operation
@@ -2231,7 +2231,7 @@ public class AvrExecutor implements AVR.Executor {
 		// Set Flags
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
-		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean C = regs.getStatusBit(CARRY_FLAG);
 		boolean Z = (R == 0);
 		boolean N = R7;
 		boolean V = false;
@@ -2250,7 +2250,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(OUT insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rr);
 		data.write(insn.A + 32, Rd);
 	}
@@ -2265,7 +2265,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(POP insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = popByte(data);
 		data.write(insn.Rd, Rd);
 	}
@@ -2280,7 +2280,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(PUSH insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		pushByte(Rd, data);
 	}
@@ -2298,9 +2298,9 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(RCALL insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		pushWord(regs.PC, data);
-		regs.PC = regs.PC + insn.k;
+		int PC = regs.getPC() + 1;
+		pushWord(PC, data);
+		regs.setPC(PC + insn.k);
 	}
 
 	/**
@@ -2313,7 +2313,7 @@ public class AvrExecutor implements AVR.Executor {
 	 */
 	private void execute(RET insn, Memory flash, Memory data, Registers regs) {
 		int address = popWord(data);
-		regs.PC = address;
+		regs.setPC(address);
 	}
 
 	/**
@@ -2330,7 +2330,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(RETI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -2346,7 +2346,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(RJMP insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + insn.k + 1;
+		regs.setPC(regs.getPC() + insn.k + 1);
 	}
 
 	/**
@@ -2360,7 +2360,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 //	private void execute(ROL insn, Memory flash, Memory data, Registers regs) {
-//		regs.PC = regs.PC + 1;
+//		regs.setPC(regs.getPC()+1);
 //		// Read carry flag
 //		int CF = (regs.SREG & CARRY_FLAG);
 //		// Read register
@@ -2396,14 +2396,14 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ROR insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Read carry flag
-		int CF = (regs.SREG & CARRY_FLAG) << 7;
+		int CF = regs.getStatusBit(CARRY_FLAG) ? 128 : 0;
 		// Read register
 		byte Rd = data.read(insn.Rd);
 		// Perform operation
-		regs.SREG &= ~1;
-		regs.SREG |= (Rd & 1);
+		regs.clearStatusBit(CARRY_FLAG);
+		regs.setStatusBit(Rd & CARRY_FLAG);
 		byte R = (byte) (CF | (Rd >>> 1));
 		// Update Register file
 		data.write(insn.Rd, R);
@@ -2430,10 +2430,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SBC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
-		int CF = (regs.SREG & CARRY_FLAG) >> 0;
+		int CF = regs.getStatusBit(CARRY_FLAG) ? 1 : 0;
 		// Perform operation
 		byte R = (byte) (Rd - Rr - CF);
 		// Update Register file
@@ -2447,7 +2447,7 @@ public class AvrExecutor implements AVR.Executor {
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
 		boolean C = (!Rd7 & Rr7) | (Rr7 & R7) | (R7 & !Rd7);
-		boolean Z = (R == 0) & ((regs.SREG & ZERO_FLAG) != 0);
+		boolean Z = (R == 0) & regs.getStatusBit(ZERO_FLAG);
 		boolean N = R7;
 		boolean V = (Rd7 & !Rr7 & !R7) | (!Rd7 & Rr7 & R7);
 		boolean S = N ^ V;
@@ -2466,10 +2466,10 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SBCI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte K = (byte) insn.K;
-		int CF = (regs.SREG & CARRY_FLAG) >> 0;
+		int CF = regs.getStatusBit(CARRY_FLAG) ? 1 : 0;
 		// Perform operation
 		byte R = (byte) (Rd - K - CF);
 		// Update Register file
@@ -2484,7 +2484,7 @@ public class AvrExecutor implements AVR.Executor {
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
 		boolean C = (!Rd7 & K7) | (K7 & R7) | (R7 & !Rd7);
-		boolean Z = (R == 0) & ((regs.SREG & ZERO_FLAG) != 0);
+		boolean Z = (R == 0) & regs.getStatusBit(ZERO_FLAG);
 		boolean N = R7;
 		boolean V = (Rd7 & !K7 & !R7) | (!Rd7 & K7 & R7);
 		boolean S = N ^ V;
@@ -2504,7 +2504,7 @@ public class AvrExecutor implements AVR.Executor {
 	 */
 	private void execute(SBI insn, Memory flash, Memory data, Registers regs) {
 		int mask = 1 << insn.b;
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte A = data.read(insn.A + 32);
 		data.write(insn.A + 32, (byte) (A | mask));
 	}
@@ -2521,11 +2521,11 @@ public class AvrExecutor implements AVR.Executor {
 	 */
 	private void execute(SBIC insn, Memory flash, Memory data, Registers regs) {
 		int mask = 1 << insn.b;
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte io = data.read(insn.A + 32);
 		if((io & mask) == 0) {
-			AvrInstruction following = decode(regs.PC, flash);
-			regs.PC = regs.PC + following.getWidth();
+			AvrInstruction following = decode(regs.getPC(), flash);
+			regs.setPC(regs.getPC() + following.getWidth());
 		}
 	}
 
@@ -2541,11 +2541,11 @@ public class AvrExecutor implements AVR.Executor {
 	 */
 	private void execute(SBIS insn, Memory flash, Memory data, Registers regs) {
 		int mask = 1 << insn.b;
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte io = data.read(insn.A + 32);
 		if((io & (mask)) != 0) {
-			AvrInstruction following = decode(regs.PC, flash);
-			regs.PC = regs.PC + following.getWidth();
+			AvrInstruction following = decode(regs.getPC(), flash);
+			regs.setPC(regs.getPC() + following.getWidth());
 		}
 	}
 
@@ -2560,7 +2560,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SBIW insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int Rd = readWord(insn.Rd, data);
 		byte Rr = (byte) insn.K;
 		// Perform operation
@@ -2591,7 +2591,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SBR insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int Rd = data.read(insn.Rd);
 		//
 		int R = Rd | insn.K;
@@ -2600,7 +2600,7 @@ public class AvrExecutor implements AVR.Executor {
 		//
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
-		boolean C = (regs.SREG & CARRY_FLAG) != 0;
+		boolean C = regs.getStatusBit(CARRY_FLAG);
 		boolean Z = (R == 0);
 		boolean N = R7;
 		boolean V = false;
@@ -2619,12 +2619,12 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SBRC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int mask = 1 << insn.b;
 		byte Rd = data.read(insn.Rd);
 		if ((Rd & mask) == 0) {
-			AvrInstruction following = decode(regs.PC, flash);
-			regs.PC = regs.PC + following.getWidth();
+			AvrInstruction following = decode(regs.getPC(), flash);
+			regs.setPC(regs.getPC() + following.getWidth());
 		}
 	}
 
@@ -2638,12 +2638,12 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SBRS insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int mask = 1 << insn.b;
 		byte Rd = data.read(insn.Rd);
 		if ((Rd & mask) != 0) {
-			AvrInstruction following = decode(regs.PC, flash);
-			regs.PC = regs.PC + following.getWidth();
+			AvrInstruction following = decode(regs.getPC(), flash);
+			regs.setPC(regs.getPC() + following.getWidth());
 		}
 	}
 
@@ -2656,8 +2656,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SEC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= CARRY_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(CARRY_FLAG);
 	}
 
 	/**
@@ -2669,8 +2669,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SEH insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= HALFCARRY_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(HALFCARRY_FLAG);
 	}
 
 	/**
@@ -2683,8 +2683,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SEI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= INTERRUPT_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(INTERRUPT_FLAG);
 	}
 
 	/**
@@ -2696,8 +2696,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SEN insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= NEGATIVE_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(NEGATIVE_FLAG);
 	}
 
 	/**
@@ -2709,7 +2709,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SER insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		data.write(insn.Rd, (byte) 0xFF);
 	}
 
@@ -2722,8 +2722,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SES insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= SIGN_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(SIGN_FLAG);
 	}
 
 	/**
@@ -2735,8 +2735,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SET insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= BITCOPY_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(BITCOPY_FLAG);
 	}
 
 	/**
@@ -2748,8 +2748,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SEV insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= OVERFLOW_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(OVERFLOW_FLAG);
 	}
 
 	/**
@@ -2761,8 +2761,8 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SEZ insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
-		regs.SREG |= ZERO_FLAG;
+		regs.setPC(regs.getPC()+1);
+		regs.setStatusBit(ZERO_FLAG);
 	}
 
 	/**
@@ -2775,7 +2775,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SLEEP insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -2792,7 +2792,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SPM insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -2810,7 +2810,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_X insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
 		// Perform operation
@@ -2827,7 +2827,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_X_INC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
 		// Perform operation
@@ -2846,7 +2846,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_X_DEC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load X register
 		int X = readWord(AVR.XL_ADDRESS, data);
 		// Pre decrement
@@ -2871,7 +2871,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_Y insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
 		// Perform operation
@@ -2888,7 +2888,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_Y_INC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
 		// Perform operation
@@ -2907,7 +2907,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_Y_DEC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
 		// Pre decrement
@@ -2919,7 +2919,7 @@ public class AvrExecutor implements AVR.Executor {
 	}
 
 	private void execute(STD_Y_Q insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Y register
 		int Y = readWord(AVR.YL_ADDRESS, data);
 		// Perform operation
@@ -2941,7 +2941,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_Z insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
@@ -2958,7 +2958,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_Z_INC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
@@ -2977,7 +2977,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(ST_Z_DEC insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Pre decrement
@@ -2989,7 +2989,7 @@ public class AvrExecutor implements AVR.Executor {
 	}
 
 	private void execute(STD_Z_Q insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		// Load Z register
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		// Perform operation
@@ -3010,7 +3010,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 //	private void execute(STS_DATA insn, Memory flash, Memory data, Registers regs) {
-//		regs.PC = regs.PC + 1;
+//		regs.setPC(regs.getPC()+1);
 //		throw new RuntimeException("implement me!");
 //	}
 
@@ -3028,7 +3028,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(STS_DATA_WIDE insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 2;
+		regs.setPC(regs.getPC() + 2);
 		byte Rd = data.read(insn.Rd);
 		data.write(insn.k, Rd);
 	}
@@ -3042,7 +3042,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SUB insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte Rr = data.read(insn.Rr);
 		// Perform operation
@@ -3058,7 +3058,7 @@ public class AvrExecutor implements AVR.Executor {
 		boolean R7 = (R & 0b1000_0000) != 0;
 		//
 		boolean C = (!Rd7 & Rr7) | (Rr7 & R7) | (R7 & !Rd7);
-		boolean Z = (R == 0) & ((regs.SREG & ZERO_FLAG) != 0);
+		boolean Z = (R == 0) & regs.getStatusBit(ZERO_FLAG);
 		boolean N = R7;
 		boolean V = (Rd7 & !Rr7 & !R7) | (!Rd7 & Rr7 & R7);
 		boolean S = N ^ V;
@@ -3078,7 +3078,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SUBI insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		byte Rd = data.read(insn.Rd);
 		byte K = (byte) insn.K;
 		// Perform operation
@@ -3112,7 +3112,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(SWAP insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		int Rd = data.read(insn.Rd);
 		int lsn = Rd & 0b0000_1111;
 		int msn = Rd & 0b1111_0000;
@@ -3133,7 +3133,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(WDR insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC()+1);
 		throw new RuntimeException("implement me!");
 	}
 
@@ -3151,7 +3151,7 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param regs
 	 */
 	private void execute(XCH insn, Memory flash, Memory data, Registers regs) {
-		regs.PC = regs.PC + 1;
+		regs.setPC(regs.getPC() + 1);
 		byte Rd = data.read(insn.Rd);
 		int Z = readWord(AVR.ZL_ADDRESS, data);
 		data.write(insn.Rd, data.read(Z));
@@ -3201,25 +3201,25 @@ public class AvrExecutor implements AVR.Executor {
 
 	private void setStatusRegister(boolean C, boolean Z, boolean N, boolean V, boolean S, Registers regs) {
 		// Initially clear all bits
-		regs.SREG = regs.SREG & 0b11100000;
+		regs.clearStatusBit(0b00011111);
 		// Set relevant flags
-		regs.SREG |= C ? 0b1 << 0 : 0;
-		regs.SREG |= Z ? 0b1 << 1 : 0;
-		regs.SREG |= N ? 0b1 << 2 : 0;
-		regs.SREG |= V ? 0b1 << 3 : 0;
-		regs.SREG |= S ? 0b1 << 4 : 0;
+		regs.setStatusBit(C ? CARRY_FLAG : 0);
+		regs.setStatusBit(Z ? ZERO_FLAG : 0);
+		regs.setStatusBit(N ? NEGATIVE_FLAG : 0);
+		regs.setStatusBit(V ? OVERFLOW_FLAG : 0);
+		regs.setStatusBit(S ? SIGN_FLAG : 0);
 	}
 
 	private void setStatusRegister(boolean C, boolean Z, boolean N, boolean V, boolean S, boolean H, Registers regs) {
 		// Initially clear all bits
-		regs.SREG = regs.SREG & 0b11000000;
+		regs.clearStatusBit(0b00111111);
 		// Set relevant flags
-		regs.SREG |= C ? 0b1 << 0 : 0;
-		regs.SREG |= Z ? 0b1 << 1 : 0;
-		regs.SREG |= N ? 0b1 << 2 : 0;
-		regs.SREG |= V ? 0b1 << 3 : 0;
-		regs.SREG |= S ? 0b1 << 4 : 0;
-		regs.SREG |= H ? 0b1 << 5 : 0;
+		regs.setStatusBit(C ? CARRY_FLAG : 0);
+		regs.setStatusBit(Z ? ZERO_FLAG : 0);
+		regs.setStatusBit(N ? NEGATIVE_FLAG : 0);
+		regs.setStatusBit(V ? OVERFLOW_FLAG : 0);
+		regs.setStatusBit(S ? SIGN_FLAG : 0);
+		regs.setStatusBit(H ? HALFCARRY_FLAG : 0);
 	}
 
 	public int readWord(int address, Memory data) {

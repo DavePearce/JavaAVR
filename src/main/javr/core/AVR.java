@@ -79,9 +79,30 @@ public class AVR {
 	}
 
 	public static final class Registers {
-		public int PC;
-		public int SREG;
+		private int PC;
+		private int SREG;
+
+		public int getPC() {
+			return PC;
+		}
+
+		public void setPC(int address) {
+			this.PC = address;
+		}
+
+		public boolean getStatusBit(int mask) {
+			return (SREG & mask) != 0;
+		}
+
+		public void clearStatusBit(int mask) {
+			SREG &= ~mask;
+		}
+
+		public void setStatusBit(int mask) {
+			SREG |= mask;
+		}
 	}
+
 
 	/**
 	 * Generic interface for decoding an instruction at a given instruction
