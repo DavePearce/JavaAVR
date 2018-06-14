@@ -449,9 +449,18 @@ public class DecoderGenerator {
 			AvrInstruction.Transform t = arg.transforms[i];
 			if(t instanceof AvrInstruction.ShiftLeft) {
 				System.out.println("\t\t\t" + arg.name + " = " + arg.name + " << 1;");
-			} else {
+			} else if(t instanceof AvrInstruction.Offset) {
 				AvrInstruction.Offset offset = (AvrInstruction.Offset) t;
 				System.out.println("\t\t\t" + arg.name + " = " + arg.name + " + " + offset.offset + ";");
+			} else {
+				AvrInstruction.RotateRight r = (AvrInstruction.RotateRight) t;
+				int rcount = arg.width - r.count;
+				int mask = (1 << arg.width) - 1;
+				int lmask = mask >> r.count;
+				int rmask = (mask << rcount) & mask;
+				System.out.println("\t\t\tint l = (" + arg.name + " >> " + r.count + ") & " + toBinaryString(lmask) + ";");
+				System.out.println("\t\t\tint r = (" + arg.name + " << " + rcount + ") & " +  toBinaryString(rmask) + ";");
+				System.out.println("\t\t\t" + arg.name + " = l | r;");
 			}
 		}
 	}

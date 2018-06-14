@@ -26,7 +26,7 @@ public abstract class AvrInstruction {
 	//
 	private static final Argument i7_k = new Argument(true, 7, Argument.Kind.RelativeAddress, 'k');
 	private static final Argument i12_k = new Argument(true, 12, Argument.Kind.RelativeAddress, 'k');
-	private static final Argument u22_k = new Argument(false, 22, Argument.Kind.AbsoluteAddress, 'k');
+	private static final Argument u22_kK = new Argument(false, 22, Argument.Kind.AbsoluteAddress, 'k', new RotateRight(6));
 	private static final Argument u7_k = new Argument(false, 7, Argument.Kind.AbsoluteAddress, 'k');
 	private static final Argument u16_k = new Argument(false, 16, Argument.Kind.AbsoluteAddress, 'k');
 	//
@@ -64,7 +64,7 @@ public abstract class AvrInstruction {
 		BRVS("Branch if Overflow Set","1111_00kk_kkkk_k011", i7_k),
 		BSET("Bit Set in SREG", "1001_0100_0sss_1000", u3_s),
 		BST("Bit Store from Bit in Register to T Flag in SREG", "1111_101d_dddd_0bbb", u5_d, u3_b),
-		CALL("Long Call to a Subroutine", "1001_010k_kkkk_111k", "kkkk_kkkk_kkkk_kkkk", u22_k),
+		CALL("Long Call to a Subroutine", "1001_010k_kkkk_111k", "kkkk_kkkk_kkkk_kkkk", u22_kK),
 		CBI("Clear Bit in I/O Register", "1001_1000_AAAA_Abbb", u5_A, u3_b),
 		CLC("Clear Carry Flag", "1001_0100_1000_1000"),
 		CLH("Clear Half Carry Flag", "1001_0100_1101_1000"),
@@ -92,7 +92,7 @@ public abstract class AvrInstruction {
 		IJMP("Indirect Jump", "1001_0100_0000_1001"),
 		IN("Load an I/O Location to Register", "1011_0AAd_dddd_AAAA", u5_d, u6_A),
 		INC("Increment", "1001_010d_dddd_0011", u5_d),
-		JMP("Jump", "1001_010k_kkkk_110k", "kkkk_kkkk_kkkk_kkkk", u22_k),
+		JMP("Jump", "1001_010k_kkkk_110k", "kkkk_kkkk_kkkk_kkkk", u22_kK),
 		LAC("Load and Clear", "1001_001d_dddd_0110", u5_d),
 		LAS("Load and Set", "1001_001d_dddd_0101", u5_d),
 		LAT("Load and Toggle", "1001_001d_dddd_0111", u5_d),
@@ -498,6 +498,16 @@ public abstract class AvrInstruction {
 
 	public static final class ShiftLeft extends Transform {
 	}
+
+
+	public static final class RotateRight extends Transform {
+		public final int count;
+
+		public RotateRight(int count) {
+			this.count = count;
+		}
+	}
+
 
 	public static abstract class Address extends AvrInstruction {
 		public final int k;
