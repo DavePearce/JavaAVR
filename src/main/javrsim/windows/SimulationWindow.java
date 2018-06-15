@@ -83,8 +83,8 @@ public class SimulationWindow extends JFrame {
 	private final JPeripheral.Descriptor[] peripheralDescriptors;
 
 	/**
-	 * The list of instantiated peripherals. This is important because they also need
-	 * to be clocked as the AVR is clocked.
+	 * The list of instantiated peripherals. This is important because they also
+	 * need to be clocked as the AVR is clocked.
 	 */
 	private final ArrayList<JPeripheral> peripherals = new ArrayList<>();
 
@@ -153,7 +153,7 @@ public class SimulationWindow extends JFrame {
 					// Pause simulation (otherwise wierd things happen)
 					clock.pause();
 					// Upload hex file
-		            loadHexFile(fc.getSelectedFile());
+					loadHexFile(fc.getSelectedFile());
 					// Redraw window
 					repaint();
 				} else {
@@ -174,10 +174,13 @@ public class SimulationWindow extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// Uncheck all other items
-					for(int j=0;j!=items.length;++j) {
+					for (int j = 0; j != items.length; ++j) {
 						items[j].setState(j == ith);
 					}
 					// Instantiate the AVR
+					clock.pause();
+					destroyAllViews();
+					destroyAllPeripherals();
 					mcu = c.instantiate();
 					resetMicroController();
 				}
@@ -202,7 +205,7 @@ public class SimulationWindow extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JDialog dialog = new ConnectionWindow(d, mcu.getPins(),peripherals);
+					JDialog dialog = new ConnectionWindow(d, mcu.getPins(), peripherals);
 					center(dialog);
 				}
 
@@ -226,7 +229,6 @@ public class SimulationWindow extends JFrame {
 		}
 		return menu;
 	}
-
 
 	private JToolBar constructToolBar() {
 		final JToolBar toolBar = new JToolBar();
@@ -275,14 +277,40 @@ public class SimulationWindow extends JFrame {
 		return toolBar;
 	}
 
+	/**
+	 * Display of all active views. This is to ensure they must be reinitialised by
+	 * being reopened (for example, after a device change).
+	 */
+	public void destroyAllViews() {
+		synchronized(views) {
+			for (JAvrView view : views) {
+				view.dispose();
+			}
+			views.clear();
+		}
+	}
+
+	/**
+	 * Dispose of all active peripherals. This is ensure they must be reinitialised
+	 * by being reconnected (for example, after a device change).
+	 */
+	public void destroyAllPeripherals() {
+		synchronized(peripherals) {
+			for (JPeripheral peripheral : peripherals) {
+				peripheral.dispose();
+			}
+			peripherals.clear();
+		}
+	}
+
 	public static void center(java.awt.Component component) {
 		int cwidth = component.getWidth();
 		int cheight = component.getHeight();
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		int width = gd.getDisplayMode().getWidth();
 		int height = gd.getDisplayMode().getHeight();
-		int x = (width/2) - (cwidth/2);
-		int y = (height/2) - (cheight/2);
+		int x = (width / 2) - (cwidth / 2);
+		int y = (height / 2) - (cheight / 2);
 		component.setBounds(x, y, cwidth, cheight);
 	}
 
@@ -292,12 +320,12 @@ public class SimulationWindow extends JFrame {
 		Random rand = new Random();
 		AVR.Memory data = mcu.getData();
 		// Randomise SRAM
-		for(int i=0;i!=data.size();++i) {
+		for (int i = 0; i != data.size(); ++i) {
 			byte item = (byte) rand.nextInt(255);
-			data.poke(i,item);
+			data.poke(i, item);
 		}
 		// Reset the peripherals
-		for(JPeripheral p : peripherals) {
+		for (JPeripheral p : peripherals) {
 			p.reset();
 		}
 	}
@@ -318,16 +346,16 @@ public class SimulationWindow extends JFrame {
 
 	private String[] toHzLabels(int[] rates) {
 		String[] labels = new String[rates.length];
-		for(int i=0;i!=labels.length;++i) {
+		for (int i = 0; i != labels.length; ++i) {
 			labels[i] = toHzLabel(rates[i]);
 		}
 		return labels;
 	}
 
 	public String toHzLabel(int rate) {
-		if(rate <= 1000) {
+		if (rate <= 1000) {
 			return Integer.toString(1000 / rate) + "MHz";
-		} else if(rate <= 1000_000) {
+		} else if (rate <= 1000_000) {
 			return Integer.toString(1000_000 / rate) + "KHz";
 		} else {
 			return Integer.toString(1000_000_000 / rate) + "Hz";
@@ -348,16 +376,20 @@ public class SimulationWindow extends JFrame {
 
 	public void clock() {
 		// Clock any peripherals
-		for(JPeripheral p : peripherals) {
-			p.clock();
+		synchronized(peripherals) {
+			for (JPeripheral p : peripherals) {
+				p.clock();
+			}
 		}
 		// Clock the AVR
 		mcu.clock();
 		// Repaint the display
 		repaint();
 		// Repaint all views
-		for(int i=0;i!=views.size();++i) {
-			views.get(i).repaint();
+		synchronized(views) {
+			for (int i = 0; i != views.size(); ++i) {
+				views.get(i).repaint();
+			}
 		}
 	}
 
