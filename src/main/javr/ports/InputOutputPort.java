@@ -1,9 +1,20 @@
 package javr.ports;
 
+import java.util.Arrays;
+
 import javr.core.Wire;
 import javr.memory.IoMemory;
+import javr.memory.IoMemory.Port;
 
-public class WireArrayPort extends AbstractPort {
+/**
+ * The most basic implementation of IoMemory.Port which simply connects I/O pins
+ * to I/O registers. This allows for direct manipulation of the I/O pins by
+ * writing / reading from the registers.
+ *
+ * @author David J. Pearce
+ *
+ */
+public class InputOutputPort extends AbstractPort {
 	/**
 	 * The pins are used to construct the PORT and PIN register values.
 	 */
@@ -13,7 +24,7 @@ public class WireArrayPort extends AbstractPort {
 	 */
 	private byte directions;
 
-	public WireArrayPort(int PORT, int DDR, int PIN, Wire... pins) {
+	public InputOutputPort(int PORT, int DDR, int PIN, Wire... pins) {
 		super(new int[] {PORT, DDR, PIN});
 		this.pins = pins;
 	}
@@ -70,5 +81,39 @@ public class WireArrayPort extends AbstractPort {
 			mask = mask << 1;
 		}
 		return (byte) data;
+	}
+
+	public static class Descriptor implements IoMemory.PortDescriptor {
+		private final int PORT;
+		private final int DDR;
+		private final int PIN;
+		private final String[] pinLabels;
+
+		public Descriptor(int PORT, int DDR, int PIN, String... pinLabels) {
+			this.PORT = PORT;
+			this.DDR = DDR;
+			this.PIN = PIN;
+			this.pinLabels = pinLabels;
+		}
+
+		@Override
+		public Port create(Wire... iopins) {
+			// FIXME: this is a little ugly, frankly.
+			Wire[] pins = new Wire[pinLabels.length];
+			for(int i=0;i!=pins.length;++i) {
+				pins[i] = findPin(pinLabels[i],iopins);
+			}
+			return new InputOutputPort(PORT,DDR,PIN,pins);
+		}
+
+		private Wire findPin(String label, Wire[] iopins) {
+			System.out.println("I/O PINS: " + Arrays.toString(iopins));
+			for (int i = 0; i != iopins.length; ++i) {
+				if (iopins[i].hasLabel(label)) {
+					return iopins[i];
+				}
+			}
+			throw new IllegalArgumentException("invalid pin label (" + label + ")");
+		}
 	}
 }

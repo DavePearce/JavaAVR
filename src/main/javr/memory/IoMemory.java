@@ -2,9 +2,11 @@ package javr.memory;
 
 import javr.core.AVR;
 import javr.core.AVR.Memory;
+import javr.core.Wire;
 
 /**
- * Provides a general hook for handling I/O ports.
+ * Provides a general hook for handling I/O peripherals (which we refer to as
+ * ports to avoid confusion with external peripherals).
  *
  * @author David J. Pearce
  *
@@ -110,5 +112,21 @@ public class IoMemory implements AVR.Memory {
 		 * @return
 		 */
 		public int getRegister(int i);
+	}
+
+	/**
+	 * A generic mechanism for instantiating and configuring I/O ports.
+	 *
+	 * @author David J. Pearce
+	 *
+	 */
+	public interface PortDescriptor {
+		/**
+		 * Construct a given port descriptor from the complete list of I/O pins.
+		 *
+		 * @param pins
+		 * @return
+		 */
+		public Port create(Wire... pins);
 	}
 }

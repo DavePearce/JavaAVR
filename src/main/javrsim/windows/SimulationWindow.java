@@ -48,7 +48,7 @@ import javr.memory.ByteMemory;
 import javr.memory.IoMemory;
 import javr.memory.MultiplexedMemory;
 import javr.peripherals.AbstractSerialPeripheral;
-import javr.ports.WireArrayPort;
+import javr.ports.InputOutputPort;
 import javrsim.peripherals.ConsolePeripheral;
 import javrsim.peripherals.DisplayPeripheral;
 import javrsim.peripherals.JPeripheral;
