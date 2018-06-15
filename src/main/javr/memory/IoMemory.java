@@ -1,6 +1,7 @@
 package javr.memory;
 
 import javr.core.AVR;
+import javr.core.AVR.Memory;
 
 /**
  * Provides a general hook for handling I/O ports.
@@ -9,12 +10,21 @@ import javr.core.AVR;
  *
  */
 public class IoMemory implements AVR.Memory {
-	private AVR.Memory memory;
-	private Port[] ports;
+	private final AVR.Memory memory;
+	private final Port[] ports;
 
 	public IoMemory(AVR.Memory memory, Port... ports) {
 		this.memory = memory;
-		this.ports = ports;
+		// Create port memory to match byte memory
+		this.ports = new Port[memory.size()];
+		// Allocate the given ports
+		for (int i = 0; i != ports.length; ++i) {
+			Port port = ports[i];
+			for (int j = 0; j != port.size(); ++j) {
+				this.ports[port.getRegister(j)] = port;
+			}
+		}
+		//
 	}
 
 	public Port getPort(int i) {
@@ -27,48 +37,29 @@ public class IoMemory implements AVR.Memory {
 
 	@Override
 	public byte read(int address) {
-		for(int i=0;i!=ports.length;++i) {
-			Port port = ports[i];
-			if(port.getDataRegister() == address) {
-				return port.readDataRegister();
-			} else if(port.getDirectionRegister() == address) {
-				return port.readDirectionRegister();
-			} else if(port.getPinRegister() == address) {
-				return port.readPinRegister();
-			}
+		Port p = ports[address];
+		if (p != null) {
+			return p.read(address);
+		} else {
+			return memory.read(address);
 		}
-		return memory.read(address);
 	}
 
 	@Override
 	public byte peek(int address) {
-		for(int i=0;i!=ports.length;++i) {
-			Port port = ports[i];
-			if(port.getDataRegister() == address) {
-				return port.readDataRegister();
-			} else if(port.getDirectionRegister() == address) {
-				return port.readDirectionRegister();
-			} else if(port.getPinRegister() == address) {
-				return port.readPinRegister();
-			}
+		Port p = ports[address];
+		if (p != null) {
+			return p.read(address);
+		} else {
+			return memory.peek(address);
 		}
-		return memory.peek(address);
 	}
 
 	@Override
 	public void write(int address, byte data) {
-		for(int i=0;i!=ports.length;++i) {
-			Port port = ports[i];
-			if(port.getDataRegister() == address) {
-				port.writeDataRegister(data);
-				break;
-			} else if(port.getDirectionRegister() == address) {
-				port.writeDirectionRegister(data);
-				break;
-			} else if(port.getPinRegister() == address) {
-				port.writePinRegister(data);
-				break;
-			}
+		Port p = ports[address];
+		if (p != null) {
+			p.write(address, data);
 		}
 		// Always write-thru
 		memory.write(address, data);
@@ -76,13 +67,9 @@ public class IoMemory implements AVR.Memory {
 
 	@Override
 	public void poke(int address, byte data) {
-		for(int i=0;i!=ports.length;++i) {
-			Port port = ports[i];
-			if (port.getDataRegister() == address || port.getDirectionRegister() == address
-					|| port.getPinRegister() == address) {
-				// I/O doesn't respond to being poked.
-				return;
-			}
+		Port p = ports[address];
+		if (p != null) {
+			p.poke(address, data);
 		}
 		// Always write-thru
 		memory.write(address, data);
@@ -91,7 +78,7 @@ public class IoMemory implements AVR.Memory {
 	@Override
 	public void write(int address, byte[] data) {
 		for(int i=0;i!=data.length;++i) {
-			memory.write(address+i, data[i]);
+			write(address+i, data[i]);
 		}
 	}
 
@@ -101,70 +88,27 @@ public class IoMemory implements AVR.Memory {
 	}
 
 	/**
-	 * Represents an I/O port which is mapped over this I/O memory.
+	 * Represents an I/O port which maps one or more memory addresses to internal
+	 * registers.
 	 *
 	 * @author David J. Pearce
 	 *
 	 */
-	public interface Port {
+	public interface Port extends Memory {
+
 		/**
-		 * Get port number of the data register (e.g. PORTB).
+		 * Get the number of registers mapped by this port.
 		 *
 		 * @return
 		 */
-		public int getDataRegister();
+		@Override
+		public int size();
 
 		/**
-		 * Get port number of Data Direction Register (e.g. DDRB).
+		 * Get the memory address occupied by the ith register.
 		 *
 		 * @return
 		 */
-		public int getDirectionRegister();
-
-		/**
-		 * Get port number of Input Pins Address Register (e.g. PINB).
-		 *
-		 * @return
-		 */
-		public int getPinRegister();
-
-		/**
-		 * Read byte from the data register.
-		 *
-		 * @return
-		 */
-		public byte readDataRegister();
-
-		/**
-		 * Read byte from the data direction register.
-		 *
-		 * @return
-		 */
-		public byte readDirectionRegister();
-
-		/**
-		 * Read byte from the data direction register.
-		 *
-		 * @return
-		 */
-		public byte readPinRegister();
-
-		/**
-		 * Write byte to the data register.
-		 * @param data
-		 */
-		public void writeDataRegister(byte data);
-
-		/**
-		 * Write byte to the data direction register.
-		 * @param data
-		 */
-		public void writeDirectionRegister(byte data);
-
-		/**
-		 * Write byte to the pin register.
-		 * @param data
-		 */
-		public void writePinRegister(byte data);
+		public int getRegister(int i);
 	}
 }

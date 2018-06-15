@@ -14,7 +14,7 @@ import javax.swing.border.Border;
 
 import javr.core.AvrPeripheral;
 import javr.core.Wire;
-import javr.util.AbstractSerialPeripheral;
+import javr.peripherals.AbstractSerialPeripheral;
 import javrsim.peripherals.JPeripheral.Descriptor;
 
 public class ConsolePeripheral extends JPeripheral {

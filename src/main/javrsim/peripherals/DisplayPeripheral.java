@@ -20,8 +20,8 @@ import javax.swing.border.Border;
 
 import javr.core.AvrPeripheral;
 import javr.core.Wire;
+import javr.peripherals.AbstractSerialPeripheral;
 import javr.peripherals.DotMatrixDisplay;
-import javr.util.AbstractSerialPeripheral;
 import javrsim.peripherals.JPeripheral.Descriptor;
 
 /**

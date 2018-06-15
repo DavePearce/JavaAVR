@@ -3,7 +3,6 @@ package javr.peripherals;
 import java.util.Arrays;
 
 import javr.core.Wire;
-import javr.util.AbstractSerialPeripheral;
 
 /**
  * A simple dot-matrix display of a given width and height. The width must be

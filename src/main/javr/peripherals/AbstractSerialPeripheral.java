@@ -1,4 +1,4 @@
-package javr.util;
+package javr.peripherals;
 
 import javr.core.AvrPeripheral;
 import javr.core.Wire;
