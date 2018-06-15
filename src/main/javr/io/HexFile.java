@@ -14,11 +14,9 @@
 package javr.io;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -26,8 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javr.core.AVR;
-import javr.core.AvrDecoder;
-import javr.core.AvrInstruction;
 import javr.memory.ByteMemory;
 
 public class HexFile {
@@ -223,10 +219,13 @@ public class HexFile {
 			write_u1(r.size());
 			// Write address
 			write_u2(r.getAddress());
+			// Write record type
+			write_u1(r.type);
 			// Write data bytes
 			for(int i=0;i!=r.size();++i) {
 				write_u1(r.get(i) & 0xFF);
 			}
+			write_u1(r.getChecksum());
 			// Write checksum
 			// End line
 			writer.println();
@@ -270,9 +269,11 @@ public class HexFile {
 	 *
 	 */
 	public static abstract class Record {
+		protected final int type;
 		protected final int address;
 
-		public Record(int address) {
+		public Record(int type, int address) {
+			this.type = type;
 			this.address = address;
 		}
 
@@ -301,6 +302,30 @@ public class HexFile {
 		 * @return
 		 */
 		public abstract byte get(int i);
+
+		/**
+		 * Calculate the checksum byte for this record.
+		 *
+		 * @return
+		 */
+		public int getChecksum() {
+			int sum = 0;
+			// Add the length
+			sum += size();
+			// Add first byte of address
+			sum += address & 0xFF;
+			// Add second byte of address
+			sum += (address >> 8) & 0xFF;
+			// Add record type
+			sum += type;
+			// Add remaining bytes
+			for (int i = 0; i != size(); ++i) {
+				int value = get(i) & 0xFF;
+				sum = sum + value;
+			}
+			sum = (~sum) + 1;
+			return (sum & 0xFF);
+		}
 	}
 
 	/**
@@ -313,7 +338,7 @@ public class HexFile {
 		private final byte[] data;
 
 		public Data(int address, byte[] data) {
-			super(address);
+			super(00,address);
 			this.data = data;
 		}
 
@@ -343,7 +368,7 @@ public class HexFile {
 
 	public static class EndOfFile extends Record {
 		public EndOfFile(int address) {
-			super(address);
+			super(01,address);
 		}
 
 		@Override
@@ -368,9 +393,8 @@ public class HexFile {
 				+ ":10012000194E79234623965778239EDA3F01B2CAA7\n"
 				+ ":100130003F0156702B5E712B722B732146013421C7\n"
 				+ ":00000001FF\n";
-		// HexFile.Reader reader = new HexFile.Reader(new StringReader(input));
-
-		HexFile.Reader reader = new HexFile.Reader(new StringReader(input));
+		HexFile.Reader reader = new HexFile.Reader(new FileReader("examples/console.hex"));
+		//HexFile.Reader reader = new HexFile.Reader(new StringReader(input));
 		HexFile hf = reader.readAll();
 		for (int i = 0; i != hf.size(); ++i) {
 			System.out.println("READ: " + hf.get(i));
