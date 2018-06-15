@@ -21,6 +21,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -77,6 +78,12 @@ public class SimulationWindow extends JFrame {
 	private final ClockThread clock;
 
 	/**
+	 * The toolbar is made avilable so that we can easily enable and disable the
+	 * actions contained therein.
+	 */
+	private final JToolBar toolBar;
+
+	/**
 	 * The list of peripheral descriptors. This determines what peripherals can be
 	 * created by this simulation.
 	 */
@@ -115,7 +122,7 @@ public class SimulationWindow extends JFrame {
 		this.clock = new ClockThread(_8MHz, this);
 		//
 		JMenuBar menuBar = constructMenuBar(device);
-		JToolBar toolBar = constructToolBar();
+		this.toolBar = constructToolBar();
 		setJMenuBar(menuBar);
 		add(toolBar, BorderLayout.PAGE_START);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -124,6 +131,7 @@ public class SimulationWindow extends JFrame {
 		setVisible(true);
 		center(this);
 		// Start clock ticking
+		setModeStopped();
 		resetMicroController();
 		clock.start();
 	}
@@ -236,6 +244,7 @@ public class SimulationWindow extends JFrame {
 		JButton newButton = new JButton(new AbstractAction("RESET") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				setModeStopped();
 				clock.pause();
 				resetMicroController();
 			}
@@ -244,6 +253,7 @@ public class SimulationWindow extends JFrame {
 		final JButton stopButton = new JButton(new AbstractAction("STOP") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				setModeStopped();
 				clock.pause();
 			}
 		});
@@ -263,6 +273,7 @@ public class SimulationWindow extends JFrame {
 		final JButton playButton = new JButton(new AbstractAction("PLAY") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				setModePlaying();
 				int index = timeSelect.getSelectedIndex();
 				clock.setDelay(CLOCK_RATES[index]);
 				clock.enable();
@@ -275,6 +286,40 @@ public class SimulationWindow extends JFrame {
 		toolBar.add(timeSelect);
 		toolBar.add(Box.createHorizontalGlue());
 		return toolBar;
+	}
+
+	public void setModeStopped() {
+		configureToolBar("RESET","STEP","PLAY");
+	}
+
+	public void setModePlaying() {
+		configureToolBar("STOP");
+	}
+
+	/**
+	 * Configure which buttons are enabled / disabled in the tool bar. This just
+	 * makes the appearance a bit better.
+	 *
+	 * @param enabled
+	 */
+	public void configureToolBar(String... enabled) {
+		for(Component component : toolBar.getComponents()) {
+			String label = null;
+			if(component instanceof JButton) {
+				JButton button = (JButton) component;
+				label = button.getActionCommand();
+			} else {
+				continue;
+			}
+			component.setEnabled(false);
+
+			for(int j=0;j!=enabled.length;++j) {
+				if(label.equals(enabled[j])) {
+					component.setEnabled(true);
+					break;
+				}
+			}
+		}
 	}
 
 	/**
