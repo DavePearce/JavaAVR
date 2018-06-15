@@ -19,6 +19,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -38,6 +39,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 
 import javr.core.AVR;
+import javr.core.AvrConfiguration;
 import javr.core.AvrDecoder;
 import javr.core.AvrExecutor;
 import javr.core.AvrInstruction;
@@ -102,17 +104,17 @@ public class SimulationWindow extends JFrame {
 	 * The underlying MCU for this simulation. This must be instrumentable to allow
 	 * the various views to hook into it as necessary.
 	 */
-	private final AVR.Instrumentable mcu;
+	private volatile AVR.Instrumentable mcu;
 
-	public SimulationWindow(AVR.Instrumentable avr, JPeripheral.Descriptor[] peripherals, JAvrView.Descriptor[] views) {
+	public SimulationWindow(String device, JPeripheral.Descriptor[] peripherals, JAvrView.Descriptor[] views) {
 		super("JavaAVR Simulator");
 		// Initialise Stuff
-		this.mcu = avr;
+		this.mcu = AvrConfiguration.instantiate(device);
 		this.peripheralDescriptors = peripherals;
 		this.viewDescriptors = views;
 		this.clock = new ClockThread(_8MHz, this);
 		//
-		JMenuBar menuBar = constructMenuBar();
+		JMenuBar menuBar = constructMenuBar(device);
 		JToolBar toolBar = constructToolBar();
 		setJMenuBar(menuBar);
 		add(toolBar, BorderLayout.PAGE_START);
@@ -130,9 +132,10 @@ public class SimulationWindow extends JFrame {
 		peripherals.add(peripheral);
 	}
 
-	private JMenuBar constructMenuBar() {
+	private JMenuBar constructMenuBar(String device) {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
+		menuBar.add(createDeviceMenu(device));
 		menuBar.add(createConnectMenu());
 		menuBar.add(createViewMenu());
 		return menuBar;
@@ -159,6 +162,37 @@ public class SimulationWindow extends JFrame {
 			}
 		}));
 		return fileMenu;
+	}
+
+	private JMenu createDeviceMenu(String device) {
+		JMenu menu = new JMenu("Device");
+		JCheckBoxMenuItem[] items = new JCheckBoxMenuItem[AvrConfiguration.CONFIGURATIONS.length];
+		for (int i = 0; i != items.length; ++i) {
+			final int ith = i;
+			AvrConfiguration c = AvrConfiguration.CONFIGURATIONS[i];
+			items[i] = new JCheckBoxMenuItem(new AbstractAction(c.getName()) {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// Uncheck all other items
+					for(int j=0;j!=items.length;++j) {
+						items[j].setState(j == ith);
+					}
+					// Instantiate the AVR
+					mcu = c.instantiate();
+					resetMicroController();
+				}
+
+			});
+			// Add to menu
+			menu.add(items[i]);
+			// Mark as check if device used to instantiate initial AVR
+			if (device.equals(c.getName())) {
+				items[i].setState(true);
+			}
+		}
+
+		// menu.set
+		return menu;
 	}
 
 	private JMenu createConnectMenu() {
