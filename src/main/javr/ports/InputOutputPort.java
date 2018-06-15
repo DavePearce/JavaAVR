@@ -83,6 +83,12 @@ public class InputOutputPort extends AbstractPort {
 		return (byte) data;
 	}
 
+	/**
+	 * Descriptor for an InputOutputPort.
+	 *
+	 * @author David J. Pearce
+	 *
+	 */
 	public static class Descriptor implements IoMemory.PortDescriptor {
 		private final int PORT;
 		private final int DDR;
@@ -107,7 +113,6 @@ public class InputOutputPort extends AbstractPort {
 		}
 
 		private Wire findPin(String label, Wire[] iopins) {
-			System.out.println("I/O PINS: " + Arrays.toString(iopins));
 			for (int i = 0; i != iopins.length; ++i) {
 				if (iopins[i].hasLabel(label)) {
 					return iopins[i];

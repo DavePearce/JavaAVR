@@ -81,8 +81,7 @@ public class ConnectionWindow extends JDialog {
 		c.gridx = 1;
 		String[] labels = toPinLabels(avrPins);
 		JComboBox<String> combo = new JComboBox<>(labels);
-		// +1 to skip the +5v pin
-		combo.setSelectedItem(labels[y+1]);
+		combo.setSelectedItem(selectBestLabel(y,labels,title));
 		connections.add(combo);
 		owner.add(combo, c);
 	}
@@ -123,6 +122,15 @@ public class ConnectionWindow extends JDialog {
 		// Finally, dispose of this dialog as we're finished.
 		dispose();
 		//
+	}
+
+	private String selectBestLabel(int ith, String[] pins, String connection) {
+		for(int i=0;i!=pins.length;++i) {
+			if(pins[i].contains(connection)) {
+				return pins[i];
+			}
+		}
+		return pins[ith];
 	}
 
 	private String[] toPinLabels(Wire[] pins) {

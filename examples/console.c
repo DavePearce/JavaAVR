@@ -1,13 +1,17 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#define SCK  0b00000100
+#define MISO 0b00000010
+#define MOSI 0b00000001
+
 void spi_write_byte(char c) {
   for(int i=0;i<8;++i) {
     PORTB = 0b00000000;    
     if((c & 1) == 1) {
-      PORTB = 0b00000011;
+      PORTB = SCK|MOSI;
     } else {
-      PORTB = 0b00000001;
+      PORTB = SCK;
     }
     c = c >> 1;
   }
@@ -15,7 +19,7 @@ void spi_write_byte(char c) {
 
 int main (void){
   // set SCLK, MOSI, MISO, SS to be output
-  DDRB = 0b00001111;
+  DDRB = SCK|MOSI|MISO;
   char chars[] = "hello world";
   //
   for(int j=0;j!=11;++j) {

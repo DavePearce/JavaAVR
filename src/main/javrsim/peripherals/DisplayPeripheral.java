@@ -167,7 +167,7 @@ public class DisplayPeripheral extends JPeripheral {
 
 		@Override
 		public String[] getWireLabels() {
-			return new String[] { "SCLK", "MOSI", "MISO", "SS" };
+			return new String[] { "SCK", "MOSI", "MISO", "SS" };
 		}
 
 		@Override

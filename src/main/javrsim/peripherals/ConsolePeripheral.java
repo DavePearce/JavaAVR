@@ -77,7 +77,6 @@ public class ConsolePeripheral extends JPeripheral {
 
 		@Override
 		public void received(byte[] data) {
-			System.out.println("RECEIVED DATA: " + data[0]);
 			text.append((char) data[0]);
 			repaint();
 		}
@@ -102,7 +101,7 @@ public class ConsolePeripheral extends JPeripheral {
 
 		@Override
 		public String[] getWireLabels() {
-			return new String[] { "SCLK", "MOSI", "MISO", "SS" };
+			return new String[] { "SCK", "MOSI", "MISO", "SS" };
 		}
 
 		@Override
