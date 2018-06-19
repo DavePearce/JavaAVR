@@ -147,27 +147,67 @@ public class AvrConfiguration {
 	public static final AvrConfiguration ATmega328 = new AvrConfiguration("ATmega328",32768, 2048,
 			new PinDescriptor[] {
 					// Pin 1
-					new PinDescriptor("PB5", "PCINT5", "!RESET", "ADC0", "dW"),
+					new PinDescriptor("PC6", "PCINT14", "!RESET"),
 					// Pin 2
-					new PinDescriptor("PB3", "PCINT3", "XTAL1", "CLK1", "!OC1B", "ADC3"),
+					new PinDescriptor("PD0", "PCINT16", "RXD"),
 					// Pin 3
-					new PinDescriptor("PB4", "PCINT4", "XTAL2", "CLK0", "OC1B", "ADC2"),
+					new PinDescriptor("PD1", "PCINT17", "TXD"),
 					// Pin 4
-					new PinDescriptor("GND"),
+					new PinDescriptor("PD2", "PCINT18", "INT0"),
 					// Pin 5
-					new PinDescriptor("PB0", "MOSI", "DI", "SDA", "AIN0", "OC0A", "!OC1A", "PCINT0"),
+					new PinDescriptor("PD3", "PCINT19", "OC2B", "INT1"),
 					// Pin 6
-					new PinDescriptor("PB1", "MISO", "DO", "AIN1", "OC0B", "OC1A", "PCINT1"),
+					new PinDescriptor("PD4", "PCINT20", "XCK", "T0"),
 					// Pin 7
-					new PinDescriptor("PB2", "SCK", "USCK", "SCL", "ADC1", "T0", "INT0", "PCINT2"),
+					new PinDescriptor("VCC"),
 					// Pin 8
-					new PinDescriptor("VCC") },
+					new PinDescriptor("GND"),
+					// Pin 9
+					new PinDescriptor("PB6", "PCINT6", "XTAL1", "TOSC1"),
+					// Pin 10
+					new PinDescriptor("PB7", "PCINT7", "XTAL2", "TOSC2"),
+					// Pin 11
+					new PinDescriptor("PD5", "PCINT21", "OC0B", "T1"),
+					// Pin 12
+					new PinDescriptor("PD6", "PCINT22", "OC0A", "AIN0"),
+					// Pin 13
+					new PinDescriptor("PD7", "PCINT23", "AIN1"),
+					// Pin 14
+					new PinDescriptor("PB0", "PCINT0", "CLK0", "ICP1"),
+					// Pin 15
+					new PinDescriptor("PB1", "OC1A", "PCINT1"),
+					// Pin 16
+					new PinDescriptor("PB2", "!SS", "OC1B", "PCINT2"),
+					// Pin 17
+					new PinDescriptor("PB3", "MOSI", "OC2A", "PCINT3"),
+					// Pin 18
+					new PinDescriptor("PB3", "MISO", "PCINT4"),
+					// Pin 19
+					new PinDescriptor("PB5", "SCK", "PCINT5"),
+					// Pin 20
+					new PinDescriptor("AVCC"),
+					// Pin 21
+					new PinDescriptor("AREF"),
+					// Pin 22
+					new PinDescriptor("GND"),
+					// Pin 23
+					new PinDescriptor("PC0", "ADC0", "PCINT8"),
+					// Pin 24
+					new PinDescriptor("PC1", "ADC1", "PCINT9"),
+					// Pin 25
+					new PinDescriptor("PC2", "ADC2", "PCINT10"),
+					// Pin 26
+					new PinDescriptor("PC3", "ADC3", "PCINT11"),
+					// Pin 27
+					new PinDescriptor("PC4", "ADC4", "SDA", "PCINT12"),
+					// Pin 28
+					new PinDescriptor("PC5", "ADC5", "SCL", "PCINT13"), },
 			// PORTB
-			new InputOutputPort.Descriptor(0x18, 0x17, 0x16, "PB0", "PB1", "PB2", "PB3", "PB4", "PB5")
-	// TIMER0
-	// TIMER1
-	// USI
-	);
+			new InputOutputPort.Descriptor(0x5, 0x4, 0x3, "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7"),
+			// PORTC
+			new InputOutputPort.Descriptor(0x8, 0x7, 0x6, "PC0", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6"),
+			// PORTD
+			new InputOutputPort.Descriptor(0xB, 0xA, 0x9, "PD0", "PD1", "PD2", "PD3", "PD4", "PD5", "PD6", "PD7"));
 
 
 	/**
