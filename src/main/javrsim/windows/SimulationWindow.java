@@ -127,14 +127,19 @@ public class SimulationWindow extends JFrame {
 	private volatile AVR.Instrumentable mcu;
 
 	public SimulationWindow(String device, JPeripheral.Descriptor[] peripherals, JAvrView.Descriptor[] views) {
+		this(AvrConfiguration.instantiate(device),peripherals,views);
+	}
+
+
+	public SimulationWindow(AVR.Instrumentable avr, JPeripheral.Descriptor[] peripherals, JAvrView.Descriptor[] views) {
 		super("JavaAVR Simulator");
 		// Initialise Stuff
-		this.mcu = AvrConfiguration.instantiate(device);
+		this.mcu = avr;
 		this.peripheralDescriptors = peripherals;
 		this.viewDescriptors = views;
 		this.clock = new ClockThread(_8MHz, this);
 		//
-		JMenuBar menuBar = constructMenuBar(device);
+		JMenuBar menuBar = constructMenuBar(avr.getDeviceName());
 		this.toolBar = constructToolBar();
 		setJMenuBar(menuBar);
 		add(toolBar, BorderLayout.PAGE_START);

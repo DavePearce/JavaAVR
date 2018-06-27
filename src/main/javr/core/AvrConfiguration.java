@@ -21,7 +21,10 @@ import javr.ports.InputOutputPort;
 import javr.util.IdealWire;
 
 public class AvrConfiguration {
-	private final String name;
+	/**
+	 * Name of this AVR device
+	 */
+	private final String deviceName;
 	/**
 	 * Amount of on-board FLASH memory.
 	 */
@@ -40,7 +43,7 @@ public class AvrConfiguration {
 	private final IoMemory.PortDescriptor[] portDescriptors;
 
 	public AvrConfiguration(String name, int FLASH, int SRAM, PinDescriptor[] pinDescriptors, IoMemory.PortDescriptor... portDescriptors) {
-		this.name = name;
+		this.deviceName = name;
 		this.FLASH = FLASH;
 		this.SRAM = SRAM;
 		this.portDescriptors = portDescriptors;
@@ -48,7 +51,7 @@ public class AvrConfiguration {
 	}
 
 	public String getName() {
-		return name;
+		return deviceName;
 	}
 
 	public AVR.Instrumentable instantiate() {
@@ -74,7 +77,7 @@ public class AvrConfiguration {
 		// Multiplex it all together.
 		AVR.Memory data = new MultiplexedMemory(registers, io, SRAM);
 		//
-		return new AVR.Instrumentable(new AvrExecutor(flash.size(),new AvrDecoder()), pins, flash, data);
+		return new AVR.Instrumentable(deviceName, new AvrExecutor(flash.size(), new AvrDecoder()), pins, flash, data);
 	}
 
 	public static class PinDescriptor {

@@ -37,6 +37,7 @@ public class AVR {
 	public final static int ZL_ADDRESS = 0x1e;
 	public final static int ZH_ADDRESS = 0x1f;
 	//
+	private final String device;
 	private final Executor executor;
 	private final Wire[] pins;
 	private final Memory data;
@@ -44,12 +45,22 @@ public class AVR {
 	// Internal registers
 	private Registers registers;
 
-	public AVR(Executor executor, Wire[] pins, Memory flash, Memory data) {
+	public AVR(String device, Executor executor, Wire[] pins, Memory flash, Memory data) {
+		this.device = device;
 		this.executor = executor;
 		this.pins = pins;
 		this.flash = flash;
 		this.data = data;
 		this.registers = new Registers();
+	}
+
+	/**
+	 * Get the device name associated with this AVR microcontroller.
+	 *
+	 * @return
+	 */
+	public String getDeviceName() {
+		return device;
 	}
 
 	public Wire[] getPins() {
@@ -199,8 +210,8 @@ public class AVR {
 	 *
 	 */
 	public static class Instrumentable extends AVR {
-		public Instrumentable(Executor executor, Wire[] pins, Memory flash, Memory data) {
-			super(executor, pins, new InstrumentableMemory(flash), new InstrumentableMemory(data));
+		public Instrumentable(String device, Executor executor, Wire[] pins, Memory flash, Memory data) {
+			super(device, executor, pins, new InstrumentableMemory(flash), new InstrumentableMemory(data));
 		}
 
 		@Override
