@@ -16,6 +16,8 @@ package javr.core;
 import static javr.core.AVR.*;
 import static javr.core.AvrInstruction.*;
 
+import java.util.Arrays;
+
 import javr.core.AVR.Decoder;
 import javr.memory.ByteMemory;
 
@@ -35,6 +37,14 @@ public class AvrExecutor implements AVR.Executor {
 	public AvrExecutor(int size, Decoder decoder) {
 		this.decoder = decoder;
 		this.decoded = new AvrInstruction[size];
+	}
+
+	@Override
+	public void reset() {
+		// Clear all decoded instructions, forcing them to be decoded again. This is
+		// important, for example, after we've reset the AVR and potentially uploaded
+		// some new firmware.
+		Arrays.fill(decoded, null);
 	}
 
 	@Override

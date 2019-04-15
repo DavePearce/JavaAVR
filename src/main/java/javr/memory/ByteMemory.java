@@ -69,6 +69,11 @@ public class ByteMemory implements AVR.Memory {
 		return data.length;
 	}
 
+	@Override
+	public void reset() {
+		Arrays.fill(data, (byte) 0);
+	}
+
 	public byte[] toByteArray() {
 		return Arrays.copyOf(data, data.length);
 	}

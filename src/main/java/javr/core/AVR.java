@@ -94,8 +94,20 @@ public class AVR {
 		return registers;
 	}
 
+	/**
+	 * Reset the AVR.
+	 */
 	public void reset() {
+		// Reset registers
 		registers = new Registers();
+		// Reset pins
+		for(int i=0;i!=pins.length;++i) {
+			pins[i].reset();
+		}
+		// Reset executor
+		executor.reset();
+		// Reset data memory
+		data.reset();
 	}
 
 	public void clock() {
@@ -151,6 +163,7 @@ public class AVR {
 	 *
 	 */
 	public interface Executor {
+		void reset();
 		void execute(Memory code, Memory data, AVR.Registers registers);
 	}
 
@@ -200,6 +213,11 @@ public class AVR {
 		 * @return
 		 */
 		public int size();
+
+		/**
+		 * Reset memory after a system-wide reset event.
+		 */
+		public void reset();
 	}
 
 	/**

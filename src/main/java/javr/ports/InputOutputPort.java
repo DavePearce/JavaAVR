@@ -70,6 +70,16 @@ public class InputOutputPort extends AbstractPort {
 	}
 
 
+	@Override
+	public void reset() {
+		// reset directions
+		this.directions = 0;
+		// reset pins
+		for(int i=0;i!=pins.length;++i) {
+			pins[i].reset();
+		}
+	}
+
 	private void writeOutputPins(byte data) {
 		int mask = 1;
 		for (int i = 0; i != pins.length; ++i) {

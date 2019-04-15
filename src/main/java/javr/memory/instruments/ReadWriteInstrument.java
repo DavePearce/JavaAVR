@@ -44,6 +44,14 @@ public class ReadWriteInstrument implements InstrumentableMemory.Instrument {
 	}
 
 	@Override
+	public void reset() {
+		// Reset all recorded read accesses
+		this.reads.clear();
+		// Reset all recorded write accesses
+		this.writes.clear();
+	}
+
+	@Override
 	public void read(int address, byte data) {
 		reads.set(address);
 	}

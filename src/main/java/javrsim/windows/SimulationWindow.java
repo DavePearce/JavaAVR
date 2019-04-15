@@ -400,13 +400,14 @@ public class SimulationWindow extends JFrame {
 
 	public void loadHexFile(File file) {
 		try {
+			// Reset the microcontroller
+			resetMicroController();
+			// Open the hex file
 			HexFile.Reader reader = new HexFile.Reader(new FileReader(file));
 			// Parse the hex file
 			HexFile hf = reader.readAll();
 			// Upload it to memory
 			hf.uploadTo(mcu.getCode());
-			// Reset the microcontroller
-			resetMicroController();
 		} catch (Exception e) {
 			error("Problem loading file", e);
 		}

@@ -102,6 +102,19 @@ public class IoMemory implements AVR.Memory {
 		return memory.size();
 	}
 
+	@Override
+	public void reset() {
+		// Reset underlying RAM
+		memory.reset();
+		// Reset ports
+		for(int i=0;i!=ports.length;++i) {
+			Port ith = ports[i];
+			if(ith != null) {
+				ith.reset();
+			}
+		}
+	}
+
 	/**
 	 * Represents an I/O port which maps one or more memory addresses to internal
 	 * registers.

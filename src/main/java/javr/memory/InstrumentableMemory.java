@@ -79,6 +79,16 @@ public class InstrumentableMemory implements Memory {
 		return memory.size();
 	}
 
+	@Override
+	public void reset() {
+		// reset underlying memory
+		memory.reset();
+		// reset underyling instruments
+		for(int i=0;i!=instruments.size();++i) {
+			instruments.get(i).reset();
+		}
+	}
+
 	public interface Instrument {
 		public void read(int address, byte data);
 
@@ -87,5 +97,7 @@ public class InstrumentableMemory implements Memory {
 		public void write(int address, byte data);
 
 		public void poke(int address, byte data);
+
+		public void reset();
 	}
 }

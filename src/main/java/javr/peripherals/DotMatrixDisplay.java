@@ -78,6 +78,9 @@ public class DotMatrixDisplay extends AbstractSerialPeripheral {
 
 	@Override
 	public void reset() {
+		// Reset all internal SPI state
+		super.reset();
+		// Clear the display buffer
 		Arrays.fill(pixels, (byte) 0);
 	}
 

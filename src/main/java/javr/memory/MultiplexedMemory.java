@@ -89,4 +89,11 @@ public class MultiplexedMemory implements Memory {
 		}
 		return size;
 	}
+
+	@Override
+	public void reset() {
+		for (int i = 0; i != memories.length; ++i) {
+			memories[i].reset();
+		}
+	}
 }
