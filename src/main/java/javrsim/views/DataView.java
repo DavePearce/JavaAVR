@@ -54,6 +54,10 @@ public class DataView extends JAvrView {
 		setVisible(true);
 	}
 
+	@Override
+	public void reset() {
+	}
+
 	public JPanel constructDataPanel() {
 		TableModel dataModel = new AbstractTableModel() {
 			@Override

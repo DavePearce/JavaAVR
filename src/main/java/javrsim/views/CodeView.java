@@ -44,7 +44,7 @@ public class CodeView extends JAvrView {
 	private final static Color LIGHT_GREEN = new Color(174,227,174);
 	//
 	private final AVR mcu;
-	private final String[] instructions;
+	private String[] instructions;
 
 	public CodeView(AVR mcu) {
 		super("Code View");
@@ -53,6 +53,11 @@ public class CodeView extends JAvrView {
 		add(constructCodePanel());
 		pack();
 		setVisible(true);
+	}
+
+	@Override
+	public void reset() {
+		this.instructions = disassemble();
 	}
 
 	public JPanel constructCodePanel() {

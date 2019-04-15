@@ -22,6 +22,11 @@ public abstract class JAvrView extends JFrame {
 		super(title);
 	}
 
+	/**
+	 * Reset view after AVR reset.
+	 */
+	public abstract void reset();
+
 	public interface Descriptor {
 		/**
 		 * Get a useful name for this view.

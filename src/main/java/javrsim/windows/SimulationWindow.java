@@ -391,6 +391,11 @@ public class SimulationWindow extends JFrame {
 		for (JPeripheral p : peripherals) {
 			p.reset();
 		}
+		// Reset the viewss
+		for (JAvrView v : views) {
+			v.reset();
+			v.repaint();
+		}
 	}
 
 	public void loadHexFile(File file) {
