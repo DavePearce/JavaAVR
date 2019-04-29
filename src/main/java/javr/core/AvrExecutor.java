@@ -477,7 +477,8 @@ public class AvrExecutor implements AVR.Executor {
 		// Check whether interrupts are enabled or not.
 		if(registers.getStatusBit(INTERRUPT_FLAG)) {
 			// Check whether an interrupt is triggered or not
-			int vector = determineInterruptVector();
+			int vector = determineInterruptVector(registers);
+			//
 			if(vector >= 0) {
 				// yes, interrupt triggered so disable interrupts
 				registers.setStatusBit(INTERRUPT_FLAG);
@@ -495,8 +496,14 @@ public class AvrExecutor implements AVR.Executor {
 	 *
 	 * @return The interrupt vector being signalled, or negative one if none signalled.
 	 */
-	private int determineInterruptVector() {
-		// FIXME: need to figure out how to detect interrupts!
+	private int determineInterruptVector(Registers registers) {
+		AVR.Interrupt[] interrupts = registers.getInterruptTable();
+		for (int i = 0; i != interrupts.length; ++i) {
+			if (interrupts[i].get()) {
+				interrupts[i].clear();
+				return i;
+			}
+		}
 		return -1;
 	}
 

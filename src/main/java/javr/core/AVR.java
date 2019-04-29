@@ -45,13 +45,13 @@ public class AVR {
 	// Internal registers
 	private Registers registers;
 
-	public AVR(String device, Executor executor, Wire[] pins, Memory flash, Memory data) {
+	public AVR(String device, Executor executor, Wire[] pins, Memory flash, Memory data, Interrupt[] interrupts) {
 		this.device = device;
 		this.executor = executor;
 		this.pins = pins;
 		this.flash = flash;
 		this.data = data;
-		this.registers = new Registers();
+		this.registers = new Registers(interrupts);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class AVR {
 	 */
 	public void reset() {
 		// Reset registers
-		registers = new Registers();
+		registers.reset();
 		// Reset pins
 		for(int i=0;i!=pins.length;++i) {
 			pins[i].reset();
@@ -117,6 +117,11 @@ public class AVR {
 	public static final class Registers {
 		private int PC;
 		private int SREG;
+		private Interrupt[] interrupts;
+
+		public Registers(Interrupt[] interrupts) {
+			this.interrupts = interrupts;
+		}
 
 		public int getPC() {
 			return PC;
@@ -136,6 +141,15 @@ public class AVR {
 
 		public void setStatusBit(int mask) {
 			SREG |= mask;
+		}
+
+		public Interrupt[] getInterruptTable() {
+			return interrupts;
+		}
+
+		public void reset() {
+			SREG = 0;
+			PC = 0;
 		}
 	}
 
@@ -221,6 +235,30 @@ public class AVR {
 	}
 
 	/**
+	 * Provides a simple mapping from interrupt vectors to their corresponding flags
+	 * (which are spread across many different physical registers).
+	 *
+	 * @author David J. Pearce
+	 *
+	 */
+	public interface Interrupt {
+		/**
+		 * Check whether a given interrupt is triggered or not.
+		 *
+		 * @param vector
+		 * @return
+		 */
+		public boolean get();
+
+		/**
+		 * Clear the trigger indicator for a given interrupt.
+		 *
+		 * @param vector
+		 */
+		public void clear();
+	}
+
+	/**
 	 * Provides a generic mechanism for hooking into the underlying AVR for the
 	 * purpose of monitoring what's going on under the hood.
 	 *
@@ -228,8 +266,9 @@ public class AVR {
 	 *
 	 */
 	public static class Instrumentable extends AVR {
-		public Instrumentable(String device, Executor executor, Wire[] pins, Memory flash, Memory data) {
-			super(device, executor, pins, new InstrumentableMemory(flash), new InstrumentableMemory(data));
+		public Instrumentable(String device, Executor executor, Wire[] pins, Memory flash, Memory data,
+				Interrupt[] interrupts) {
+			super(device, executor, pins, new InstrumentableMemory(flash), new InstrumentableMemory(data), interrupts);
 		}
 
 		@Override
