@@ -38,16 +38,21 @@ public class AvrConfiguration {
 	 */
 	private final PinDescriptor[] pinDescriptors;
 	/**
+	 * Set of interrupt descriprots
+	 */
+	private final InterruptDescriptor[] interruptDescriptors;
+	/**
 	 * Set of internal I/O components
 	 */
 	private final IoMemory.PortDescriptor[] portDescriptors;
 
-	public AvrConfiguration(String name, int FLASH, int SRAM, PinDescriptor[] pinDescriptors, IoMemory.PortDescriptor... portDescriptors) {
+	public AvrConfiguration(String name, int FLASH, int SRAM, PinDescriptor[] pinDescriptors, InterruptDescriptor[] interruptDescriptors, IoMemory.PortDescriptor... portDescriptors) {
 		this.deviceName = name;
 		this.FLASH = FLASH;
 		this.SRAM = SRAM;
 		this.portDescriptors = portDescriptors;
 		this.pinDescriptors = pinDescriptors;
+		this.interruptDescriptors = interruptDescriptors;
 	}
 
 	public String getName() {
@@ -76,8 +81,17 @@ public class AvrConfiguration {
 		AVR.Memory flash = new ByteMemory(FLASH);
 		// Multiplex it all together.
 		AVR.Memory data = new MultiplexedMemory(registers, io, SRAM);
+		// interrupts
+		AVR.Interrupt[] interrupts = new AVR.Interrupt[interruptDescriptors.length];
 		//
-		return new AVR.Instrumentable(deviceName, new AvrExecutor(flash.size(), new AvrDecoder()), pins, flash, data);
+		for(int i=0;i!=interruptDescriptors.length;++i) {
+			final InterruptDescriptor interrupt = interruptDescriptors[i];
+			if(interrupt != null) {
+				interrupts[i] = interrupt.instantiate(data);			}
+		}
+		//
+		return new AVR.Instrumentable(deviceName, new AvrExecutor(flash.size(), new AvrDecoder()), pins, flash, data,
+				interrupts);
 	}
 
 	public static class PinDescriptor {
@@ -85,6 +99,42 @@ public class AvrConfiguration {
 
 		public PinDescriptor(String... labels) {
 			this.labels = labels;
+		}
+	}
+
+	public static class InterruptDescriptor {
+		private final int register;
+		private final int mask;
+
+		public InterruptDescriptor(int register, int mask) {
+			this.register = register;
+			this.mask = mask;
+		}
+
+		public boolean get(AVR.Memory memory) {
+			return (memory.peek(register) & mask) != 0;
+		}
+
+		public void clear(AVR.Memory memory) {
+			byte data = memory.peek(register);
+			memory.poke(register, (byte) (data & ~mask));
+		}
+
+		public AVR.Interrupt instantiate(AVR.Memory memory) {
+			return new AVR.Interrupt() {
+
+				@Override
+				public boolean get() {
+					return InterruptDescriptor.this.get(memory);
+				}
+
+				@Override
+				public void clear() {
+					InterruptDescriptor.this.clear(memory);
+				}
+
+			};
+
 		}
 	}
 
@@ -115,6 +165,8 @@ public class AvrConfiguration {
 					new PinDescriptor("PB2", "SCK", "USCK", "SCL", "ADC1", "T0", "INT0", "PCINT2"),
 					// Pin 8
 					new PinDescriptor("VCC") },
+					// Interrupts
+					new InterruptDescriptor[] {},
 					// PORTB
 					new InputOutputPort.Descriptor(0x18, 0x17, 0x16, "PB0", "PB1", "PB2", "PB3", "PB4", "PB5")
 			// TIMER0
@@ -205,6 +257,8 @@ public class AvrConfiguration {
 					new PinDescriptor("PC4", "ADC4", "SDA", "PCINT12"),
 					// Pin 28
 					new PinDescriptor("PC5", "ADC5", "SCL", "PCINT13"), },
+			// INTERRUPTS
+			new InterruptDescriptor[] {},
 			// PORTB
 			new InputOutputPort.Descriptor(0x5, 0x4, 0x3, "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7"),
 			// PORTC

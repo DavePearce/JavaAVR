@@ -49,6 +49,9 @@ public class AvrExecutor implements AVR.Executor {
 
 	@Override
 	public void execute(Memory flash, Memory data, Registers registers) {
+		// First check for interrupts
+		handleInterrupts(flash,data,registers);
+		// Second decode relevant instruction
 		AvrInstruction insn = decode(registers.getPC(), flash);
 		// Dispatch on instruction
 		switch (insn.getOpcode()) {
@@ -460,6 +463,48 @@ public class AvrExecutor implements AVR.Executor {
 		default:
 			throw new IllegalArgumentException("invalid opcode encountered: " + insn.getOpcode());
 		}
+	}
+
+	/**
+	 * Responsible for handling interrupts which are raised. There are various ways
+	 * that interrupts can be raised, such as via the internal watchdown timer, etc.
+	 *
+	 * @param flash
+	 * @param data
+	 * @param registers
+	 */
+	private void handleInterrupts(Memory flash, Memory data, Registers registers) {
+		// Check whether interrupts are enabled or not.
+		if(registers.getStatusBit(INTERRUPT_FLAG)) {
+			// Check whether an interrupt is triggered or not
+			int vector = determineInterruptVector(registers);
+			//
+			if(vector >= 0) {
+				// yes, interrupt triggered so disable interrupts
+				registers.setStatusBit(INTERRUPT_FLAG);
+				// push PC
+				pushWord(registers.getPC(), data);
+				// jump to interrupt vector
+				registers.setPC(vector);
+			}
+		}
+	}
+
+	/**
+	 * Determine whether an interrupt is signalled or not. This is done by checking
+	 * the relevant ways in which an interrupt can be signaled.
+	 *
+	 * @return The interrupt vector being signalled, or negative one if none signalled.
+	 */
+	private int determineInterruptVector(Registers registers) {
+		AVR.Interrupt[] interrupts = registers.getInterruptTable();
+		for (int i = 0; i != interrupts.length; ++i) {
+			if (interrupts[i].get()) {
+				interrupts[i].clear();
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	private AvrInstruction decode(int PC, Memory flash) {
