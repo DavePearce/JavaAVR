@@ -1527,9 +1527,12 @@ public abstract class AvrInstruction {
 	    @Override
 		public byte[] getBytes() {
 	        int opcode = 0b1001010000001110;
-	        opcode |= (this.k << 0) & 0b1;
-	        opcode |= (this.k << 3) & 0b111110000;
-	        opcode |= (this.k << 10) & 0b11111111111111110000000000000000;
+	        int l = (k << 6) & 0b1111111111111111000000;
+			int r = (k >> 16) & 0b111111;
+			int k = l | r;
+	        opcode |= (k << 0) & 0b1;
+	        opcode |= (k << 3) & 0b111110000;
+	        opcode |= (k << 10) & 0b11111111111111110000000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}
@@ -2121,9 +2124,12 @@ public abstract class AvrInstruction {
 	    @Override
 		public byte[] getBytes() {
 	        int opcode = 0b1001010000001100;
-	        opcode |= (this.k << 0) & 0b1;
-	        opcode |= (this.k << 3) & 0b111110000;
-	        opcode |= (this.k << 10) & 0b11111111111111110000000000000000;
+	        int l = (k << 6) & 0b1111111111111111000000;
+			int r = (k >> 16) & 0b111111;
+			int k = l | r;
+	        opcode |= (k << 0) & 0b1;
+	        opcode |= (k << 3) & 0b111110000;
+	        opcode |= (k << 10) & 0b11111111111111110000000000000000;
 	        return new byte[]{ (byte) opcode, (byte) (opcode >> 8), (byte) (opcode >> 16), (byte) (opcode >> 24) };
 	    }
 	}

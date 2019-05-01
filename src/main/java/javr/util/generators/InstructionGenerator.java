@@ -135,7 +135,7 @@ public class InstructionGenerator {
 		for (AvrInstruction.Argument arg : opcode.getArguments()) {
 			AvrInstruction.Bits[] bits = arg.getBitRanges(opcode);
 			int width = 0;
-			// FIXME: we need to undo transforms here.
+			// FIXME: we need to undo transforms here (#15)
 			for (int i = 0; i != bits.length; ++i) {
 				AvrInstruction.Bits b = bits[i];
 				int shift = b.getStart() - width;
