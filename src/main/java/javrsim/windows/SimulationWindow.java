@@ -450,8 +450,16 @@ public class SimulationWindow extends JFrame {
 				p.clock();
 			}
 		}
-		// Clock the AVR
-		mcu.clock();
+		try {
+			// Clock the AVR
+			mcu.clock();
+		} catch(AVR.HaltedException e) {
+			// Machine terminated
+			setModeStopped();
+			clock.pause();
+			// Inform user
+			JOptionPane.showMessageDialog(this, "Machine has terminated (exit code " + e.getExitCode() + ")");
+		}
 		// Repaint the display
 		repaint();
 		// Repaint all views

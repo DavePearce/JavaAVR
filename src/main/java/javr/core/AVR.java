@@ -30,12 +30,38 @@ public class AVR {
 	public final static int SPH_ADDRESS = 0x3e + 32;
 	public final static int SPL_ADDRESS = 0x3d + 32;
 	//
-	public final static int XL_ADDRESS = 0x1a;
-	public final static int XH_ADDRESS = 0x1b;
-	public final static int YL_ADDRESS = 0x1c;
-	public final static int YH_ADDRESS = 0x1d;
-	public final static int ZL_ADDRESS = 0x1e;
-	public final static int ZH_ADDRESS = 0x1f;
+	public final static int R00_ADDRESS = 0x00;
+	public final static int R01_ADDRESS = 0x01;
+	public final static int R02_ADDRESS = 0x02;
+	public final static int R03_ADDRESS = 0x03;
+	public final static int R04_ADDRESS = 0x04;
+	public final static int R05_ADDRESS = 0x05;
+	public final static int R06_ADDRESS = 0x06;
+	public final static int R07_ADDRESS = 0x07;
+	public final static int R08_ADDRESS = 0x08;
+	public final static int R09_ADDRESS = 0x09;
+	public final static int R10_ADDRESS = 0x0a;
+	public final static int R11_ADDRESS = 0x0b;
+	public final static int R12_ADDRESS = 0x0c;
+	public final static int R13_ADDRESS = 0x0d;
+	public final static int R14_ADDRESS = 0x0e;
+	public final static int R15_ADDRESS = 0x0f;
+	public final static int R16_ADDRESS = 0x10;
+	public final static int R17_ADDRESS = 0x11;
+	public final static int R18_ADDRESS = 0x12;
+	public final static int R19_ADDRESS = 0x13;
+	public final static int R20_ADDRESS = 0x14;
+	public final static int R21_ADDRESS = 0x15;
+	public final static int R22_ADDRESS = 0x16;
+	public final static int R23_ADDRESS = 0x17;
+	public final static int R24_ADDRESS = 0x18;
+	public final static int R25_ADDRESS = 0x19;
+	public final static int R26_XL_ADDRESS = 0x1a;
+	public final static int R27_XH_ADDRESS = 0x1b;
+	public final static int R28_YL_ADDRESS = 0x1c;
+	public final static int R29_YH_ADDRESS = 0x1d;
+	public final static int R30_ZL_ADDRESS = 0x1e;
+	public final static int R31_ZH_ADDRESS = 0x1f;
 	//
 	private final String device;
 	private final Executor executor;
@@ -110,7 +136,7 @@ public class AVR {
 		data.reset();
 	}
 
-	public void clock() {
+	public void clock() throws HaltedException {
 		executor.execute(flash, data, registers);
 	}
 
@@ -153,6 +179,26 @@ public class AVR {
 		}
 	}
 
+	public static class HaltedException extends Exception {
+		/**
+		 * The exit code when the machine terminated, where zero means success.
+		 */
+		private int exitCode;
+
+		public HaltedException(int exitCode) {
+			this.exitCode = exitCode;
+		}
+
+		/**
+		 * Get the exit code when the machine halted. This indicates whether the machine
+		 * exited successfully or not (e.g. because of an assertion failure).
+		 *
+		 * @return
+		 */
+		public int getExitCode() {
+			return exitCode;
+		}
+	}
 
 	/**
 	 * Generic interface for decoding an instruction at a given instruction
@@ -178,7 +224,7 @@ public class AVR {
 	 */
 	public interface Executor {
 		void reset();
-		void execute(Memory code, Memory data, AVR.Registers registers);
+		void execute(Memory code, Memory data, AVR.Registers registers) throws HaltedException;
 	}
 
 	public interface Memory {

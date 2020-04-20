@@ -19,6 +19,7 @@ import static javr.core.AvrInstruction.*;
 import java.util.Arrays;
 
 import javr.core.AVR.Decoder;
+import javr.core.AVR.HaltedException;
 import javr.memory.ByteMemory;
 
 public class AvrExecutor implements AVR.Executor {
@@ -48,7 +49,7 @@ public class AvrExecutor implements AVR.Executor {
 	}
 
 	@Override
-	public void execute(Memory flash, Memory data, Registers registers) {
+	public void execute(Memory flash, Memory data, Registers registers) throws HaltedException {
 		// First check for interrupts
 		handleInterrupts(flash,data,registers);
 		// Second decode relevant instruction
@@ -1626,7 +1627,7 @@ public class AvrExecutor implements AVR.Executor {
 		regs.setPC(regs.getPC()+1);
 		pushWord(regs.getPC(), data);
 		// Read the Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		regs.setPC(Z);
 	}
 
@@ -1642,7 +1643,7 @@ public class AvrExecutor implements AVR.Executor {
 	 */
 	private void execute(IJMP insn, Memory flash, Memory data, Registers regs) {
 		// Read the Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		regs.setPC(Z);
 	}
 
@@ -1791,7 +1792,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_X insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load X register
-		int X = readWord(AVR.XL_ADDRESS, data);
+		int X = readWord(AVR.R26_XL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(X);
 		data.write(insn.Rd, Rd);
@@ -1808,12 +1809,12 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_X_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load X register
-		int X = readWord(AVR.XL_ADDRESS, data);
+		int X = readWord(AVR.R26_XL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(X);
 		data.write(insn.Rd, Rd);
 		// Post increment
-		writeWord(AVR.XL_ADDRESS, X + 1, data);
+		writeWord(AVR.R26_XL_ADDRESS, X + 1, data);
 	}
 
 	/**
@@ -1827,10 +1828,10 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_X_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load X register
-		int X = readWord(AVR.XL_ADDRESS, data);
+		int X = readWord(AVR.R26_XL_ADDRESS, data);
 		// Pre decrement
 		X = X - 1;
-		writeWord(AVR.XL_ADDRESS, X, data);
+		writeWord(AVR.R26_XL_ADDRESS, X, data);
 		// Perform operation
 		byte Rd = data.read(X);
 		data.write(insn.Rd, Rd);
@@ -1852,7 +1853,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_Y insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Y register
-		int Y = readWord(AVR.YL_ADDRESS, data);
+		int Y = readWord(AVR.R28_YL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(Y);
 		data.write(insn.Rd, Rd);
@@ -1869,12 +1870,12 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_Y_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Y register
-		int Y = readWord(AVR.YL_ADDRESS, data);
+		int Y = readWord(AVR.R28_YL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(Y);
 		data.write(insn.Rd, Rd);
 		// Post increment
-		writeWord(AVR.YL_ADDRESS, Y + 1, data);
+		writeWord(AVR.R28_YL_ADDRESS, Y + 1, data);
 	}
 
 	/**
@@ -1888,10 +1889,10 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_Y_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Y register
-		int Y = readWord(AVR.YL_ADDRESS, data);
+		int Y = readWord(AVR.R28_YL_ADDRESS, data);
 		// Pre decrement
 		Y = Y - 1;
-		writeWord(AVR.YL_ADDRESS, Y, data);
+		writeWord(AVR.R28_YL_ADDRESS, Y, data);
 		// Perform operation
 		byte Rd = data.read(Y);
 		data.write(insn.Rd, Rd);
@@ -1900,7 +1901,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LDD_Y_Q insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Y register
-		int Y = readWord(AVR.YL_ADDRESS, data);
+		int Y = readWord(AVR.R28_YL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(Y + insn.q);
 		data.write(insn.Rd, Rd);
@@ -1924,7 +1925,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_Z insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(Z);
 		data.write(insn.Rd, Rd);
@@ -1941,12 +1942,12 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_Z_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(Z);
 		data.write(insn.Rd, Rd);
 		// Post increment
-		writeWord(AVR.ZL_ADDRESS, Z + 1, data);
+		writeWord(AVR.R30_ZL_ADDRESS, Z + 1, data);
 	}
 
 	/**
@@ -1960,10 +1961,10 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LD_Z_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Pre decrement
 		Z = Z - 1;
-		writeWord(AVR.ZL_ADDRESS, Z, data);
+		writeWord(AVR.R30_ZL_ADDRESS, Z, data);
 		// Perform operation
 		byte Rd = data.read(Z);
 		data.write(insn.Rd, Rd);
@@ -1972,7 +1973,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LDD_Z_Q insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(Z + insn.q);
 		data.write(insn.Rd, Rd);
@@ -2055,7 +2056,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LPM_Z insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Perform operation
 		byte Rd = flash.read(Z);
 		data.write(insn.Rd, Rd);
@@ -2064,12 +2065,12 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(LPM_Z_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Perform operation
 		byte Rd = flash.read(Z);
 		data.write(insn.Rd, Rd);
 		// Post increment
-		writeWord(AVR.ZL_ADDRESS, Z + 1, data);
+		writeWord(AVR.R30_ZL_ADDRESS, Z + 1, data);
 	}
 
 	/**
@@ -2412,9 +2413,17 @@ public class AvrExecutor implements AVR.Executor {
 	 * @param code
 	 * @param data
 	 * @param regs
+	 * @throws HaltedException
 	 */
-	private void execute(RJMP insn, Memory flash, Memory data, Registers regs) {
-		regs.setPC(regs.getPC() + insn.k + 1);
+	private void execute(RJMP insn, Memory flash, Memory data, Registers regs) throws HaltedException {
+		int pc = regs.getPC() + insn.k + 1;
+		if(pc == regs.getPC()) {
+			int code = readWord(AVR.R24_ADDRESS, data);
+			// Indicate machine halted
+			throw new AVR.HaltedException(code);
+		} else {
+			regs.setPC(pc);
+		}
 	}
 
 	/**
@@ -2880,7 +2889,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_X insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load X register
-		int X = readWord(AVR.XL_ADDRESS, data);
+		int X = readWord(AVR.R26_XL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(X, Rd);
@@ -2897,12 +2906,12 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_X_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load X register
-		int X = readWord(AVR.XL_ADDRESS, data);
+		int X = readWord(AVR.R26_XL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(X, Rd);
 		// Post increment
-		writeWord(AVR.XL_ADDRESS, X + 1, data);
+		writeWord(AVR.R26_XL_ADDRESS, X + 1, data);
 	}
 
 	/**
@@ -2916,10 +2925,10 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_X_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load X register
-		int X = readWord(AVR.XL_ADDRESS, data);
+		int X = readWord(AVR.R26_XL_ADDRESS, data);
 		// Pre decrement
 		X = X - 1;
-		writeWord(AVR.XL_ADDRESS, X, data);
+		writeWord(AVR.R26_XL_ADDRESS, X, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(X, Rd);
@@ -2941,7 +2950,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_Y insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Y register
-		int Y = readWord(AVR.YL_ADDRESS, data);
+		int Y = readWord(AVR.R28_YL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(Y, Rd);
@@ -2958,12 +2967,12 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_Y_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Y register
-		int Y = readWord(AVR.YL_ADDRESS, data);
+		int Y = readWord(AVR.R28_YL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(Y, Rd);
 		// Post increment
-		writeWord(AVR.YL_ADDRESS, Y + 1, data);
+		writeWord(AVR.R28_YL_ADDRESS, Y + 1, data);
 	}
 
 	/**
@@ -2977,10 +2986,10 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_Y_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Y register
-		int Y = readWord(AVR.YL_ADDRESS, data);
+		int Y = readWord(AVR.R28_YL_ADDRESS, data);
 		// Pre decrement
 		Y = Y - 1;
-		writeWord(AVR.YL_ADDRESS, Y, data);
+		writeWord(AVR.R28_YL_ADDRESS, Y, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(Y, Rd);
@@ -2989,7 +2998,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(STD_Y_Q insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Y register
-		int Y = readWord(AVR.YL_ADDRESS, data);
+		int Y = readWord(AVR.R28_YL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(Y + insn.q, Rd);
@@ -3011,7 +3020,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_Z insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(Z, Rd);
@@ -3028,12 +3037,12 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_Z_INC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(Z, Rd);
 		// Post increment
-		writeWord(AVR.ZL_ADDRESS, Z + 1, data);
+		writeWord(AVR.R30_ZL_ADDRESS, Z + 1, data);
 	}
 
 	/**
@@ -3047,10 +3056,10 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(ST_Z_DEC insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Pre decrement
 		Z = Z - 1;
-		writeWord(AVR.ZL_ADDRESS, Z, data);
+		writeWord(AVR.R30_ZL_ADDRESS, Z, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(Z, Rd);
@@ -3059,7 +3068,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(STD_Z_Q insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC()+1);
 		// Load Z register
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		// Perform operation
 		byte Rd = data.read(insn.Rd);
 		data.write(Z + insn.q, Rd);
@@ -3221,7 +3230,7 @@ public class AvrExecutor implements AVR.Executor {
 	private void execute(XCH insn, Memory flash, Memory data, Registers regs) {
 		regs.setPC(regs.getPC() + 1);
 		byte Rd = data.read(insn.Rd);
-		int Z = readWord(AVR.ZL_ADDRESS, data);
+		int Z = readWord(AVR.R30_ZL_ADDRESS, data);
 		data.write(insn.Rd, data.read(Z));
 		data.write(Z, Rd);
 	}
