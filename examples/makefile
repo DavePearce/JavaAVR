@@ -6,7 +6,7 @@ PROGRAMMER = -c usbtiny
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 COMPILE = avr-gcc -Wall -Os -std=c99 -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
-TARGETS = console.hex display.hex assert.hex blink.hex timer.hex
+TARGETS = console.hex display.hex assert.hex blink.hex int_timer.hex
 
 all: $(TARGETS)
 
