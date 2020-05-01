@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -26,7 +27,15 @@ import java.util.List;
 import javr.core.AVR;
 import javr.memory.ByteMemory;
 
-public class HexFile {
+public class HexFile implements Serializable {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Array of records within this class
+	 */
 	private final Record[] records;
 
 	public HexFile(List<Record> records) {
@@ -268,7 +277,7 @@ public class HexFile {
 	 * @author David J. Pearce
 	 *
 	 */
-	public static abstract class Record {
+	public static abstract class Record implements Serializable {
 		protected final int type;
 		protected final int address;
 
@@ -335,6 +344,13 @@ public class HexFile {
 	 *
 	 */
 	public static class Data extends Record {
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+		/**
+		 * Bytes of data within this record
+		 */
 		private final byte[] data;
 
 		public Data(int address, byte[] data) {
@@ -367,6 +383,11 @@ public class HexFile {
 	}
 
 	public static class EndOfFile extends Record {
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public EndOfFile(int address) {
 			super(01,address);
 		}

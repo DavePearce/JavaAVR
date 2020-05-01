@@ -6,7 +6,7 @@ PROGRAMMER = -c usbtiny
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 COMPILE = avr-gcc -Wall -Os -std=c99 -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
-TARGETS = console.hex display.hex assert.hex
+TARGETS = console.hex display.hex assert.hex blink.hex timer.hex
 
 all: $(TARGETS)
 
@@ -22,6 +22,8 @@ all: $(TARGETS)
 %.hex: %.elf
 	avr-objcopy -j .text -j .data -O ihex $< $@
 	avr-size --format=avr --mcu=$(DEVICE) $<
+%.install: %.hex
+	$(AVRDUDE) -Uflash:w:$<:i 
 
 clean:
 	rm -f *.hex *.elf *.o
