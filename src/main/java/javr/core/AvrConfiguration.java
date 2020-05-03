@@ -17,7 +17,6 @@ import java.util.function.Function;
 
 import javr.memory.ByteMemory;
 import javr.memory.IoMemory;
-import javr.memory.IoMemory.PortDescriptor;
 import javr.memory.MultiplexedMemory;
 import javr.ports.InputOutputPort;
 import javr.util.IdealWire;
