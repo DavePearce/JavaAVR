@@ -13,6 +13,8 @@
 // limitations under the License.
 package javr.core;
 
+import java.util.function.Function;
+
 import javr.memory.ByteMemory;
 import javr.memory.IoMemory;
 import javr.memory.IoMemory.PortDescriptor;
@@ -60,11 +62,15 @@ public class AvrConfiguration {
 	}
 
 	public AVR.Instrumentable instantiate() {
+		return instantiate(labels -> new IdealWire(labels));
+	}
+
+	public AVR.Instrumentable instantiate(Function<String[],Wire> factory) {
 		// Construct AVR pins
 		Wire[] pins = new Wire[pinDescriptors.length];
 		for(int i=0;i!=pinDescriptors.length;++i) {
 			// FIXME: this is incorrect!
-			pins[i] = new IdealWire(pinDescriptors[i].labels);
+			pins[i] = factory.apply(pinDescriptors[i].labels);
 		}
 		// Construct AVR I/O ports (i.e. internal peripherals)
 		IoMemory.Port[] ports = new IoMemory.Port[portDescriptors.length];
@@ -280,14 +286,26 @@ public class AvrConfiguration {
 	/**
 	 * Construct an AVR instance based on a device string (e.g ATtiny85).
 	 *
-	 * @param device
+	 * @param device The device name being instantiated
 	 * @return
 	 */
 	public static final AVR.Instrumentable instantiate(String device) {
+		return instantiate(device, labels -> new IdealWire(labels));
+	}
+
+	/**
+	 * Construct an AVR instance based on a device string (e.g ATtiny85).
+	 *
+	 * @param device  The device name being instantiated
+	 * @param factory A function for constructing wires. This allows one to use
+	 *                alternative implementations of Wire.
+	 * @return
+	 */
+	public static final AVR.Instrumentable instantiate(String device, Function<String[],Wire> factory) {
 		for(int i=0;i!=CONFIGURATIONS.length;++i) {
 			AvrConfiguration config = CONFIGURATIONS[i];
 			if(config.getName().equals(device)) {
-				return config.instantiate();
+				return config.instantiate(factory);
 			}
 		}
 		throw new IllegalArgumentException("invalid device (" + device + ")");
