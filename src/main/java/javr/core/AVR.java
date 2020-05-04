@@ -14,6 +14,8 @@
 package javr.core;
 
 import javr.memory.InstrumentableMemory;
+import javr.memory.InstrumentableRegisters;
+
 import java.util.*;
 
 public class AVR {
@@ -71,13 +73,13 @@ public class AVR {
 	// Internal registers
 	private Registers registers;
 
-	public AVR(String device, Executor executor, Wire[] pins, Memory flash, Memory data, Interrupt[] interrupts) {
+	public AVR(String device, Executor executor, Wire[] pins, Registers regs, Memory flash, Memory data) {
 		this.device = device;
 		this.executor = executor;
 		this.pins = pins;
 		this.flash = flash;
 		this.data = data;
-		this.registers = new Registers(interrupts);
+		this.registers = regs;
 	}
 
 	/**
@@ -140,7 +142,7 @@ public class AVR {
 		executor.execute(flash, data, registers);
 	}
 
-	public static final class Registers {
+	public static class Registers {
 		private int PC;
 		private int SREG;
 		private Interrupt[] interrupts;
@@ -314,7 +316,12 @@ public class AVR {
 	public static class Instrumentable extends AVR {
 		public Instrumentable(String device, Executor executor, Wire[] pins, Memory flash, Memory data,
 				Interrupt[] interrupts) {
-			super(device, executor, pins, new InstrumentableMemory(flash), new InstrumentableMemory(data), interrupts);
+			super(device, executor, pins, new InstrumentableRegisters(interrupts), new InstrumentableMemory(flash), new InstrumentableMemory(data));
+		}
+
+		@Override
+		public InstrumentableRegisters getRegisters() {
+			return (InstrumentableRegisters) super.getRegisters();
 		}
 
 		@Override
@@ -325,6 +332,34 @@ public class AVR {
 		@Override
 		public InstrumentableMemory getData() {
 			return (InstrumentableMemory) super.getData();
+		}
+	}
+
+	public static interface Instrument {
+		public interface Memory {
+			public void read(int address, byte data);
+
+			public void peek(int address, byte data);
+
+			public void write(int address, byte data);
+
+			public void poke(int address, byte data);
+
+			public void reset();
+		}
+
+		public interface Registers {
+			public void readPC();
+
+			public void writePC(int address);
+
+			public void readStatusBit(int mask);
+
+			public void clearStatusBit(int mask);
+
+			public void writeStatusBit(int mask);
+
+			public void reset();
 		}
 	}
 }

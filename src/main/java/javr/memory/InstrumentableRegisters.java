@@ -16,88 +16,80 @@ package javr.memory;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javr.core.AVR;
 import javr.core.AVR.Instrument;
-import javr.core.AVR.Memory;
+import javr.core.AVR.Interrupt;
 
-public class InstrumentableMemory implements Memory {
-	private final Memory memory;
-	private Instrument.Memory[] instruments = new Instrument.Memory[0];
+public final class InstrumentableRegisters extends AVR.Registers {
+	private Instrument.Registers[] instruments;
 
-	public InstrumentableMemory(Memory memory) {
-		this.memory = memory;
+	public InstrumentableRegisters(Interrupt[] interrupts) {
+		super(interrupts);
+		this.instruments = new Instrument.Registers[0];
 	}
 
-	public void register(Instrument.Memory instrument) {
+	public void register(Instrument.Registers instrument) {
 		int n = instruments.length;
 		instruments = Arrays.copyOf(instruments, instruments.length + 1);
 		instruments[n] = instrument;
 	}
 
-	public void unregister(Instrument.Memory instrument) {
+	public void unregister(Instrument.Registers instrument) {
 		for(int i=0;i!=instruments.length;++i) {
 			if(instruments[i] == instrument) {
-				Instrument.Memory[] tmp = new Instrument.Registers[instruments.length-1];
+				Instrument.Registers[] tmp = new Instrument.Registers[instruments.length-1];
 				System.arraycopy(instruments, 0, tmp, 0, i);
 				System.arraycopy(instruments, i + 1, tmp, i, (instruments.length - i + 1));
-				this.instruments = tmp;
 				return;
 			}
 		}
 	}
 
 	@Override
-	public byte read(int address) {
-		byte data = memory.read(address);
+	public int getPC() {
 		for(int i=0;i!=instruments.length;++i) {
-			instruments[i].read(address, data);
+			instruments[i].readPC();
 		}
-		return data;
+		return super.getPC();
 	}
 
 	@Override
-	public byte peek(int address) {
-		byte data = memory.peek(address);
+	public void setPC(int address) {
 		for(int i=0;i!=instruments.length;++i) {
-			instruments[i].peek(address, data);
+			instruments[i].writePC(address);
 		}
-		return data;
+		super.setPC(address);
 	}
 
 	@Override
-	public void write(int address, byte data) {
-		memory.write(address, data);
+	public boolean getStatusBit(int mask) {
 		for(int i=0;i!=instruments.length;++i) {
-			instruments[i].write(address, data);
+			instruments[i].readStatusBit(mask);
 		}
+		return super.getStatusBit(mask);
 	}
 
 	@Override
-	public void poke(int address, byte data) {
-		memory.write(address, data);
+	public void clearStatusBit(int mask){
 		for(int i=0;i!=instruments.length;++i) {
-			instruments[i].poke(address, data);
+			instruments[i].clearStatusBit(mask);
 		}
+		super.clearStatusBit(mask);
 	}
 
 	@Override
-	public void write(int address, byte[] data) {
-		for(int i=0;i!=data.length;++i) {
-			write(address+i,data[i]);
+	public void setStatusBit(int mask) {
+		for(int i=0;i!=instruments.length;++i) {
+			instruments[i].writeStatusBit(mask);
 		}
-	}
-
-	@Override
-	public int size() {
-		return memory.size();
+		super.setStatusBit(mask);
 	}
 
 	@Override
 	public void reset() {
-		// reset underlying memory
-		memory.reset();
-		// reset underyling instruments
 		for(int i=0;i!=instruments.length;++i) {
 			instruments[i].reset();
 		}
+		super.reset();
 	}
 }

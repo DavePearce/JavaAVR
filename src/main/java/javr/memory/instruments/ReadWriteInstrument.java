@@ -14,7 +14,8 @@
 package javr.memory.instruments;
 
 import java.util.BitSet;
-import javr.memory.InstrumentableMemory;
+
+import javr.core.AVR.Instrument;
 
 /**
  * The ReadWrite instrument is a basic memory instrument for recording which
@@ -23,7 +24,7 @@ import javr.memory.InstrumentableMemory;
  * @author David J. Pearce
  *
  */
-public class ReadWriteInstrument implements InstrumentableMemory.Instrument {
+public class ReadWriteInstrument implements Instrument.Memory {
 	private BitSet reads = new BitSet();
 	private BitSet writes = new BitSet();
 
