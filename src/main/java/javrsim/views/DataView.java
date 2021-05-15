@@ -41,14 +41,17 @@ public class DataView extends JAvrView {
 	private final static Color LIGHT_RED = new Color(227,174,174);
 	private final static Color LIGHT_GREEN = new Color(174,227,174);
 
-	private final AVR.Instrumentable avr;
+	private final AVR avr;
 	private final ReadWriteInstrument instrument;
 
-	public DataView(AVR.Instrumentable avr) {
+	public DataView(AVR avr) {
 		super("Data Space View");
 		this.avr = avr;
 		this.instrument = new ReadWriteInstrument();
-		avr.getData().register(instrument);
+		// Register the read/write instrument
+		InstrumentableMemory im = (InstrumentableMemory) avr.getData();
+		im.register(instrument);
+		// Done
 		add(constructDataPanel());
 		pack();
 		setVisible(true);
@@ -146,7 +149,7 @@ public class DataView extends JAvrView {
 		}
 
 		@Override
-		public JAvrView construct(AVR.Instrumentable avr) {
+		public JAvrView construct(AVR avr) {
 			return new DataView(avr);
 		}
 

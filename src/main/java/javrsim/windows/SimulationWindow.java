@@ -55,12 +55,12 @@ import javax.swing.table.TableModel;
 import javr.core.AVR;
 import javr.core.AvrConfiguration;
 import javr.core.AvrDecoder;
-import javr.core.AvrExecutor;
 import javr.core.AvrInstruction;
 import javr.core.AvrPeripheral;
 import javr.core.Wire;
 import javr.io.HexFile;
 import javr.memory.ByteMemory;
+import javr.memory.InstrumentableMemory;
 import javr.memory.IoMemory;
 import javr.memory.MultiplexedMemory;
 import javr.peripherals.AbstractSerialPeripheral;
@@ -124,20 +124,21 @@ public class SimulationWindow extends JFrame {
 	 * The underlying MCU for this simulation. This must be instrumentable to allow
 	 * the various views to hook into it as necessary.
 	 */
-	private volatile AVR.Instrumentable mcu;
+	private volatile AVR mcu;
 
 	public SimulationWindow(String device, JPeripheral.Descriptor[] peripherals, JAvrView.Descriptor[] views) {
 		this(AvrConfiguration.instantiate(device),peripherals,views);
 	}
 
 
-	public SimulationWindow(AVR.Instrumentable avr, JPeripheral.Descriptor[] peripherals, JAvrView.Descriptor[] views) {
+	public SimulationWindow(AVR avr, JPeripheral.Descriptor[] peripherals, JAvrView.Descriptor[] views) {
 		super("JavaAVR Simulator");
 		// Initialise Stuff
 		this.mcu = avr;
 		this.peripheralDescriptors = peripherals;
 		this.viewDescriptors = views;
 		this.clock = new ClockThread(_8MHz, this);
+		this.mcu.setData(new InstrumentableMemory(avr.getData()));
 		//
 		JMenuBar menuBar = constructMenuBar(avr.getDeviceName());
 		this.toolBar = constructToolBar();
@@ -208,6 +209,7 @@ public class SimulationWindow extends JFrame {
 					destroyAllViews();
 					destroyAllPeripherals();
 					mcu = c.instantiate();
+					mcu.setData(new InstrumentableMemory(mcu.getData()));
 					resetMicroController();
 				}
 
