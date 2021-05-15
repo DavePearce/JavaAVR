@@ -41,6 +41,6 @@ public abstract class JAvrView extends JFrame {
 		 * @param avr
 		 * @return
 		 */
-		public JAvrView construct(AVR.Instrumentable avr);
+		public JAvrView construct(AVR avr);
 	}
 }

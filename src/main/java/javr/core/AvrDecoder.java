@@ -16,9 +16,8 @@ package javr.core;
 import static javr.core.AVR.Memory;
 import static javr.core.AvrInstruction.*;
 
-public class AvrDecoder implements AVR.Decoder {
+public class AvrDecoder {
 
-	@Override
 	public AvrInstruction decode(Memory mem, int pc) {
 		// Multiply address by 2
 		pc = pc * 2;

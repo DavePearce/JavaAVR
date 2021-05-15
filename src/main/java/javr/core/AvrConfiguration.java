@@ -60,11 +60,11 @@ public class AvrConfiguration {
 		return deviceName;
 	}
 
-	public AVR.Instrumentable instantiate() {
+	public AVR instantiate() {
 		return instantiate(labels -> new IdealWire(labels));
 	}
 
-	public AVR.Instrumentable instantiate(Function<String[],Wire> factory) {
+	public AVR instantiate(Function<String[],Wire> factory) {
 		// Construct AVR pins
 		Wire[] pins = new Wire[pinDescriptors.length];
 		for(int i=0;i!=pinDescriptors.length;++i) {
@@ -94,9 +94,8 @@ public class AvrConfiguration {
 			if(interrupt != null) {
 				interrupts[i] = interrupt.instantiate(data);			}
 		}
-		//
-		return new AVR.Instrumentable(deviceName, new AvrExecutor(flash.size(), new AvrDecoder()), pins, flash, data,
-				interrupts);
+		// Construct the AVR!
+		return new AVR(deviceName, pins, flash, data, interrupts);
 	}
 
 	public static class PinDescriptor {
@@ -288,7 +287,7 @@ public class AvrConfiguration {
 	 * @param device The device name being instantiated
 	 * @return
 	 */
-	public static final AVR.Instrumentable instantiate(String device) {
+	public static final AVR instantiate(String device) {
 		return instantiate(device, labels -> new IdealWire(labels));
 	}
 
@@ -300,7 +299,7 @@ public class AvrConfiguration {
 	 *                alternative implementations of Wire.
 	 * @return
 	 */
-	public static final AVR.Instrumentable instantiate(String device, Function<String[],Wire> factory) {
+	public static final AVR instantiate(String device, Function<String[],Wire> factory) {
 		for(int i=0;i!=CONFIGURATIONS.length;++i) {
 			AvrConfiguration config = CONFIGURATIONS[i];
 			if(config.getName().equals(device)) {
