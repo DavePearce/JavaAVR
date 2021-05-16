@@ -1715,7 +1715,7 @@ public class AVR {
 		boolean C = (SREG & CARRY_FLAG) != 0;
 		boolean Z = (R == 0);
 		boolean N = R7;
-		boolean V = (Rd == 0x80);
+		boolean V = (Rd == -128);
 		boolean S = N ^ V;
 		boolean H = (SREG & HALFCARRY_FLAG) != 0;
 		boolean T = (SREG & BITCOPY_FLAG) != 0;
@@ -2212,7 +2212,7 @@ public class AVR {
 		boolean C = (R != 0);
 		boolean Z = (R == 0);
 		boolean N = R7;
-		boolean V = (R == 0x80);
+		boolean V = (R == -128);
 		boolean S = N ^ V;
 		boolean H = R3 || !Rd3;
 		boolean T = (SREG & BITCOPY_FLAG) != 0;
