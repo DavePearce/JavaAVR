@@ -1710,21 +1710,12 @@ public class AVR {
 		byte R = (byte) (Rd - 1);
 		// Update Register file
 		data.write(insn.Rd, R);
-		// Set Flags
-		boolean R0 = (R & 0b0000_0001) != 0;
-		boolean R1 = (R & 0b0000_0010) != 0;
-		boolean R2 = (R & 0b0000_0100) != 0;
-		boolean R3 = (R & 0b0000_1000) != 0;
-		boolean R4 = (R & 0b0001_0000) != 0;
-		boolean R5 = (R & 0b0010_0000) != 0;
-		boolean R6 = (R & 0b0100_0000) != 0;
 		boolean R7 = (R & 0b1000_0000) != 0;
-		//
 		//
 		boolean C = (SREG & CARRY_FLAG) != 0;
 		boolean Z = (R == 0);
 		boolean N = R7;
-		boolean V = !R7 & R6 & R5 & R4 & R3 & R2 & R1 & R0;;
+		boolean V = (Rd == 0x80);
 		boolean S = N ^ V;
 		boolean H = (SREG & HALFCARRY_FLAG) != 0;
 		boolean T = (SREG & BITCOPY_FLAG) != 0;
@@ -2221,7 +2212,7 @@ public class AVR {
 		boolean C = (R != 0);
 		boolean Z = (R == 0);
 		boolean N = R7;
-		boolean V = (R & 0xFF) == 0b1000_0000;
+		boolean V = (R == 0x80);
 		boolean S = N ^ V;
 		boolean H = R3 || !Rd3;
 		boolean T = (SREG & BITCOPY_FLAG) != 0;
