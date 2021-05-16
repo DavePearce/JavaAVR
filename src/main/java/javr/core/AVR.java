@@ -979,7 +979,7 @@ public class AVR {
 	private void execute(BLD insn) {
 		PC = PC + 1;
 		int Rd = data.read(insn.Rd);
-		int mask = (1 << insn.b);
+		int mask = ~(1 << insn.b);
 		Rd = Rd & mask;
 		Rd |= ((SREG & BITCOPY_FLAG) != 0) ? mask : 0;
 		data.write(insn.Rd, (byte) Rd);
