@@ -75,7 +75,7 @@ public class AVR {
 	 * Flash memory in the abstract AVR. This is concrete because it represents the
 	 * firmware being executed (i.e. whose contents is concrete).
 	 */
-	private final Memory code;
+	private Memory code;
 	/**
 	 * Model of data Memory in the abstract AVR (i.e. including registers and SRAM).
 	 * This is abstract because it may contain locations within unknown values.
@@ -144,6 +144,10 @@ public class AVR {
 
 	public Memory getData() {
 		return data;
+	}
+
+	public void setCode(Memory memory) {
+		this.code = memory;
 	}
 
 	public void setData(Memory memory) {

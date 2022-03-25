@@ -7,7 +7,7 @@
   
   <groupId>org.whiley</groupId>
   <artifactId>javr</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
   <packaging>jar</packaging>
   
   <licenses>
